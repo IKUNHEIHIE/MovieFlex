@@ -126,14 +126,15 @@ model WatchHistory {
 }
 
 model CollectSource {
-  id        Int          @id @default(autoincrement())
-  name      String       @db.VarChar(100)
-  apiUrl    String       @map("api_url") @db.VarChar(500)
-  sourceKey String       @unique @map("source_key") @db.VarChar(50)
-  format    SourceFormat @default(JSON)
-  isActive  Boolean      @default(true) @map("is_active")
-  lastSync  DateTime?    @map("last_sync")
-  createdAt DateTime     @default(now()) @map("created_at")
+  id            Int          @id @default(autoincrement())
+  name          String       @db.VarChar(100)
+  apiUrl        String       @map("api_url") @db.VarChar(500)
+  sourceKey     String       @unique @map("source_key") @db.VarChar(50)
+  format        SourceFormat @default(JSON)
+  isActive      Boolean      @default(true) @map("is_active")
+  lastSync      DateTime?    @map("last_sync")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  playerConfigs Json?        @map("player_configs")
 
   @@map("collect_sources")
 }

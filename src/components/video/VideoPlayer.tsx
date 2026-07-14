@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
-import type { PlayerMode } from '@/lib/playback';
+import type { PlayerMode } from '@/lib/playback/playback';
 
 interface VideoPlayerProps {
   url: string;

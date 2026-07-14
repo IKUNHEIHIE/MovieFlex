@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth';
+import { auth } from '@/lib/auth/auth';
 
 export default async function ProfilePage() {
   const session = await auth(); const user = session!.user as { username?: string; email?: string; role?: string };

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
 import styles from './admin.module.css';
+import AdminPageHeader from '@/components/shared/AdminPageHeader';
 
 export default async function AdminOverviewPage() {
   const [sources, activeSources, movies, latestSource] = await Promise.all([
@@ -11,7 +12,7 @@ export default async function AdminOverviewPage() {
   ]);
 
   return <>
-    <header className={styles.header}><div><p>OPERATIONS</p><h1>运营概览</h1></div><span>管理员专用</span></header>
+    <AdminPageHeader eyebrow="OPERATIONS" title="运营概览" badge="管理员专用" />
     <section className={styles.metrics}>
       <div><span>采集源总数</span><strong>{sources}</strong></div><div><span>启用采集源</span><strong>{activeSources}</strong></div><div><span>影片总数</span><strong>{movies}</strong></div><div><span>最近同步</span><strong>{latestSource?.lastSync ? new Date(latestSource.lastSync).toLocaleDateString() : '暂无'}</strong></div>
     </section>

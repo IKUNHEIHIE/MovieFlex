@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { auth } from '@/lib/auth/auth';
 import { OperationsSidebar } from '@/components/admin/OperationsSidebar';
 import styles from './admin.module.css';
 

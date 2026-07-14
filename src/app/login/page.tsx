@@ -4,7 +4,7 @@ import { FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 
-function safeCallbackUrl(value: string | null) {
+export function safeCallbackUrl(value: string | null) {
   return value?.startsWith('/') && !value.startsWith('//') ? value : '/';
 }
 

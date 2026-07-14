@@ -131,7 +131,7 @@ it('does not overwrite a newer cancellation while releasing a paused task lease'
     .mockResolvedValueOnce(task({ status: 'PAUSED', nextPage: 2, pagesProcessed: 1, fetched: 20, saved: 20 }));
   prisma.collectSource.findUnique.mockResolvedValue(source);
   collectPage.mockResolvedValue({ fetched: 20, saved: 20, pageCount: 2, warnings: [] });
-  prisma.collectTask.update.mockImplementation(async ({ data }: { data: { status?: string } }) => {
+  prisma.collectTask.update.mockImplementation(async ({ data }: { data: { currentPage?: number; status?: string } }) => {
     if (data.currentPage === undefined) persistentStatus = 'CANCELLED';
     if (data.status) persistentStatus = data.status;
     return task({ status: persistentStatus });

@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import prisma from './prisma';
+import prisma from '../prisma';
 
 type AppUser = { id?: number; role?: string; username?: string };
 
@@ -56,6 +56,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         appUser.username = typeof token.username === 'string' ? token.username : undefined;
       }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // 服务端验证 callbackUrl，仅允许站内相对路径
+      if (url.startsWith('/')) {
+        // 防止协议相对 URL（//evil.com）
+        if (url.startsWith('//')) {
+          return baseUrl;
+        }
+        return `${baseUrl}${url}`;
+      }
+      // 允许 baseUrl 开头的 URL
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      // 拒绝所有其他 URL
+      return baseUrl;
     },
   },
   pages: {

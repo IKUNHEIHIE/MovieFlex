@@ -1,5 +1,3 @@
-import prisma from './prisma';
-
 export function selectRecommendationRail<T>(
   personalizedMovies: T[],
   popularMovies: T[],
@@ -12,6 +10,8 @@ export function selectRecommendationRail<T>(
 }
 
 export async function getRecommendationRail(userId: number | undefined) {
+  const prisma = (await import('./prisma')).default;
+
   const popularMovies = await prisma.movie.findMany({
     orderBy: [{ viewCount: 'desc' }, { id: 'asc' }],
     take: 12,
