@@ -1,0 +1,37 @@
+<h2>MovieFlex 后台信息架构</h2>
+<p class="subtitle">本轮会同时补齐安全、用户功能、运营后台和数据链路。请确认左侧导航与每个模块的职责。</p>
+
+<div class="mockup">
+  <div class="mockup-header">运营后台 · 蓝白控制台</div>
+  <div style="display:grid;grid-template-columns:210px 1fr;min-height:450px;border:1px solid #dce6f6;border-radius:10px;overflow:hidden">
+    <aside style="padding:18px;background:#fff;border-right:1px solid #dce6f6">
+      <strong style="font-size:20px">Movie<span style="color:#4f7df3">Flex</span></strong>
+      <p class="label" style="margin-top:4px">OPERATIONS</p>
+      <div style="display:grid;gap:8px;margin-top:24px;font-size:14px">
+        <div style="padding:9px;border-radius:7px;background:#eaf1ff;color:#4f7df3">运营概览</div>
+        <div style="padding:9px">采集源与任务</div>
+        <div style="padding:9px">分类映射</div>
+        <div style="padding:9px">影片库</div>
+        <div style="padding:9px">用户管理</div>
+        <div style="padding:9px">主题管理</div>
+        <div style="padding:9px">数据大屏</div>
+      </div>
+    </aside>
+    <main style="padding:26px;background:#f5f8fc">
+      <p class="label">OPERATIONS</p><h3 style="margin-top:4px">运营概览</h3>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0">
+        <div class="placeholder">采集源<br><strong>12</strong></div><div class="placeholder">影片库<br><strong>5,651</strong></div><div class="placeholder">待映射<br><strong>8</strong></div><div class="placeholder">任务健康<br><strong>正常</strong></div>
+      </div>
+      <div class="split"><div class="placeholder">最近采集任务<br>状态、耗时、抓取/失败数</div><div class="placeholder">数据链路<br>Kafka、Spark、推荐批次</div></div>
+    </main>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="architecture-approved" onclick="toggleSelect(this)">
+    <div class="letter">A</div><div class="content"><h3>确认此架构</h3><p>按七个后台模块、统一运营概览和安全/数据链路治理实施。</p></div>
+  </div>
+  <div class="option" data-choice="architecture-adjust" onclick="toggleSelect(this)">
+    <div class="letter">B</div><div class="content"><h3>需要调整</h3><p>在终端说明希望增加、合并或隐藏的模块。</p></div>
+  </div>
+</div>

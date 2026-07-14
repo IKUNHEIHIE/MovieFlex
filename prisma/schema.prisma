@@ -1,0 +1,275 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique @db.VarChar(50)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
+  avatarUrl String?  @map("avatar_url") @db.VarChar(500)
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  favorites    UserFavorite[]
+  ratings      UserRating[]
+  watchHistory WatchHistory[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model Movie {
+  id          Int       @id @default(autoincrement())
+  vodId       Int       @map("vod_id")
+  sourceKey   String    @map("source_key") @db.VarChar(50)
+  title       String    @db.VarChar(255)
+  titleEn     String?   @map("title_en") @db.VarChar(255)
+  typeId      Int       @map("type_id")
+  typeName    String?   @map("type_name") @db.VarChar(50)
+  picUrl      String?   @map("pic_url") @db.VarChar(500)
+  director    String?   @db.VarChar(255)
+  actors      String?   @db.Text
+  area        String?   @db.VarChar(100)
+  language    String?   @db.VarChar(100)
+  year        Int?
+  remarks     String?   @db.VarChar(255)
+  description String?   @db.Text
+  playFrom    String?   @map("play_from") @db.Text
+  playUrl     String?   @map("play_url") @db.LongText
+  score       Decimal   @default(0) @db.Decimal(3, 1)
+  scoreCount  Int       @default(0) @map("score_count")
+  viewCount   Int       @default(0) @map("view_count")
+  sourceTime  DateTime? @map("source_time")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  favorites    UserFavorite[]
+  ratings      UserRating[]
+  watchHistory WatchHistory[]
+
+  @@unique([sourceKey, vodId], name: "uk_source_vod")
+  @@index([typeId], name: "idx_type")
+  @@index([area], name: "idx_area")
+  @@index([year], name: "idx_year")
+  @@index([language], name: "idx_language")
+  @@map("movies")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(50)
+  slug      String   @unique @db.VarChar(50)
+  parentId  Int?     @map("parent_id")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  parent   Category?  @relation("CategoryParent", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryParent")
+
+  @@map("categories")
+}
+
+model UserFavorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  movieId   Int      @map("movie_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId], name: "uk_user_movie")
+  @@map("user_favorites")
+}
+
+model UserRating {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  movieId   Int      @map("movie_id")
+  rating    Decimal  @db.Decimal(2, 1)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId], name: "uk_user_movie_rating")
+  @@map("user_ratings")
+}
+
+model WatchHistory {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @map("user_id")
+  movieId       Int      @map("movie_id")
+  episode       String?  @db.VarChar(100)
+  watchDuration Int      @default(0) @map("watch_duration")
+  totalDuration Int      @default(0) @map("total_duration")
+  progress      Decimal  @default(0) @db.Decimal(5, 2)
+  lastWatchedAt DateTime @default(now()) @map("last_watched_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId, episode], name: "uk_user_movie_ep")
+  @@index([userId, lastWatchedAt], name: "idx_user_time")
+  @@map("watch_history")
+}
+
+model CollectSource {
+  id        Int          @id @default(autoincrement())
+  name      String       @db.VarChar(100)
+  apiUrl    String       @map("api_url") @db.VarChar(500)
+  sourceKey String       @unique @map("source_key") @db.VarChar(50)
+  format    SourceFormat @default(JSON)
+  isActive  Boolean      @default(true) @map("is_active")
+  lastSync  DateTime?    @map("last_sync")
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  @@map("collect_sources")
+}
+
+model CollectTask {
+  id             String   @id @db.VarChar(36)
+  sourceKey      String   @map("source_key") @db.VarChar(50)
+  mode           String   @db.VarChar(20)
+  status         String   @db.VarChar(20)
+  totalPages     Int      @default(0) @map("total_pages")
+  pagesProcessed Int      @default(0) @map("pages_processed")
+  fetched        Int      @default(0)
+  saved          Int      @default(0)
+  errorMessage   String?  @map("error_message") @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+  finishedAt     DateTime? @map("finished_at")
+
+  @@index([sourceKey], name: "source_key")
+  @@index([status], name: "status")
+  @@map("collect_tasks")
+}
+
+enum SourceFormat {
+  JSON
+  XML
+}
+
+enum MappingStatus {
+  MAPPED
+  PENDING_REVIEW
+  IGNORED
+}
+
+model CategoryMapping {
+  id              Int           @id @default(autoincrement())
+  sourceKey       String        @map("source_key") @db.VarChar(50)
+  sourceTypeId    Int           @map("source_type_id")
+  sourceTypeName  String        @map("source_type_name") @db.VarChar(100)
+  localCategoryId Int?          @map("local_category_id")
+  status          MappingStatus @default(PENDING_REVIEW)
+  isAuto          Boolean       @default(true) @map("is_auto")
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  @@unique([sourceKey, sourceTypeId], name: "uk_source_type")
+  @@map("category_mappings")
+}
+
+model SystemSetting {
+  key       String   @id @db.VarChar(100)
+  value     String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
+
+model Theme {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  themeKey    String   @unique @map("theme_key") @db.VarChar(50)
+  author      String?  @db.VarChar(100)
+  version     String?  @db.VarChar(50)
+  description String?  @db.Text
+  isBuiltIn   Boolean  @default(false) @map("is_built_in")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("themes")
+}
+
+model Recommendation {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  movieId   Int      @map("movie_id")
+  score     Decimal  @db.Decimal(8, 6)
+  rankPos   Int      @map("rank_pos")
+  batchId   String   @map("batch_id") @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, batchId], name: "idx_user_batch")
+  @@index([batchId], name: "idx_batch")
+  @@map("recommendations")
+}
+
+model AnalyticsResult {
+  id          Int      @id @default(autoincrement())
+  metricType  String   @map("metric_type") @db.VarChar(50)
+  metricKey   String   @map("metric_key") @db.VarChar(100)
+  metricValue Decimal  @map("metric_value") @db.Decimal(15, 4)
+  extraData   Json?    @map("extra_data")
+  timeWindow  String   @map("time_window") @db.VarChar(20)
+  reportDate  DateTime @map("report_date") @db.Date
+  batchId     String   @map("batch_id") @db.VarChar(50)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([metricType, reportDate], name: "idx_type_date")
+  @@index([batchId], name: "idx_analytics_batch")
+  @@map("analytics_results")
+}
+
+model EventOutbox {
+  id           String    @id @db.VarChar(36)
+  topic        String    @db.VarChar(100)
+  payload      Json
+  status       String    @default("PENDING") @db.VarChar(20)
+  attempts     Int       @default(0)
+  lastError    String?   @map("last_error") @db.Text
+  availableAt  DateTime  @default(now()) @map("available_at")
+  deliveredAt  DateTime? @map("delivered_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@index([status, availableAt], name: "idx_outbox_status_available")
+  @@map("event_outbox")
+}
+
+model DoubanMovie {
+  id            Int      @id @default(autoincrement())
+  name          String?  @map("电影名称") @db.LongText
+  link          String?  @map("电影链接") @db.LongText
+  director      String?  @map("导演") @db.LongText
+  scriptwriter  String?  @map("编剧") @db.LongText
+  actors        String?  @map("主演") @db.LongText
+  genre         String?  @map("类型") @db.LongText
+  country       String?  @map("制片国家/地区") @db.LongText
+  language      String?  @map("语言") @db.LongText
+  releaseDate   String?  @map("上映日期") @db.LongText
+  duration      String?  @map("片长") @db.LongText
+  alias         String?  @map("又名") @db.LongText
+  imdb          String?  @map("IMDb") @db.LongText
+  rating        Float?   @map("豆瓣评分")
+  ratingCount   Int?     @map("评价人数")
+  star5         Float?   @map("五星比例")
+  star4         Float?   @map("四星比例")
+  star3         Float?   @map("三星比例")
+  star2         Float?   @map("二星比例")
+  star1         Float?   @map("一星比例")
+  summary       String?  @map("剧情简介") @db.LongText
+
+  @@map("douban_movies")
+}
