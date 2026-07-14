@@ -23,7 +23,7 @@ const { prisma, collectPage } = vi.hoisted(() => {
 vi.mock('../prisma', () => ({ default: prisma }));
 vi.mock('./collector', () => ({ collectPage }));
 
-import { recoverCollectionTasks, runTask } from './task-runner';
+import { mutateCollectionTask, recoverCollectionTasks, runTask } from './task-runner';
 
 const source = {
   sourceKey: 'qz',
@@ -143,6 +143,42 @@ it('does not overwrite a newer cancellation while releasing a paused task lease'
   expect(prisma.collectTask.update).toHaveBeenLastCalledWith(expect.objectContaining({
     data: expect.not.objectContaining({ status: expect.any(String) }),
   }));
+});
+
+it('claims a task resumed while its paused runner is releasing the lease', async () => {
+  let finishLeaseRelease: (() => void) | undefined;
+  const leaseRelease = new Promise<void>((resolve) => {
+    finishLeaseRelease = resolve;
+  });
+  prisma.collectTask.findUnique
+    .mockResolvedValueOnce(task())
+    .mockResolvedValueOnce(task({ status: 'PAUSED' }))
+    .mockResolvedValueOnce(task({ status: 'QUEUED' }))
+    .mockResolvedValueOnce(null);
+  prisma.collectTask.update.mockImplementation(async ({ data }: { data: { leaseToken?: null } }) => {
+    if (data.leaseToken === null) await leaseRelease;
+    return task({ status: 'PAUSED' });
+  });
+  prisma.collectTask.updateMany
+    .mockResolvedValueOnce({ count: 1 })
+    .mockResolvedValueOnce({ count: 1 });
+  prisma.collectTask.findMany.mockResolvedValue([task({ status: 'QUEUED' })]);
+  prisma.collectTask.findFirst.mockResolvedValue(null);
+  prisma.collectSource.findUnique.mockResolvedValue(source);
+
+  const originalRunner = runTask('task-1');
+  await vi.waitFor(() => expect(prisma.collectTask.update).toHaveBeenCalled());
+
+  await mutateCollectionTask('task-1', 'resume');
+  finishLeaseRelease?.();
+  await originalRunner;
+
+  await vi.waitFor(() => {
+    expect(prisma.collectTask.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ id: 'task-1', sourceKey: 'qz', status: 'QUEUED' }),
+      data: expect.objectContaining({ status: 'RUNNING' }),
+    }));
+  });
 });
 
 it('preserves a pause submitted while a page exhausts retries', async () => {

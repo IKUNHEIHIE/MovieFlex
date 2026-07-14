@@ -159,6 +159,7 @@ export async function runTask(id: string): Promise<void> {
     }
   } finally {
     runningTaskIds.delete(id);
+    dispatchQueuedTasks();
   }
 }
 
