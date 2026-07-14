@@ -56,6 +56,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
@@ -122,6 +123,29 @@ it('honors a pause submitted while the final page is being collected', async () 
   expect(prisma.collectSource.update).not.toHaveBeenCalled();
 });
 
+it('preserves a pause submitted while a page exhausts retries', async () => {
+  vi.useFakeTimers();
+  prisma.collectTask.findUnique
+    .mockResolvedValueOnce(task())
+    .mockResolvedValueOnce(task())
+    .mockResolvedValueOnce(task({ status: 'PAUSED' }));
+  prisma.collectSource.findUnique.mockResolvedValue(source);
+  collectPage.mockRejectedValue(new Error('source unavailable'));
+  prisma.collectTask.update.mockResolvedValue(task({ status: 'PAUSED' }));
+
+  const runner = runTask('task-1');
+  await vi.runAllTimersAsync();
+  await runner;
+
+  expect(collectPage).toHaveBeenCalledTimes(4);
+  expect(prisma.collectTask.update).toHaveBeenCalledWith(expect.objectContaining({
+    data: expect.objectContaining({ status: 'PAUSED' }),
+  }));
+  expect(prisma.collectTask.updateMany).not.toHaveBeenCalledWith(expect.objectContaining({
+    data: expect.objectContaining({ status: 'FAILED' }),
+  }));
+});
+
 it('marks a stale running task queued during recovery', async () => {
   prisma.collectTask.updateMany.mockResolvedValue({ count: 1 });
 
@@ -130,6 +154,24 @@ it('marks a stale running task queued during recovery', async () => {
   expect(prisma.collectTask.updateMany).toHaveBeenCalledWith(expect.objectContaining({
     data: expect.objectContaining({ status: 'QUEUED' }),
   }));
+});
+
+it('dispatches a stale task after recovery requeues it', async () => {
+  prisma.collectTask.updateMany
+    .mockResolvedValueOnce({ count: 1 })
+    .mockResolvedValueOnce({ count: 1 });
+  prisma.collectTask.findMany.mockResolvedValue([task({ status: 'QUEUED' })]);
+  prisma.collectTask.findFirst.mockResolvedValue(null);
+  prisma.collectTask.findUnique.mockResolvedValue(null);
+
+  await recoverCollectionTasks();
+
+  await vi.waitFor(() => {
+    expect(prisma.collectTask.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: expect.objectContaining({ id: 'task-1', sourceKey: 'qz', status: 'QUEUED' }),
+      data: expect.objectContaining({ status: 'RUNNING' }),
+    }));
+  });
 });
 
 it('succeeds an initial task after its saved target is reached', async () => {

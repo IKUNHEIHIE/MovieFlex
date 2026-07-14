@@ -33,8 +33,16 @@ async function releaseTask(id: string, status: 'PAUSED' | 'CANCELLED') {
 }
 
 async function failTask(id: string, error: unknown) {
-  await prisma.collectTask.update({
-    where: { id },
+  const task = await prisma.collectTask.findUnique({ where: { id } });
+  if (!task) return;
+  if (task.status === 'PAUSED' || task.status === 'CANCELLED') {
+    await releaseTask(id, task.status);
+    return;
+  }
+  if (task.status !== 'RUNNING') return;
+
+  const failure = await prisma.collectTask.updateMany({
+    where: { id, status: 'RUNNING' },
     data: {
       status: 'FAILED',
       errorMessage: errorMessage(error),
@@ -43,6 +51,12 @@ async function failTask(id: string, error: unknown) {
       leaseExpiresAt: null,
     },
   });
+  if (failure.count !== 0) return;
+
+  const boundaryTask = await prisma.collectTask.findUnique({ where: { id } });
+  if (boundaryTask?.status === 'PAUSED' || boundaryTask?.status === 'CANCELLED') {
+    await releaseTask(id, boundaryTask.status);
+  }
 }
 
 async function collectWithRetry(task: CollectTask, source: { sourceKey: string; apiUrl: string; format: 'JSON' | 'XML' }) {
@@ -214,6 +228,7 @@ export async function recoverCollectionTasks(): Promise<void> {
       leaseExpiresAt: null,
     },
   });
+  dispatchQueuedTasks();
 }
 
 export async function mutateCollectionTask(id: string, action: 'pause' | 'resume' | 'cancel') {
