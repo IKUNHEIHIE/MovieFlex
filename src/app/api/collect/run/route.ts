@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
-import { collector } from '@/lib/collector';
+import { runCollect } from '@/lib/collector/collector';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(request: NextRequest) {
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     try {
     // 1. 采集第一页，获取 pageCount
     console.log(`[Collector] Starting page 1 for source ${source.name} (${sourceKey})...`);
-    const firstPageResult = await collector.runCollect(
+    const firstPageResult = await runCollect(
       source.sourceKey,
       source.apiUrl,
       source.format === 'XML' ? 'XML' : 'JSON',
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         // 限频休眠 500ms
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        const pageResult = await collector.runCollect(
+        const pageResult = await runCollect(
           source.sourceKey,
           source.apiUrl,
           source.format === 'XML' ? 'XML' : 'JSON',
