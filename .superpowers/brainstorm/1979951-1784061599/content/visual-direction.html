@@ -1,0 +1,64 @@
+<h2>MovieFlex 前台视觉方向</h2>
+<p class="subtitle">选择最适合影视平台的整体风格基调，后续会基于 Ant Design 组件体系实现</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); padding: 1.5rem; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 0.5rem;">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #e50914, #b20710);"></div>
+        <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #f5c518, #d4a017);"></div>
+        <div style="width: 32px; height: 32px; border-radius: 6px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);"></div>
+      </div>
+      <div style="color: #e5e5e5; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;">DARK CINEMA</div>
+      <div style="color: rgba(255,255,255,0.5); font-size: 0.7rem;">深海蓝 + 琥珀金点缀</div>
+    </div>
+    <div class="card-body">
+      <h3>A · 暗色影院</h3>
+      <p>深色背景 + 海报优先。参考 Netflix/Disney+ 的沉浸感，用 Ant Design 暗色算法驱动。适合强调视觉冲击力。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>优势</h4><ul><li>海报视觉突出</li><li>沉浸感强</li><li>符合影视行业惯例</li></ul></div>
+        <div class="cons"><h4>风险</h4><ul><li>与现有冰蓝主题差异大</li><li>需处理吉祥物适配</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #faf8f5, #f0ebe3, #e8e0d4); padding: 1.5rem; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 0.5rem;">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #9b4938, #73352a);"></div>
+        <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #1c3039, #2a4a55);"></div>
+        <div style="width: 32px; height: 32px; border-radius: 6px; background: #f7f5ee; border: 1px solid #c9c7bb;"></div>
+      </div>
+      <div style="color: #1c3039; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;">EDITORIAL LIGHT</div>
+      <div style="color: #5e6d69; font-size: 0.7rem;">暖白底 + 赤陶色点缀</div>
+    </div>
+    <div class="card-body">
+      <h3>B · 杂志编辑风</h3>
+      <p>暖色浅底 + 衬线标题 + 强排版层次。保留现有冰蓝主题的部分 DNA，升级为更有质感的编辑风格。适合文艺/品质感。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>优势</h4><ul><li>与现有主题延续性好</li><li>排版质感强</li><li>辨识度高</li></ul></div>
+        <div class="cons"><h4>风险</h4><ul><li>不如暗色主题沉浸</li><li>海报视觉被弱化</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #f0f4ff, #e8eeff, #dde6ff); padding: 1.5rem; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 0.5rem;">
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #1677ff, #0958d9);"></div>
+        <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #0f172a, #1e293b);"></div>
+        <div style="width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #7c3aed, #5b21b6);"></div>
+      </div>
+      <div style="color: #0f172a; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;">HYBRID PREMIUM</div>
+      <div style="color: #64748b; font-size: 0.7rem;">Ant Design 蓝 + 暗色英雄区</div>
+    </div>
+    <div class="card-body">
+      <h3>C · 混合高级感（推荐）</h3>
+      <p>浅色主体 + 暗色英雄区/详情页首屏。Ant Design 原生蓝作为主色，配合暗色渐变英雄区营造影院氛围。兼顾品牌一致性与视觉冲击。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>优势</h4><ul><li>Ant Design 原生融合度最高</li><li>英雄区保留影院感</li><li>吉祥物/雪花可保留</li></ul></div>
+        <div class="cons"><h4>风险</h4><ul><li>需平衡两套色调</li><li>过渡区域设计需精细</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>

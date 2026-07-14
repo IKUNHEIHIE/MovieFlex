@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MovieFlex Ant Design 主题预览</title>
+<!-- Ant Design CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.24.7/dist/reset.css" />
+<!-- Ant Design Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ant-design/icons-svg@4.4.2/src/inline-svg/outline/filled/" />
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ===== ANT DESIGN THEME TOKENS ===== */
+:root {
+  --ant-color-primary: #3a8bbf;
+  --ant-color-primary-hover: #5aa3d1;
+  --ant-color-primary-active: #2a7aaa;
+  --ant-color-primary-bg: rgba(58,139,191,0.06);
+  --ant-color-primary-border: rgba(58,139,191,0.20);
+  --ant-color-primary-border-hover: rgba(58,139,191,0.40);
+
+  --ant-color-success: #278a66;
+  --ant-color-warning: #bc7824;
+  --ant-color-error: #d95252;
+  --ant-color-info: #3a8bbf;
+
+  --ant-color-bg-layout: #edf5f8;
+  --ant-color-bg-container: #ffffff;
+  --ant-color-bg-elevated: #ffffff;
+  --ant-color-bg-spotlight: rgba(0,0,0,0.85);
+
+  --ant-color-text: #1c3039;
+  --ant-color-text-secondary: #5e6d69;
+  --ant-color-text-tertiary: #7a827a;
+  --ant-color-text-quaternary: #b0bdb5;
+
+  --ant-color-border: #d4e8f2;
+  --ant-color-border-secondary: #e4eff5;
+
+  --ant-border-radius: 8px;
+  --ant-border-radius-lg: 12px;
+  --ant-border-radius-sm: 4px;
+
+  --ant-font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --ant-font-size: 14px;
+  --ant-font-size-lg: 16px;
+  --ant-font-size-sm: 12px;
+  --ant-line-height: 1.5714;
+
+  --ant-control-height: 36px;
+  --ant-motion-duration: 0.2s;
+
+  --ant-box-shadow: 0 6px 16px 0 rgba(0,0,0,0.08), 0 3px 6px -4px rgba(0,0,0,0.12), 0 9px 28px 8px rgba(0,0,0,0.05);
+  --ant-box-shadow-secondary: 0 6px 16px 0 rgba(0,0,0,0.08), 0 3px 6px -4px rgba(0,0,0,0.12), 0 9px 28px 8px rgba(0,0,0,0.05);
+  --ant-box-shadow-tertiary: 0 1px 2px 0 rgba(0,0,0,0.03), 0 1px 6px -1px rgba(0,0,0,0.02), 0 2px 4px 0 rgba(0,0,0,0.02);
+
+  --nav-height: 64px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--ant-font-family);
+  font-size: var(--ant-font-size);
+  line-height: var(--ant-line-height);
+  color: var(--ant-color-text);
+  background: var(--ant-color-bg-layout);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--ant-color-primary); text-decoration: none; transition: color var(--ant-motion-duration); }
+a:hover { color: var(--ant-color-primary-hover); }
+img { display: block; max-width: 100%; }
+
+/* ===== ANT DESIGN BUTTON ===== */
+.ant-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; height: var(--ant-control-height); padding: 0 15px;
+  border: 1px solid var(--ant-color-border); border-radius: var(--ant-border-radius);
+  background: var(--ant-color-bg-container); color: var(--ant-color-text);
+  font-size: var(--ant-font-size); font-weight: 400; cursor: pointer;
+  transition: all var(--ant-motion-duration);
+  font-family: var(--ant-font-family); white-space: nowrap;
+  line-height: 1;
+}
+.ant-btn:hover { color: var(--ant-color-primary); border-color: var(--ant-color-primary); }
+.ant-btn-primary {
+  background: var(--ant-color-primary); border-color: var(--ant-color-primary);
+  color: #fff; box-shadow: 0 2px 0 rgba(58,139,191,0.1);
+}
+.ant-btn-primary:hover { background: var(--ant-color-primary-hover); border-color: var(--ant-color-primary-hover); color: #fff; }
+.ant-btn-primary:active { background: var(--ant-color-primary-active); border-color: var(--ant-color-primary-active); }
+.ant-btn-text { border: 0; background: transparent; }
+.ant-btn-text:hover { background: var(--ant-color-primary-bg); color: var(--ant-color-primary); }
+.ant-btn-link { border: 0; background: transparent; color: var(--ant-color-primary); }
+.ant-btn-link:hover { color: var(--ant-color-primary-hover); }
+.ant-btn-dashed { border-style: dashed; }
+.ant-btn-lg { height: 40px; padding: 0 20px; font-size: var(--ant-font-size-lg); border-radius: var(--ant-border-radius); }
+.ant-btn-sm { height: 28px; padding: 0 8px; font-size: var(--ant-font-size-sm); }
+.ant-btn-round { border-radius: 999px; }
+.ant-btn-icon { width: 36px; padding: 0; }
+
+/* ===== ANT DESIGN INPUT ===== */
+.ant-input {
+  width: 100%; height: var(--ant-control-height); padding: 4px 11px;
+  border: 1px solid var(--ant-color-border); border-radius: var(--ant-border-radius);
+  background: var(--ant-color-bg-container); color: var(--ant-color-text);
+  font-size: var(--ant-font-size); outline: none;
+  transition: all var(--ant-motion-duration);
+  font-family: var(--ant-font-family);
+}
+.ant-input:focus, .ant-input-focused {
+  border-color: var(--ant-color-primary);
+  box-shadow: 0 0 0 2px rgba(58,139,191,0.10);
+}
+.ant-input::placeholder { color: var(--ant-color-text-quaternary); }
+.ant-input-search {
+  position: relative; display: flex; align-items: center;
+}
+.ant-input-search .ant-input { padding-right: 36px; }
+.ant-input-search-icon {
+  position: absolute; right: 0; top: 0; width: 36px; height: var(--ant-control-height);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ant-color-text-tertiary); cursor: pointer;
+  background: transparent; border: 1px solid transparent; border-radius: 0 var(--ant-border-radius) var(--ant-border-radius) 0;
+  transition: all var(--ant-motion-duration);
+}
+.ant-input-search-icon:hover { color: var(--ant-color-primary); }
+.ant-input-lg { height: 44px; padding: 6px 14px; font-size: var(--ant-font-size-lg); border-radius: var(--ant-border-radius); }
+
+/* ===== ANT DESIGN TAG ===== */
+.ant-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 0 8px; height: 22px;
+  border: 1px solid var(--ant-color-border);
+  border-radius: var(--ant-border-radius-sm);
+  font-size: var(--ant-font-size-sm); line-height: 1;
+  white-space: nowrap;
+}
+.ant-tag-blue { background: #e6f4ff; border-color: #91caff; color: #0958d9; }
+.ant-tag-cyan { background: #e6fffb; border-color: #87e8de; color: #006d75; }
+.ant-tag-geekblue { background: #f0f5ff; border-color: #adc6ff; color: #1d39c4; }
+.ant-tag-gold { background: #fffbe6; border-color: #ffe58f; color: #ad6800; }
+.ant-tag-green { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
+.ant-tag-red { background: #fff2f0; border-color: #ffccc7; color: #cf1322; }
+.ant-tag-orange { background: #fff7e6; border-color: #ffd591; color: #d46b08; }
+.ant-tag-movie-theme {
+  background: rgba(58,139,191,0.08); border-color: rgba(58,139,191,0.20);
+  color: var(--ant-color-primary); font-weight: 500; border-radius: var(--ant-border-radius);
+}
+
+/* ===== ANT DESIGN SEGMENTED ===== */
+.ant-segmented {
+  display: inline-flex; align-items: center;
+  padding: 2px; background: rgba(0,0,0,0.04);
+  border-radius: var(--ant-border-radius);
+}
+.ant-segmented-item {
+  padding: 0 16px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--ant-font-size); color: var(--ant-color-text-secondary);
+  border-radius: var(--ant-border-radius-sm);
+  cursor: pointer; transition: all var(--ant-motion-duration);
+  position: relative; user-select: none;
+}
+.ant-segmented-item:hover { color: var(--ant-color-primary); }
+.ant-segmented-item-selected {
+  background: var(--ant-color-bg-container);
+  color: var(--ant-color-text);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  font-weight: 500;
+}
+
+/* ===== ANT DESIGN PAGINATION ===== */
+.ant-pagination {
+  display: flex; align-items: center; gap: 8px;
+  list-style: none; padding: 0;
+}
+.ant-pagination-item {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 32px; height: 32px; padding: 0 6px;
+  border: 1px solid var(--ant-color-border); border-radius: var(--ant-border-radius);
+  background: var(--ant-color-bg-container); color: var(--ant-color-text);
+  font-size: var(--ant-font-size); cursor: pointer;
+  transition: all var(--ant-motion-duration);
+  text-decoration: none; font-family: var(--ant-font-family);
+}
+.ant-pagination-item:hover { border-color: var(--ant-color-primary); color: var(--ant-color-primary); }
+.ant-pagination-item-active {
+  background: var(--ant-color-bg-container);
+  border-color: var(--ant-color-primary);
+  color: var(--ant-color-primary); font-weight: 500;
+}
+.ant-pagination-prev, .ant-pagination-next {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 32px; height: 32px;
+  border: 1px solid var(--ant-color-border); border-radius: var(--ant-border-radius);
+  background: var(--ant-color-bg-container); color: var(--ant-color-text);
+  cursor: pointer; transition: all var(--ant-motion-duration);
+  font-size: var(--ant-font-size); text-decoration: none;
+}
+.ant-pagination-prev:hover, .ant-pagination-next:hover { border-color: var(--ant-color-primary); color: var(--ant-color-primary); }
+
+/* ===== ANT DESIGN CARDS ===== */
+.ant-card {
+  background: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+  box-shadow: var(--ant-box-shadow-tertiary);
+  transition: box-shadow var(--ant-motion-duration);
+}
+.ant-card:hover { box-shadow: 0 6px 16px rgba(0,0,0,0.06), 0 3px 6px -4px rgba(0,0,0,0.08), 0 9px 28px 8px rgba(0,0,0,0.03); }
+
+/* ===== ANT DESIGN TABS ===== */
+.ant-tabs { display: flex; border-bottom: 1px solid var(--ant-color-border); }
+.ant-tab {
+  padding: 12px 16px;
+  font-size: var(--ant-font-size); color: var(--ant-color-text-secondary);
+  cursor: pointer; border-bottom: 2px solid transparent;
+  transition: all var(--ant-motion-duration); font-weight: 400;
+  white-space: nowrap;
+}
+.ant-tab:hover { color: var(--ant-color-primary); }
+.ant-tab-active { color: var(--ant-color-primary); font-weight: 500; border-bottom-color: var(--ant-color-primary); }
+
+/* ===== ANT DESIGN AVATAR ===== */
+.ant-avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; overflow: hidden;
+  background: var(--ant-color-primary); color: #fff;
+  font-weight: 600;
+}
+.ant-avatar-sm { width: 28px; height: 28px; font-size: 12px; }
+.ant-avatar-md { width: 36px; height: 36px; font-size: 14px; }
+.ant-avatar-lg { width: 48px; height: 48px; font-size: 18px; }
+.ant-avatar-xl { width: 80px; height: 80px; font-size: 32px; }
+
+/* ===== ANT DESIGN BADGE ===== */
+.ant-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ant-color-error);
+  display: inline-block;
+}
+
+/* ===== ANT DESIGN DIVIDER ===== */
+.ant-divider {
+  border-top: 1px solid var(--ant-color-border-secondary);
+  margin: 32px 0;
+}
+.ant-divider-vertical {
+  border-top: 0; border-left: 1px solid var(--ant-color-border-secondary);
+  height: 1em; margin: 0 8px; display: inline-block; vertical-align: middle;
+}
+
+/* ===== ANT DESIGN DROPDOWN ===== */
+.ant-dropdown-menu {
+  background: var(--ant-color-bg-elevated);
+  border-radius: var(--ant-border-radius-lg);
+  box-shadow: var(--ant-box-shadow);
+  padding: 4px; min-width: 160px;
+  list-style: none;
+}
+.ant-dropdown-menu-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: var(--ant-border-radius-sm);
+  color: var(--ant-color-text); font-size: var(--ant-font-size);
+  cursor: pointer; transition: background var(--ant-motion-duration);
+}
+.ant-dropdown-menu-item:hover { background: rgba(0,0,0,0.04); }
+.ant-dropdown-menu-divider { border-top: 1px solid var(--ant-color-border-secondary); margin: 4px 0; }
+.ant-dropdown-menu-danger { color: var(--ant-color-error); }
+
+/* ===== ANT DESIGN TOOLTIP ===== */
+.ant-tooltip {
+  position: relative; background: rgba(0,0,0,0.85); color: #fff;
+  padding: 6px 8px; border-radius: var(--ant-border-radius-sm);
+  font-size: var(--ant-font-size-sm);
+}
+
+/* ===== ANT DESIGN ALERT ===== */
+.ant-alert {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 8px 12px; border-radius: var(--ant-border-radius-lg);
+  font-size: var(--ant-font-size);
+}
+.ant-alert-info { background: #e6f4ff; border: 1px solid #91caff; }
+.ant-alert-success { background: #f6ffed; border: 1px solid #b7eb8f; }
+
+/* ===== ANT DESIGN PROGRESS ===== */
+.ant-progress {
+  width: 100%; height: 8px; border-radius: 999px;
+  background: rgba(0,0,0,0.06); overflow: hidden;
+}
+.ant-progress-bar {
+  height: 100%; border-radius: 999px;
+  background: var(--ant-color-primary);
+  transition: width 0.3s;
+}
+
+/* ===== ANT DESIGN BREADCRUMB ===== */
+.ant-breadcrumb {
+  display: flex; align-items: center; gap: 4px;
+  font-size: var(--ant-font-size-sm); color: var(--ant-color-text-tertiary);
+}
+.ant-breadcrumb-separator { margin: 0 4px; color: var(--ant-color-text-quaternary); }
+.ant-breadcrumb-link { color: var(--ant-color-text-tertiary); }
+.ant-breadcrumb-link-current { color: var(--ant-color-text); }
+
+/* ===== ANT DESIGN DESCRIPTIONS ===== */
+.ant-descriptions { width: 100%; }
+.ant-descriptions-row { display: flex; border-bottom: 1px solid var(--ant-color-border-secondary); }
+.ant-descriptions-row:last-child { border-bottom: 0; }
+.ant-descriptions-label {
+  padding: 12px 0; min-width: 80px;
+  font-size: var(--ant-font-size); color: var(--ant-color-text-tertiary); font-weight: 400;
+}
+.ant-descriptions-content {
+  padding: 12px 0; flex: 1;
+  font-size: var(--ant-font-size); color: var(--ant-color-text);
+}
+
+/* ===== ANT DESIGN EMPTY ===== */
+.ant-empty {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 32px 0; color: var(--ant-color-text-tertiary);
+}
+.ant-empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.3; }
+.ant-empty-description { font-size: var(--ant-font-size); }
+
+/* ===== ANT DESIGN STATISTIC ===== */
+.ant-statistic { text-align: center; }
+.ant-statistic-title { font-size: var(--ant-font-size-sm); color: var(--ant-color-text-tertiary); margin-bottom: 4px; }
+.ant-statistic-content { font-size: 28px; font-weight: 600; color: var(--ant-color-primary); line-height: 1.2; }
+.ant-statistic-suffix { font-size: var(--ant-font-size); font-weight: 400; margin-left: 4px; color: var(--ant-color-text-tertiary); }
+
+/* ==========================================================================
+   PAGE LAYOUT
+   ========================================================================== */
+
+.container { width: min(100%, 1360px); margin: 0 auto; padding: 0 32px; }
+
+/* ===== COMPONENT LABEL ===== */
+.section-label-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin: 40px 0 16px; padding: 8px 0;
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+.section-label-bar .label-tag {
+  padding: 2px 10px; border-radius: 4px;
+  background: var(--ant-color-primary); color: #fff;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+}
+.section-label-bar .label-text {
+  font-size: 12px; color: var(--ant-color-text-tertiary);
+}
+
+/* ==========================================================================
+   LAYOUT - HEADER
+   ========================================================================== */
+.layout-header {
+  position: sticky; top: 0; z-index: 100;
+  height: var(--nav-height);
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--ant-color-border);
+}
+.layout-header-inner {
+  display: flex; align-items: center; height: 100%; gap: 24px;
+}
+.header-logo {
+  font-size: 1.25rem; font-weight: 700; color: var(--ant-color-text);
+  letter-spacing: -0.02em; white-space: nowrap; display: flex; align-items: center; gap: 4px;
+}
+.header-logo .logo-accent { color: var(--ant-color-primary); }
+.header-logo .logo-icon {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: linear-gradient(135deg, var(--ant-color-primary), #5bb8e8);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 14px; font-weight: 800;
+  margin-right: 6px;
+}
+
+/* AntD Menu styled as horizontal nav */
+.header-menu {
+  display: flex; align-items: center; gap: 4px;
+  list-style: none;
+}
+.header-menu-item {
+  padding: 6px 14px; border-radius: 6px;
+  font-size: 14px; font-weight: 400;
+  color: var(--ant-color-text-secondary);
+  cursor: pointer; transition: all 0.2s;
+  white-space: nowrap; position: relative;
+}
+.header-menu-item:hover { color: var(--ant-color-primary); background: var(--ant-color-primary-bg); }
+.header-menu-item-active {
+  color: var(--ant-color-primary); font-weight: 500;
+  background: var(--ant-color-primary-bg);
+}
+
+.header-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+
+/* ==========================================================================
+   COMPONENT SHOWCASE GRID
+   ========================================================================== */
+.component-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  margin: 24px 0;
+}
+
+.showcase-card {
+  background: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+  overflow: hidden;
+}
+.showcase-header {
+  padding: 12px 16px;
+  background: rgba(58,139,191,0.04);
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+  font-size: 13px; font-weight: 600;
+  color: var(--ant-color-text-secondary);
+  display: flex; align-items: center; gap: 8px;
+}
+.showcase-header .ant-tag { font-size: 11px; height: 20px; padding: 0 6px; }
+.showcase-body { padding: 20px; }
+
+/* ==========================================================================
+   HOME - HERO CAROUSEL
+   ========================================================================== */
+.hero-carousel {
+  position: relative; margin: 24px 0 0; border-radius: var(--ant-border-radius-lg);
+  overflow: hidden; min-height: 460px;
+  background: linear-gradient(135deg, #0c3547, #155a78, #1a7a9e);
+  box-shadow: 0 8px 24px rgba(12,53,71,0.18);
+}
+.hero-backdrop {
+  position: absolute; inset: 0;
+  background: url('https://images.unsplash.com/photo-1536440136628-849c1769f551?w=1400&q=80') center/cover;
+  opacity: 0.30; filter: saturate(1.1);
+}
+.hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(8,40,58,0.94) 0%, rgba(14,72,100,0.68) 46%, rgba(26,122,158,0.12) 100%),
+              linear-gradient(0deg, rgba(8,40,58,0.55) 0%, transparent 55%);
+}
+.hero-body {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  min-height: 460px; max-width: 600px;
+  padding: 56px 48px 48px;
+  color: #fff;
+}
+.hero-indicator {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(200,230,255,0.85); margin-bottom: 10px;
+}
+.hero-indicator::before {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #7dd3fc; box-shadow: 0 0 10px rgba(125,211,252,0.6);
+  content: '';
+}
+.hero-title {
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 700; line-height: 1.1;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.3);
+}
+.hero-sub {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 14px; color: rgba(220,240,255,0.8);
+  margin-bottom: 10px;
+}
+.hero-score-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 10px; border-radius: 4px;
+  background: rgba(253,224,71,0.18);
+  color: #fde68a; font-weight: 700; font-size: 13px;
+}
+.hero-desc {
+  font-size: 14px; line-height: 1.7;
+  color: rgba(230,245,255,0.78);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden; margin-bottom: 20px;
+}
+.hero-btns { display: flex; gap: 12px; }
+.hero-play-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0 24px; height: 40px;
+  border-radius: 999px; border: 0;
+  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+  color: #0c4a6e; font-weight: 600; font-size: 14px;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  font-family: var(--ant-font-family);
+}
+.hero-play-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.3); }
+.hero-detail-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 20px; height: 40px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #e0f2fe; font-weight: 500; font-size: 14px;
+  cursor: pointer; transition: all 0.2s;
+  font-family: var(--ant-font-family);
+}
+.hero-detail-btn:hover { background: rgba(255,255,255,0.22); }
+
+.hero-dots {
+  position: absolute; right: 24px; bottom: 24px;
+  display: flex; gap: 6px; z-index: 3;
+}
+.hero-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  transition: all 0.2s;
+}
+.hero-dot.active { width: 22px; border-radius: 999px; background: #fff; }
+
+/* ==========================================================================
+   HOME - MOVIE RAIL
+   ========================================================================== */
+.rail-section { margin-top: 40px; }
+.rail-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.rail-title-group { display: flex; align-items: baseline; gap: 8px; }
+.rail-title {
+  font-size: 18px; font-weight: 600; color: var(--ant-color-text);
+}
+.rail-subtitle {
+  font-size: 12px; color: var(--ant-color-text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500;
+}
+.rail-more {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 13px; color: var(--ant-color-text-tertiary);
+  cursor: pointer; transition: color 0.2s;
+}
+.rail-more:hover { color: var(--ant-color-primary); }
+
+.movie-scroll {
+  display: flex; gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ant-color-border) transparent;
+}
+.movie-scroll::-webkit-scrollbar { height: 4px; }
+.movie-scroll::-webkit-scrollbar-thumb { border-radius: 999px; background: var(--ant-color-border); }
+
+/* ===== MOVIE CARD ===== */
+.movie-card-link { display: block; text-decoration: none; color: inherit; flex-shrink: 0; width: 168px; }
+.movie-card { border-radius: var(--ant-border-radius-lg); overflow: hidden; }
+.movie-poster {
+  position: relative; aspect-ratio: 2/3;
+  border-radius: var(--ant-border-radius-lg); overflow: hidden;
+  background: #d8eaf0;
+  box-shadow: var(--ant-box-shadow-tertiary);
+  transition: all 0.25s;
+}
+.movie-card-link:hover .movie-poster {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  transform: translateY(-4px);
+}
+.movie-poster img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.3s;
+}
+.movie-card-link:hover .movie-poster img { transform: scale(1.04); }
+.movie-poster-score {
+  position: absolute; top: 8px; right: 8px;
+  display: flex; align-items: center; gap: 3px;
+  padding: 2px 8px; border-radius: var(--ant-border-radius-sm);
+  background: rgba(0,0,0,0.62); backdrop-filter: blur(4px);
+  color: #fde68a; font-size: 11px; font-weight: 700;
+}
+.movie-poster-score .star { font-size: 10px; }
+.movie-poster-remarks {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 20px 10px 7px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.72));
+  color: rgba(255,255,255,0.92); font-size: 11px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.movie-meta-block { padding: 8px 2px 0; }
+.movie-meta-title {
+  font-size: 14px; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  color: var(--ant-color-text);
+}
+.movie-meta-sub {
+  font-size: 12px; color: var(--ant-color-text-tertiary); margin-top: 2px;
+}
+
+/* ===== DUAL RAIL ===== */
+.dual-rail { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+
+/* ==========================================================================
+   MOVIE LIST - FILTER
+   ========================================================================== */
+.filter-card {
+  background: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+  box-shadow: var(--ant-box-shadow-tertiary);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.filter-card-title {
+  font-size: 15px; font-weight: 600;
+  margin-bottom: 16px; color: var(--ant-color-text);
+}
+
+.filter-row-block {
+  padding: 10px 0; border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+.filter-row-block:last-child { border-bottom: 0; }
+.filter-row-label {
+  font-size: 13px; font-weight: 500;
+  color: var(--ant-color-text-secondary);
+  margin-bottom: 8px;
+}
+.filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.filter-chip {
+  display: inline-flex; align-items: center;
+  padding: 4px 12px; border-radius: var(--ant-border-radius-sm);
+  font-size: 13px; color: var(--ant-color-text-secondary);
+  background: transparent; border: 1px solid transparent;
+  cursor: pointer; transition: all 0.15s;
+  font-family: var(--ant-font-family);
+}
+.filter-chip:hover { color: var(--ant-color-primary); background: var(--ant-color-primary-bg); }
+.filter-chip-active {
+  background: var(--ant-color-primary); color: #fff;
+  border-color: var(--ant-color-primary); font-weight: 500;
+}
+
+/* ===== MOVIE GRID ===== */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 20px;
+}
+
+/* ==========================================================================
+   DETAIL PAGE
+   ========================================================================== */
+.player-container {
+  position: relative; width: 100%;
+  aspect-ratio: 16/9; border-radius: var(--ant-border-radius-lg);
+  overflow: hidden; background: #000;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  margin-bottom: 24px;
+}
+
+.detail-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+
+.info-card {
+  background: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+  box-shadow: var(--ant-box-shadow-tertiary);
+  padding: 24px;
+}
+.info-card-header {
+  font-size: 15px; font-weight: 600;
+  margin-bottom: 16px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* Episode grid using AntD-like buttons */
+.episode-source-tabs { margin-bottom: 14px; }
+.episode-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 8px;
+}
+.episode-btn {
+  display: flex; align-items: center; justify-content: center;
+  height: var(--ant-control-height);
+  border: 1px solid var(--ant-color-border); border-radius: var(--ant-border-radius);
+  background: var(--ant-color-bg-container); color: var(--ant-color-text);
+  font-size: 13px; cursor: pointer;
+  transition: all 0.15s; font-family: var(--ant-font-family);
+}
+.episode-btn:hover { border-color: var(--ant-color-primary); color: var(--ant-color-primary); }
+.episode-btn-active {
+  background: var(--ant-color-primary); color: #fff;
+  border-color: var(--ant-color-primary); font-weight: 500;
+}
+
+/* Movie intro with poster */
+.intro-flex { display: flex; gap: 20px; margin-bottom: 16px; }
+.intro-poster {
+  width: 128px; aspect-ratio: 2/3;
+  border-radius: var(--ant-border-radius); object-fit: cover; flex-shrink: 0;
+}
+
+/* ==========================================================================
+   AUTH PAGES
+   ========================================================================== */
+.auth-card {
+  max-width: 400px; margin: 40px auto;
+  background: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  padding: 36px 32px;
+}
+.auth-title {
+  font-size: 22px; font-weight: 600;
+  text-align: center; margin-bottom: 28px;
+  color: var(--ant-color-text);
+}
+.auth-form-group { margin-bottom: 18px; }
+.auth-form-label {
+  display: block; margin-bottom: 6px;
+  font-size: 14px; font-weight: 400;
+  color: var(--ant-color-text-secondary);
+}
+.auth-footer-text {
+  text-align: center; margin-top: 20px;
+  font-size: 14px; color: var(--ant-color-text-tertiary);
+}
+
+/* ==========================================================================
+   USER CENTER
+   ========================================================================== */
+.user-layout { display: grid; grid-template-columns: 200px 1fr; gap: 24px; padding: 24px 0; }
+
+.user-sider {
+  background: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+  box-shadow: var(--ant-box-shadow-tertiary);
+  padding: 8px;
+  height: fit-content;
+}
+
+/* AntD Menu vertical */
+.ant-menu-vertical { list-style: none; padding: 4px 0; }
+.ant-menu-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-radius: var(--ant-border-radius);
+  font-size: 14px; color: var(--ant-color-text);
+  cursor: pointer; transition: all 0.15s;
+  position: relative;
+}
+.ant-menu-item:hover { background: rgba(0,0,0,0.04); color: var(--ant-color-primary); }
+.ant-menu-item-selected {
+  background: var(--ant-color-primary-bg);
+  color: var(--ant-color-primary); font-weight: 500;
+}
+.ant-menu-item-icon { font-size: 16px; width: 16px; text-align: center; }
+
+.user-main {
+  background: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: var(--ant-border-radius-lg);
+  box-shadow: var(--ant-box-shadow-tertiary);
+  padding: 24px;
+}
+.user-main-title {
+  font-size: 18px; font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* Statistic cards using AntD tokens */
+.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-box {
+  background: var(--ant-color-primary-bg);
+  border: 1px solid rgba(58,139,191,0.10);
+  border-radius: var(--ant-border-radius-lg);
+  padding: 20px; text-align: center;
+}
+.stat-value {
+  font-size: 28px; font-weight: 600;
+  color: var(--ant-color-primary); line-height: 1.2;
+}
+.stat-label {
+  font-size: 13px; color: var(--ant-color-text-tertiary);
+  margin-top: 4px;
+}
+
+.user-profile-rows { display: flex; flex-direction: column; gap: 0; }
+
+/* ==========================================================================
+   SEARCH
+   ========================================================================== */
+.search-hero {
+  max-width: 600px; margin: 0 auto; padding: 32px 0;
+}
+.search-input-hero {
+  width: 100%; height: 48px; padding: 0 48px 0 16px;
+  border: 2px solid var(--ant-color-border);
+  border-radius: var(--ant-border-radius-lg);
+  background: var(--ant-color-bg-container);
+  font-size: 16px; color: var(--ant-color-text);
+  outline: none; transition: all 0.2s;
+  font-family: var(--ant-font-family);
+}
+.search-input-hero:focus {
+  border-color: var(--ant-color-primary);
+  box-shadow: 0 0 0 3px rgba(58,139,191,0.10);
+}
+
+/* ===== FAVORITES LIST ===== */
+.fav-list-item {
+  display: flex; gap: 14px; align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+.fav-list-item:last-child { border-bottom: 0; }
+.fav-poster {
+  width: 56px; aspect-ratio: 2/3;
+  border-radius: var(--ant-border-radius-sm);
+  overflow: hidden; background: #d8eaf0; flex-shrink: 0;
+}
+.fav-poster img { width: 100%; height: 100%; object-fit: cover; }
+.fav-info { flex: 1; min-width: 0; }
+.fav-title {
+  font-size: 14px; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.fav-meta { font-size: 12px; color: var(--ant-color-text-tertiary); margin-top: 2px; }
+.fav-actions { flex-shrink: 0; }
+
+/* ===== HISTORY TABLE ===== */
+.history-table { width: 100%; border-collapse: collapse; }
+.history-table thead { background: rgba(0,0,0,0.02); }
+.history-table th {
+  padding: 12px 16px; text-align: left;
+  font-size: 14px; font-weight: 600;
+  color: var(--ant-color-text);
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+.history-table td {
+  padding: 12px 16px; font-size: 14px;
+  color: var(--ant-color-text);
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+  vertical-align: middle;
+}
+.history-table tbody tr:hover { background: rgba(58,139,191,0.03); }
+
+/* Responsive */
+@media (max-width: 860px) {
+  .dual-rail { grid-template-columns: 1fr; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .user-layout { grid-template-columns: 1fr; }
+  .stat-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     LAYOUT.HEADER 演示
+     ================================================================ -->
+<div class="section-label-bar">
+  <span class="label-tag">Layout.Header</span>
+  <span class="label-text">全站顶栏 — 使用 Flex + Menu + Input.Search + Avatar + Dropdown</span>
+</div>
+
+<header class="layout-header">
+  <div class="container layout-header-inner">
+    <!-- Logo -->
+    <a href="#" class="header-logo">
+      <span class="logo-icon">M</span>
+      Movie<span class="logo-accent">Flex</span>
+    </a>
+
+    <!-- AntD Menu (水平导航) -->
+    <ul class="header-menu">
+      <li class="header-menu-item header-menu-item-active">首页</li>
+      <li class="header-menu-item">电影</li>
+      <li class="header-menu-item">剧集</li>
+      <li class="header-menu-item">综艺</li>
+      <li class="header-menu-item">动漫</li>
+    </ul>
+
+    <!-- Right actions: Search + User -->
+    <div class="header-actions">
+      <!-- AntD Input.Search -->
+      <div class="ant-input-search" style="width: min(24vw, 220px);">
+        <input class="ant-input" placeholder="搜索影片…" />
+        <span class="ant-input-search-icon">🔍</span>
+      </div>
+
+      <!-- AntD Avatar + Dropdown 用户菜单 -->
+      <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+        <div class="ant-avatar ant-avatar-md" style="background: linear-gradient(135deg, var(--ant-color-primary), #5bb8e8);">U</div>
+        <span style="font-size: 14px; color: var(--ant-color-text); font-weight: 500;">我的</span>
+        <span style="font-size: 10px; color: var(--ant-color-text-tertiary);">▾</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-bottom: 60px;">
+
+<!-- ================================================================
+     HOME PAGE
+     ================================================================ -->
+<div class="section-label-bar">
+  <span class="label-tag">Home 首页</span>
+  <span class="label-text">Hero 轮播 → Segmented 分类 → 横滑影片卡片 → 双栏布局</span>
+</div>
+
+<!-- Hero -->
+<div class="hero-carousel">
+  <div class="hero-backdrop"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-body">
+    <p class="hero-indicator">本周人气放映</p>
+    <h1 class="hero-title">长安三万里</h1>
+    <div class="hero-sub">
+      <span class="hero-score-pill">★ 8.5</span>
+      <span>动画</span>
+      <span>2023</span>
+      <span>中国大陆</span>
+    </div>
+    <p class="hero-desc">盛唐之下，高适与李白命运交错。以诗为剑，以酒为歌，一段跨越半生的知己之情在大唐的山河间徐徐展开。</p>
+    <div class="hero-btns">
+      <!-- AntD Button (primary, round) -->
+      <button class="hero-play-btn">▶ 立即播放</button>
+      <!-- AntD Button (default, round, ghost) -->
+      <button class="hero-detail-btn">详情介绍 →</button>
+    </div>
+  </div>
+  <div class="hero-dots">
+    <span class="hero-dot active"></span>
+    <span class="hero-dot"></span>
+    <span class="hero-dot"></span>
+    <span class="hero-dot"></span>
+  </div>
+</div>
+
+<!-- Segmented 分类切换 -->
+<div style="margin-top: 28px; display: flex; align-items: center; gap: 16px;">
+  <div class="ant-segmented">
+    <div class="ant-segmented-item ant-segmented-item-selected">为你推荐</div>
+    <div class="ant-segmented-item">最新发布</div>
+    <div class="ant-segmented-item">评分最高</div>
+    <div class="ant-segmented-item">热度最高</div>
+  </div>
+</div>
+
+<!-- Rail: 推荐 -->
+<div class="rail-section">
+  <div class="rail-header">
+    <div class="rail-title-group">
+      <h2 class="rail-title">为你推荐</h2>
+      <span class="rail-subtitle">RECOMMENDED</span>
+    </div>
+    <a class="rail-more" href="#">查看全部 →</a>
+  </div>
+  <div class="movie-scroll">
+    <a class="movie-card-link" href="#">
+      <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.5</span><span class="movie-poster-remarks">更新至第12集</span></div></div>
+      <div class="movie-meta-block"><p class="movie-meta-title">长安三万里</p><p class="movie-meta-sub">动画 · 2023</p></div>
+    </a>
+    <a class="movie-card-link" href="#">
+      <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 9.1</span></div></div>
+      <div class="movie-meta-block"><p class="movie-meta-title">奥本海默</p><p class="movie-meta-sub">剧情 · 2023</p></div>
+    </a>
+    <a class="movie-card-link" href="#">
+      <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1535016120720-40c646be5580?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 7.8</span><span class="movie-poster-remarks">全24集</span></div></div>
+      <div class="movie-meta-block"><p class="movie-meta-title">繁花</p><p class="movie-meta-sub">剧情 · 2024</p></div>
+    </a>
+    <a class="movie-card-link" href="#">
+      <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.3</span></div></div>
+      <div class="movie-meta-block"><p class="movie-meta-title">沙丘2</p><p class="movie-meta-sub">科幻 · 2024</p></div>
+    </a>
+    <a class="movie-card-link" href="#">
+      <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.9</span><span class="movie-poster-remarks">更新至EP8</span></div></div>
+      <div class="movie-meta-block"><p class="movie-meta-title">庆余年 第二季</p><p class="movie-meta-sub">古装 · 2024</p></div>
+    </a>
+    <a class="movie-card-link" href="#">
+      <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1518676590747-1e3dcf5a630e?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 7.6</span></div></div>
+      <div class="movie-meta-block"><p class="movie-meta-title">周处除三害</p><p class="movie-meta-sub">动作 · 2024</p></div>
+    </a>
+    <a class="movie-card-link" href="#">
+      <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1594909122845-11baa439b0bf?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.7</span></div></div>
+      <div class="movie-meta-block"><p class="movie-meta-title">你的名字</p><p class="movie-meta-sub">动画 · 2016</p></div>
+    </a>
+  </div>
+</div>
+
+<!-- 双栏：动画 + 综艺 -->
+<div class="dual-rail" style="margin-top: 40px;">
+  <div class="rail-section" style="margin-top: 0;">
+    <div class="rail-header">
+      <div class="rail-title-group">
+        <h2 class="rail-title">动画放映厅</h2>
+        <span class="rail-subtitle">ANIME</span>
+      </div>
+    </div>
+    <div class="movie-scroll">
+      <a class="movie-card-link" href="#">
+        <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 9.0</span></div></div>
+        <div class="movie-meta-block"><p class="movie-meta-title">鬼灭之刃</p><p class="movie-meta-sub">动漫 · 2024</p></div>
+      </a>
+      <a class="movie-card-link" href="#">
+        <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1607604276583-3d4d4b82e0eb?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.6</span></div></div>
+        <div class="movie-meta-block"><p class="movie-meta-title">咒术回战</p><p class="movie-meta-sub">动漫 · 2024</p></div>
+      </a>
+      <a class="movie-card-link" href="#">
+        <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1613376023733-0a73315d9b06?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.2</span></div></div>
+        <div class="movie-meta-block"><p class="movie-meta-title">间谍过家家</p><p class="movie-meta-sub">动漫 · 2024</p></div>
+      </a>
+      <a class="movie-card-link" href="#">
+        <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1611457194403-d3571b64e266?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 7.9</span></div></div>
+        <div class="movie-meta-block"><p class="movie-meta-title">药屋少女</p><p class="movie-meta-sub">动漫 · 2024</p></div>
+      </a>
+    </div>
+  </div>
+  <div class="rail-section" style="margin-top: 0;">
+    <div class="rail-header">
+      <div class="rail-title-group">
+        <h2 class="rail-title">综艺现场</h2>
+        <span class="rail-subtitle">VARIETY</span>
+      </div>
+    </div>
+    <div class="movie-scroll">
+      <a class="movie-card-link" href="#">
+        <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.1</span></div></div>
+        <div class="movie-meta-block"><p class="movie-meta-title">歌手 2024</p><p class="movie-meta-sub">综艺 · 2024</p></div>
+      </a>
+      <a class="movie-card-link" href="#">
+        <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 7.8</span></div></div>
+        <div class="movie-meta-block"><p class="movie-meta-title">奔跑吧</p><p class="movie-meta-sub">综艺 · 2024</p></div>
+      </a>
+      <a class="movie-card-link" href="#">
+        <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.5</span></div></div>
+        <div class="movie-meta-block"><p class="movie-meta-title">向往的生活</p><p class="movie-meta-sub">综艺 · 2024</p></div>
+      </a>
+      <a class="movie-card-link" href="#">
+        <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 7.4</span></div></div>
+        <div class="movie-meta-block"><p class="movie-meta-title">极限挑战</p><p class="movie-meta-sub">综艺 · 2024</p></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="ant-divider"></div>
+
+<!-- ================================================================
+     COMPONENT LIBRARY SHOWCASE
+     ================================================================ -->
+<div class="section-label-bar">
+  <span class="label-tag">AntD 组件集</span>
+  <span class="label-text">Button · Input · Tag · Segmented · Pagination · Card · Tabs · Statistic · Alert</span>
+</div>
+
+<div class="component-showcase">
+
+  <!-- Button -->
+  <div class="showcase-card">
+    <div class="showcase-header">
+      <span>Button 按钮</span>
+      <span class="ant-tag ant-tag-blue">通用</span>
+    </div>
+    <div class="showcase-body" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+      <button class="ant-btn ant-btn-primary">主按钮</button>
+      <button class="ant-btn">默认按钮</button>
+      <button class="ant-btn ant-btn-dashed">虚线按钮</button>
+      <button class="ant-btn ant-btn-text">文字按钮</button>
+      <button class="ant-btn ant-btn-link">链接按钮</button>
+      <button class="ant-btn ant-btn-primary ant-btn-round">▶ 立即播放</button>
+      <button class="ant-btn ant-btn-round">收藏影片</button>
+      <button class="ant-btn ant-btn-primary ant-btn-lg">大按钮</button>
+      <button class="ant-btn ant-btn-sm">小按钮</button>
+      <button class="ant-btn" style="background: var(--ant-color-error); border-color: var(--ant-color-error); color: #fff;">删除</button>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="showcase-card">
+    <div class="showcase-header">
+      <span>Input 输入框</span>
+      <span class="ant-tag ant-tag-cyan">数据录入</span>
+    </div>
+    <div class="showcase-body" style="display: flex; flex-direction: column; gap: 12px;">
+      <input class="ant-input" placeholder="默认输入框" />
+      <div style="display: flex; gap: 12px;">
+        <input class="ant-input" placeholder="邮箱" style="flex: 1;" />
+        <button class="ant-btn ant-btn-primary" style="flex-shrink: 0;">搜索</button>
+      </div>
+      <input class="ant-input ant-input-lg" placeholder="大号输入框" />
+    </div>
+  </div>
+
+  <!-- Tag -->
+  <div class="showcase-card">
+    <div class="showcase-header">
+      <span>Tag 标签</span>
+      <span class="ant-tag ant-tag-gold">展示</span>
+    </div>
+    <div class="showcase-body" style="display: flex; flex-wrap: wrap; gap: 8px;">
+      <span class="ant-tag ant-tag-blue">动作</span>
+      <span class="ant-tag ant-tag-cyan">科幻</span>
+      <span class="ant-tag ant-tag-geekblue">悬疑</span>
+      <span class="ant-tag ant-tag-gold">★ 9.2</span>
+      <span class="ant-tag ant-tag-green">高清</span>
+      <span class="ant-tag ant-tag-red">独家</span>
+      <span class="ant-tag ant-tag-orange">更新中</span>
+      <span class="ant-tag ant-tag-movie-theme">电影</span>
+      <span class="ant-tag ant-tag-movie-theme">电视剧</span>
+      <span class="ant-tag ant-tag-movie-theme">综艺</span>
+      <span class="ant-tag ant-tag-movie-theme">动漫</span>
+    </div>
+  </div>
+
+  <!-- Segmented & Tabs -->
+  <div class="showcase-card">
+    <div class="showcase-header">
+      <span>Segmented 分段 &amp; Tabs 标签页</span>
+      <span class="ant-tag ant-tag-geekblue">导航</span>
+    </div>
+    <div class="showcase-body">
+      <p style="font-size: 12px; color: var(--ant-color-text-tertiary); margin-bottom: 10px;">Sorted</p>
+      <div class="ant-segmented" style="margin-bottom: 20px;">
+        <div class="ant-segmented-item ant-segmented-item-selected">最新</div>
+        <div class="ant-segmented-item">评分</div>
+        <div class="ant-segmented-item">热度</div>
+      </div>
+      <p style="font-size: 12px; color: var(--ant-color-text-tertiary); margin-bottom: 10px;">Tabs</p>
+      <div class="ant-tabs">
+        <div class="ant-tab ant-tab-active">剧情简介</div>
+        <div class="ant-tab">演员表</div>
+        <div class="ant-tab">相关推荐</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="showcase-card">
+    <div class="showcase-header">
+      <span>Pagination 分页</span>
+      <span class="ant-tag ant-tag-blue">导航</span>
+    </div>
+    <div class="showcase-body" style="display: flex; justify-content: center;">
+      <ul class="ant-pagination">
+        <li class="ant-pagination-prev">‹</li>
+        <li class="ant-pagination-item ant-pagination-item-active">1</li>
+        <li class="ant-pagination-item">2</li>
+        <li class="ant-pagination-item">3</li>
+        <li class="ant-pagination-item">4</li>
+        <li class="ant-pagination-item">5</li>
+        <li class="ant-pagination-item">...</li>
+        <li class="ant-pagination-item">72</li>
+        <li class="ant-pagination-next">›</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Statistic -->
+  <div class="showcase-card">
+    <div class="showcase-header">
+      <span>Statistic 统计数值</span>
+      <span class="ant-tag ant-tag-green">展示</span>
+    </div>
+    <div class="showcase-body">
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-value">1,286</div>
+          <div class="stat-label">影片总数</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">24</div>
+          <div class="stat-label">我的收藏</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">156</div>
+          <div class="stat-label">观看记录</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert -->
+  <div class="showcase-card">
+    <div class="showcase-header">
+      <span>Alert 消息提示</span>
+      <span class="ant-tag ant-tag-orange">反馈</span>
+    </div>
+    <div class="showcase-body" style="display: flex; flex-direction: column; gap: 12px;">
+      <div class="ant-alert ant-alert-info">ℹ️ 已为您加载最新影片数据。</div>
+      <div class="ant-alert ant-alert-success">✅ 收藏成功，已添加到「我的收藏」。</div>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="showcase-card">
+    <div class="showcase-header">
+      <span>Card 卡片 + Descriptions</span>
+      <span class="ant-tag ant-tag-cyan">展示</span>
+    </div>
+    <div class="showcase-body" style="padding: 0;">
+      <table class="ant-descriptions" style="width: 100%;">
+        <tr class="ant-descriptions-row">
+          <td class="ant-descriptions-label">导演</td>
+          <td class="ant-descriptions-content">谢晋</td>
+        </tr>
+        <tr class="ant-descriptions-row">
+          <td class="ant-descriptions-label">主演</td>
+          <td class="ant-descriptions-content">李白、杜甫、高适</td>
+        </tr>
+        <tr class="ant-descriptions-row">
+          <td class="ant-descriptions-label">地区</td>
+          <td class="ant-descriptions-content">中国大陆</td>
+        </tr>
+        <tr class="ant-descriptions-row">
+          <td class="ant-descriptions-label">年份</td>
+          <td class="ant-descriptions-content">
+            <span style="display: flex; gap: 6px;">
+              <span class="ant-tag ant-tag-blue">动画</span>
+              <span class="ant-tag ant-tag-gold">★ 8.5</span>
+            </span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Dropdown -->
+  <div class="showcase-card">
+    <div class="showcase-header">
+      <span>Dropdown 下拉菜单</span>
+      <span class="ant-tag ant-tag-geekblue">导航</span>
+    </div>
+    <div class="showcase-body">
+      <ul class="ant-dropdown-menu">
+        <li class="ant-dropdown-menu-item">👤 个人中心</li>
+        <li class="ant-dropdown-menu-item">⭐ 我的收藏</li>
+        <li class="ant-dropdown-menu-item">🕐 观看历史</li>
+        <li class="ant-dropdown-menu-divider"></li>
+        <li class="ant-dropdown-menu-item ant-dropdown-menu-danger">退出登录</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="ant-divider"></div>
+
+<!-- ================================================================
+     MOVIES PAGE 影片库
+     ================================================================ -->
+<div class="section-label-bar">
+  <span class="label-tag">Films 影片库</span>
+  <span class="label-text">Card 筛选面板 → Segmented 排序 → Grid 卡片 → Pagination 分页</span>
+</div>
+
+<div class="filter-card">
+  <div class="filter-card-title">影片库筛选</div>
+  <div class="filter-row-block">
+    <div class="filter-row-label">分类</div>
+    <div class="filter-chips">
+      <span class="filter-chip filter-chip-active">全部</span>
+      <span class="filter-chip">电影</span>
+      <span class="filter-chip">电视剧</span>
+      <span class="filter-chip">综艺</span>
+      <span class="filter-chip">动漫</span>
+      <span class="filter-chip">纪录片</span>
+    </div>
+  </div>
+  <div class="filter-row-block">
+    <div class="filter-row-label">地区</div>
+    <div class="filter-chips">
+      <span class="filter-chip filter-chip-active">全部</span>
+      <span class="filter-chip">中国大陆</span>
+      <span class="filter-chip">美国</span>
+      <span class="filter-chip">韩国</span>
+      <span class="filter-chip">日本</span>
+      <span class="filter-chip">英国</span>
+    </div>
+  </div>
+  <div class="filter-row-block">
+    <div class="filter-row-label">排序</div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div class="ant-segmented">
+        <div class="ant-segmented-item ant-segmented-item-selected">最新发布</div>
+        <div class="ant-segmented-item">评分最高</div>
+        <div class="ant-segmented-item">热度最高</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+  <span style="font-size: 14px; color: var(--ant-color-text-tertiary);">
+    为您找到 <span style="color: var(--ant-color-primary); font-weight: 600;">1,286</span> 部相关影视
+  </span>
+</div>
+
+<div class="movie-grid">
+  <a class="movie-card-link" href="#" style="width: auto;">
+    <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.5</span><span class="movie-poster-remarks">更新至第12集</span></div></div>
+    <div class="movie-meta-block"><p class="movie-meta-title">长安三万里</p><p class="movie-meta-sub">动画 · 2023</p></div>
+  </a>
+  <a class="movie-card-link" href="#" style="width: auto;">
+    <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 9.1</span></div></div>
+    <div class="movie-meta-block"><p class="movie-meta-title">奥本海默</p><p class="movie-meta-sub">剧情 · 2023</p></div>
+  </a>
+  <a class="movie-card-link" href="#" style="width: auto;">
+    <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1535016120720-40c646be5580?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 7.8</span></div></div>
+    <div class="movie-meta-block"><p class="movie-meta-title">繁花</p><p class="movie-meta-sub">剧情 · 2024</p></div>
+  </a>
+  <a class="movie-card-link" href="#" style="width: auto;">
+    <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.3</span></div></div>
+    <div class="movie-meta-block"><p class="movie-meta-title">沙丘2</p><p class="movie-meta-sub">科幻 · 2024</p></div>
+  </a>
+  <a class="movie-card-link" href="#" style="width: auto;">
+    <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.9</span></div></div>
+    <div class="movie-meta-block"><p class="movie-meta-title">庆余年 第二季</p><p class="movie-meta-sub">古装 · 2024</p></div>
+  </a>
+  <a class="movie-card-link" href="#" style="width: auto;">
+    <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1518676590747-1e3dcf5a630e?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 7.6</span></div></div>
+    <div class="movie-meta-block"><p class="movie-meta-title">周处除三害</p><p class="movie-meta-sub">动作 · 2024</p></div>
+  </a>
+</div>
+
+<div style="margin-top: 24px; display: flex; justify-content: center;">
+  <ul class="ant-pagination">
+    <li class="ant-pagination-prev">‹</li>
+    <li class="ant-pagination-item ant-pagination-item-active">1</li>
+    <li class="ant-pagination-item">2</li>
+    <li class="ant-pagination-item">3</li>
+    <li class="ant-pagination-item">...</li>
+    <li class="ant-pagination-item">72</li>
+    <li class="ant-pagination-next">›</li>
+  </ul>
+</div>
+
+<div class="ant-divider"></div>
+
+<!-- ================================================================
+     MOVIE DETAIL 详情页
+     ================================================================ -->
+<div class="section-label-bar">
+  <span class="label-tag">Detail 详情页</span>
+  <span class="label-text">播放器 → Tabs 选集 → Descriptions 信息 → Card 推荐</span>
+</div>
+
+<!-- Breadcrumb -->
+<div class="ant-breadcrumb" style="margin-bottom: 16px;">
+  <span class="ant-breadcrumb-link">首页</span>
+  <span class="ant-breadcrumb-separator">/</span>
+  <span class="ant-breadcrumb-link">电影</span>
+  <span class="ant-breadcrumb-separator">/</span>
+  <span class="ant-breadcrumb-link-current">长安三万里</span>
+</div>
+
+<!-- Player -->
+<div class="player-container">
+  <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.35);font-size:14px;">
+    <div style="text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:8px;">▶</div>
+      <div>Video Player</div>
+    </div>
+  </div>
+</div>
+
+<!-- Playing status -->
+<div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+  <span style="font-size: 14px; color: var(--ant-color-text-tertiary);">正在播放：</span>
+  <span style="font-size: 14px; font-weight: 600; color: var(--ant-color-primary);">长安三万里 — 第1集</span>
+  <button class="ant-btn ant-btn-sm" style="margin-left: auto;">⭐ 取消收藏</button>
+</div>
+
+<div class="detail-grid">
+  <div>
+    <!-- Episode selector with Tabs + Button -->
+    <div class="info-card" style="margin-bottom: 20px;">
+      <div class="info-card-header">📺 选集播放</div>
+      <div class="episode-source-tabs">
+        <div class="ant-tabs" style="margin-bottom: 0; border-bottom: 0;">
+          <div class="ant-tab ant-tab-active" style="padding: 6px 14px;">源 1</div>
+          <div class="ant-tab" style="padding: 6px 14px;">源 2</div>
+        </div>
+      </div>
+      <div class="episode-grid">
+        <button class="episode-btn episode-btn-active">第 1 集</button>
+        <button class="episode-btn">第 2 集</button>
+        <button class="episode-btn">第 3 集</button>
+        <button class="episode-btn">第 4 集</button>
+        <button class="episode-btn">第 5 集</button>
+        <button class="episode-btn">第 6 集</button>
+        <button class="episode-btn">第 7 集</button>
+        <button class="episode-btn">第 8 集</button>
+        <button class="episode-btn">第 9 集</button>
+        <button class="episode-btn">第 10 集</button>
+        <button class="episode-btn">第 11 集</button>
+        <button class="episode-btn">第 12 集</button>
+      </div>
+    </div>
+
+    <!-- Movie Info with Descriptions -->
+    <div class="info-card">
+      <div class="info-card-header">🎬 影片详情介绍</div>
+      <div class="intro-flex">
+        <img class="intro-poster" src="https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=200&h=300&fit=crop" alt="海报" />
+        <div style="flex: 1;">
+          <table class="ant-descriptions">
+            <tr class="ant-descriptions-row"><td class="ant-descriptions-label">导演</td><td class="ant-descriptions-content">谢晋</td></tr>
+            <tr class="ant-descriptions-row"><td class="ant-descriptions-label">主演</td><td class="ant-descriptions-content">李白、杜甫、高适</td></tr>
+            <tr class="ant-descriptions-row"><td class="ant-descriptions-label">地区</td><td class="ant-descriptions-content">中国大陆</td></tr>
+            <tr class="ant-descriptions-row"><td class="ant-descriptions-label">语言</td><td class="ant-descriptions-content">汉语普通话</td></tr>
+            <tr class="ant-descriptions-row"><td class="ant-descriptions-label">年份</td><td class="ant-descriptions-content">2023</td></tr>
+          </table>
+          <div style="display: flex; gap: 6px; margin-top: 12px;">
+            <span class="ant-tag ant-tag-blue">动画</span>
+            <span class="ant-tag ant-tag-gold">★ 8.5</span>
+            <span class="ant-tag ant-tag-green">高清</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 8px;">
+        <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 8px;">剧情简介</h3>
+        <p style="font-size: 14px; color: var(--ant-color-text-secondary); line-height: 1.7;">
+          影片以盛唐为背景，讲述安史之乱后，高适在回忆中与李白重逢，两人一同经历了人生的起伏跌宕，见证了大唐的辉煌与衰落。这是一部以诗为媒、以山河为画的恢弘之作。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar recommendations -->
+  <div>
+    <div class="info-card">
+      <div class="info-card-header">⭐ 为您推荐</div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <a href="#" style="display: flex; gap: 12px; text-decoration: none; color: inherit;">
+          <div style="width: 56px; aspect-ratio: 2/3; border-radius: 6px; overflow: hidden; background: #d8eaf0; flex-shrink: 0;">
+            <img src="https://images.unsplash.com/photo-1536440136628-849c1769f551?w=100&h=150&fit=crop" style="width:100%;height:100%;object-fit:cover;" alt="" />
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <p style="font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">你的名字</p>
+            <p style="font-size: 12px; color: var(--ant-color-text-tertiary); margin-top: 2px;">评分：<span style="color: var(--ant-color-primary); font-weight: 600;">★ 8.7</span> · 动漫</p>
+          </div>
+        </a>
+        <a href="#" style="display: flex; gap: 12px; text-decoration: none; color: inherit;">
+          <div style="width: 56px; aspect-ratio: 2/3; border-radius: 6px; overflow: hidden; background: #d8eaf0; flex-shrink: 0;">
+            <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=150&fit=crop" style="width:100%;height:100%;object-fit:cover;" alt="" />
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <p style="font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">鬼灭之刃 柱训练篇</p>
+            <p style="font-size: 12px; color: var(--ant-color-text-tertiary); margin-top: 2px;">评分：<span style="color: var(--ant-color-primary); font-weight: 600;">★ 9.0</span> · 动漫</p>
+          </div>
+        </a>
+        <a href="#" style="display: flex; gap: 12px; text-decoration: none; color: inherit;">
+          <div style="width: 56px; aspect-ratio: 2/3; border-radius: 6px; overflow: hidden; background: #d8eaf0; flex-shrink: 0;">
+            <img src="https://images.unsplash.com/photo-1607604276583-3d4d4b82e0eb?w=100&h=150&fit=crop" style="width:100%;height:100%;object-fit:cover;" alt="" />
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <p style="font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">铃芽之旅</p>
+            <p style="font-size: 12px; color: var(--ant-color-text-tertiary); margin-top: 2px;">评分：<span style="color: var(--ant-color-primary); font-weight: 600;">★ 8.2</span> · 动漫</p>
+          </div>
+        </a>
+        <a href="#" style="display: flex; gap: 12px; text-decoration: none; color: inherit;">
+          <div style="width: 56px; aspect-ratio: 2/3; border-radius: 6px; overflow: hidden; background: #d8eaf0; flex-shrink: 0;">
+            <img src="https://images.unsplash.com/photo-1613376023733-0a73315d9b06?w=100&h=150&fit=crop" style="width:100%;height:100%;object-fit:cover;" alt="" />
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <p style="font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">间谍过家家 第二季</p>
+            <p style="font-size: 12px; color: var(--ant-color-text-tertiary); margin-top: 2px;">评分：<span style="color: var(--ant-color-primary); font-weight: 600;">★ 8.2</span> · 动漫</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ant-divider"></div>
+
+<!-- ================================================================
+     LOGIN / REGISTER
+     ================================================================ -->
+<div class="section-label-bar">
+  <span class="label-tag">Auth 登录 / 注册</span>
+  <span class="label-text">Card 卡片容器 → Form 表单 → Button 提交</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 880px; margin: 0 auto;">
+  <!-- Login -->
+  <div>
+    <p style="font-size: 12px; color: var(--ant-color-text-tertiary); margin-bottom: 12px; text-align: center;">登录</p>
+    <div class="auth-card" style="margin: 0 auto;">
+      <h2 class="auth-title">登录 MovieFlex</h2>
+      <div class="auth-form-group">
+        <label class="auth-form-label">邮箱</label>
+        <input class="ant-input" type="email" placeholder="请输入邮箱地址" />
+      </div>
+      <div class="auth-form-group">
+        <label class="auth-form-label">密码</label>
+        <input class="ant-input" type="password" placeholder="请输入密码" />
+      </div>
+      <button class="ant-btn ant-btn-primary ant-btn-lg" style="width: 100%; margin-top: 4px;">登录</button>
+      <p class="auth-footer-text">还没有账号？<a href="#">立即注册</a></p>
+    </div>
+  </div>
+  <!-- Register -->
+  <div>
+    <p style="font-size: 12px; color: var(--ant-color-text-tertiary); margin-bottom: 12px; text-align: center;">注册</p>
+    <div class="auth-card" style="margin: 0 auto;">
+      <h2 class="auth-title">注册 MovieFlex</h2>
+      <div class="auth-form-group">
+        <label class="auth-form-label">用户名</label>
+        <input class="ant-input" placeholder="请输入用户名" />
+      </div>
+      <div class="auth-form-group">
+        <label class="auth-form-label">邮箱</label>
+        <input class="ant-input" type="email" placeholder="请输入邮箱地址" />
+      </div>
+      <div class="auth-form-group">
+        <label class="auth-form-label">密码</label>
+        <input class="ant-input" type="password" placeholder="密码至少 6 位" />
+      </div>
+      <button class="ant-btn ant-btn-primary ant-btn-lg" style="width: 100%; margin-top: 4px;">注册</button>
+      <p class="auth-footer-text">已有账号？<a href="#">去登录</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="ant-divider"></div>
+
+<!-- ================================================================
+     USER CENTER
+     ================================================================ -->
+<div class="section-label-bar">
+  <span class="label-tag">User 用户中心</span>
+  <span class="label-text">Layout.Sider 侧栏 → Layout.Content → Menu + Statistic + Table + List</span>
+</div>
+
+<div class="user-layout">
+  <!-- Sider Menu -->
+  <aside class="user-sider">
+    <div style="text-align: center; padding: 16px 0 12px;">
+      <div class="ant-avatar ant-avatar-lg" style="background: linear-gradient(135deg, var(--ant-color-primary), #5bb8e8); margin-bottom: 8px;">U</div>
+      <p style="font-size: 14px; font-weight: 600;">MovieFan</p>
+    </div>
+    <ul class="ant-menu-vertical">
+      <li class="ant-menu-item ant-menu-item-selected"><span class="ant-menu-item-icon">👤</span> 个人中心</li>
+      <li class="ant-menu-item"><span class="ant-menu-item-icon">⭐</span> 我的收藏</li>
+      <li class="ant-menu-item"><span class="ant-menu-item-icon">🕐</span> 观看历史</li>
+    </ul>
+  </aside>
+
+  <!-- Content -->
+  <div class="user-main">
+    <h2 class="user-main-title">个人中心</h2>
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-value">24</div>
+        <div class="stat-label">收藏影片</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">156</div>
+        <div class="stat-label">观看记录</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">89<span style="font-size: 16px; font-weight: 400;">h</span></div>
+        <div class="stat-label">累计观看</div>
+      </div>
+    </div>
+    <table class="ant-descriptions">
+      <tr class="ant-descriptions-row"><td class="ant-descriptions-label">用户名</td><td class="ant-descriptions-content">MovieFan2024</td></tr>
+      <tr class="ant-descriptions-row"><td class="ant-descriptions-label">邮箱</td><td class="ant-descriptions-content">user@example.com</td></tr>
+      <tr class="ant-descriptions-row"><td class="ant-descriptions-label">角色</td><td class="ant-descriptions-content"><span class="ant-tag ant-tag-movie-theme">普通用户</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Favorites sub-page -->
+<p style="font-size: 12px; color: var(--ant-color-text-tertiary); margin: 32px 0 12px; text-align: center;">— 我的收藏 — List 列表样式 —</p>
+<div style="background: var(--ant-color-bg-container); border: 1px solid var(--ant-color-border-secondary); border-radius: var(--ant-border-radius-lg); padding: 16px 20px; box-shadow: var(--ant-box-shadow-tertiary); max-width: 640px; margin: 0 auto;">
+  <div class="fav-list-item">
+    <div class="fav-poster"><img src="https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=100&h=150&fit=crop" alt="" /></div>
+    <div class="fav-info"><p class="fav-title">长安三万里</p><p class="fav-meta">动画 · 2023 · ★ 8.5</p></div>
+    <div class="fav-actions"><button class="ant-btn ant-btn-sm" style="color: var(--ant-color-error); border-color: var(--ant-color-error);">取消收藏</button></div>
+  </div>
+  <div class="fav-list-item">
+    <div class="fav-poster"><img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100&h=150&fit=crop" alt="" /></div>
+    <div class="fav-info"><p class="fav-title">奥本海默</p><p class="fav-meta">剧情 · 2023 · ★ 9.1</p></div>
+    <div class="fav-actions"><button class="ant-btn ant-btn-sm" style="color: var(--ant-color-error); border-color: var(--ant-color-error);">取消收藏</button></div>
+  </div>
+  <div class="fav-list-item">
+    <div class="fav-poster"><img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=100&h=150&fit=crop" alt="" /></div>
+    <div class="fav-info"><p class="fav-title">鬼灭之刃 柱训练篇</p><p class="fav-meta">动漫 · 2024 · ★ 9.0</p></div>
+    <div class="fav-actions"><button class="ant-btn ant-btn-sm" style="color: var(--ant-color-error); border-color: var(--ant-color-error);">取消收藏</button></div>
+  </div>
+</div>
+
+<!-- History sub-page with Table + Progress -->
+<p style="font-size: 12px; color: var(--ant-color-text-tertiary); margin: 32px 0 12px; text-align: center;">— 观看历史 — Table 表格 + Progress 进度条 —</p>
+<div style="background: var(--ant-color-bg-container); border: 1px solid var(--ant-color-border-secondary); border-radius: var(--ant-border-radius-lg); overflow: hidden; box-shadow: var(--ant-box-shadow-tertiary); max-width: 800px; margin: 0 auto;">
+  <table class="history-table">
+    <thead>
+      <tr>
+        <th>影片</th>
+        <th>集数</th>
+        <th>观看进度</th>
+        <th>最近观看</th>
+        <th style="text-align: right;">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 36px; aspect-ratio: 2/3; border-radius: 4px; overflow: hidden; background: #d8eaf0; flex-shrink: 0;"><img src="https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=80&h=120&fit=crop" style="width:100%;height:100%;object-fit:cover;" alt="" /></div>
+          <span>长安三万里</span>
+        </td>
+        <td>第 8 集</td>
+        <td style="width: 140px;"><div class="ant-progress"><div class="ant-progress-bar" style="width: 72%;"></div></div><span style="font-size: 12px; color: var(--ant-color-text-tertiary);">72%</span></td>
+        <td style="color: var(--ant-color-text-tertiary); font-size: 13px;">2 小时前</td>
+        <td style="text-align: right;"><button class="ant-btn ant-btn-sm ant-btn-text" style="color: var(--ant-color-error);">删除</button></td>
+      </tr>
+      <tr>
+        <td style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 36px; aspect-ratio: 2/3; border-radius: 4px; overflow: hidden; background: #d8eaf0; flex-shrink: 0;"><img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=80&h=120&fit=crop" style="width:100%;height:100%;object-fit:cover;" alt="" /></div>
+          <span>鬼灭之刃</span>
+        </td>
+        <td>第 3 集</td>
+        <td style="width: 140px;"><div class="ant-progress"><div class="ant-progress-bar" style="width: 45%;"></div></div><span style="font-size: 12px; color: var(--ant-color-text-tertiary);">45%</span></td>
+        <td style="color: var(--ant-color-text-tertiary); font-size: 13px;">昨天</td>
+        <td style="text-align: right;"><button class="ant-btn ant-btn-sm ant-btn-text" style="color: var(--ant-color-error);">删除</button></td>
+      </tr>
+      <tr>
+        <td style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 36px; aspect-ratio: 2/3; border-radius: 4px; overflow: hidden; background: #d8eaf0; flex-shrink: 0;"><img src="https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=80&h=120&fit=crop" style="width:100%;height:100%;object-fit:cover;" alt="" /></div>
+          <span>庆余年 第二季</span>
+        </td>
+        <td>第 12 集</td>
+        <td style="width: 140px;"><div class="ant-progress"><div class="ant-progress-bar" style="width: 100%; background: var(--ant-color-success);"></div></div><span style="font-size: 12px; color: var(--ant-color-text-tertiary);">100%</span></td>
+        <td style="color: var(--ant-color-text-tertiary); font-size: 13px;">3 天前</td>
+        <td style="text-align: right;"><button class="ant-btn ant-btn-sm ant-btn-text" style="color: var(--ant-color-error);">删除</button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="ant-divider"></div>
+
+<!-- ================================================================
+     SEARCH PAGE
+     ================================================================ -->
+<div class="section-label-bar">
+  <span class="label-tag">Search 搜索</span>
+  <span class="label-text">Input.Search (Large) → Alert 空状态 → Grid 结果</span>
+</div>
+
+<div class="search-hero">
+  <input class="search-input-hero" placeholder="搜索影片名称…" value="长安" />
+  <div style="margin-top: 12px;">
+    <div class="ant-alert ant-alert-info">
+      ℹ️ "长安" 的搜索结果 — 共找到 <strong>3</strong> 部相关影片
+    </div>
+  </div>
+</div>
+
+<div class="movie-grid" style="max-width: 640px; margin: 0 auto; grid-template-columns: repeat(3, 1fr);">
+  <a class="movie-card-link" href="#" style="width: auto;">
+    <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.5</span></div></div>
+    <div class="movie-meta-block"><p class="movie-meta-title">长安三万里</p><p class="movie-meta-sub">动画 · 2023</p></div>
+  </a>
+  <a class="movie-card-link" href="#" style="width: auto;">
+    <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1535016120720-40c646be5580?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 7.8</span></div></div>
+    <div class="movie-meta-block"><p class="movie-meta-title">长安十二时辰</p><p class="movie-meta-sub">古装 · 2019</p></div>
+  </a>
+  <a class="movie-card-link" href="#" style="width: auto;">
+    <div class="movie-card"><div class="movie-poster"><img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&h=450&fit=crop" alt="" /><span class="movie-poster-score"><span class="star">★</span> 8.1</span></div></div>
+    <div class="movie-meta-block"><p class="movie-meta-title">长安诺</p><p class="movie-meta-sub">古装 · 2020</p></div>
+  </a>
+</div>
+
+</main>
+
+</body>
+</html>
