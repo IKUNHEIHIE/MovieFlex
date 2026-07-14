@@ -139,21 +139,45 @@ model CollectSource {
 }
 
 model CollectTask {
-  id             String   @id @db.VarChar(36)
-  sourceKey      String   @map("source_key") @db.VarChar(50)
-  mode           String   @db.VarChar(20)
-  status         String   @db.VarChar(20)
-  totalPages     Int      @default(0) @map("total_pages")
-  pagesProcessed Int      @default(0) @map("pages_processed")
-  fetched        Int      @default(0)
-  saved          Int      @default(0)
-  errorMessage   String?  @map("error_message") @db.Text
-  createdAt      DateTime @default(now()) @map("created_at")
-  finishedAt     DateTime? @map("finished_at")
+  id              String            @id @db.VarChar(36)
+  sourceKey       String            @map("source_key") @db.VarChar(50)
+  mode            CollectTaskMode
+  status          CollectTaskStatus @default(QUEUED)
+  targetRecords   Int?              @map("target_records")
+  totalPages      Int               @default(0) @map("total_pages")
+  pagesProcessed  Int               @default(0) @map("pages_processed")
+  nextPage        Int               @default(1) @map("next_page")
+  currentPage     Int               @default(0) @map("current_page")
+  fetched         Int               @default(0)
+  saved           Int               @default(0)
+  errorMessage    String?           @map("error_message") @db.Text
+  createdAt       DateTime          @default(now()) @map("created_at")
+  startedAt       DateTime?         @map("started_at")
+  updatedAt       DateTime          @default(now()) @updatedAt @map("updated_at")
+  heartbeatAt     DateTime?         @map("heartbeat_at")
+  pausedAt        DateTime?         @map("paused_at")
+  finishedAt      DateTime?         @map("finished_at")
+  leaseToken      String?           @map("lease_token") @db.VarChar(36)
+  leaseExpiresAt  DateTime?         @map("lease_expires_at")
 
   @@index([sourceKey], name: "source_key")
   @@index([status], name: "status")
+  @@index([status, createdAt], name: "idx_collect_task_status_created")
   @@map("collect_tasks")
+}
+
+enum CollectTaskMode {
+  INITIAL_100 @map("initial-100")
+  FULL        @map("full")
+}
+
+enum CollectTaskStatus {
+  QUEUED
+  RUNNING
+  PAUSED
+  SUCCEEDED
+  FAILED
+  CANCELLED
 }
 
 enum SourceFormat {
