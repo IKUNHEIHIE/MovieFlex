@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import VideoPlayer from '@/components/video/VideoPlayer';
-import { buildResolverUrl, DEFAULT_PLAYERS, parsePlayGroups, selectPlayback } from '@/lib/playback';
+import { buildResolverUrl, DEFAULT_PLAYERS, parsePlayGroups, playersFromSourceConfig, selectPlayback } from '@/lib/playback';
 import FavoriteButton from '@/components/user/FavoriteButton';
 
 export const revalidate = 0; // 动态实时计算
@@ -38,7 +38,13 @@ export default async function MovieDetailPage({ params, searchParams }: MovieDet
   if (!movie) return notFound();
 
   // 2. 解析播放列表
-  const playback = selectPlayback(parsePlayGroups(movie.playFrom, movie.playUrl), DEFAULT_PLAYERS, {
+  const source = await prisma.collectSource.findUnique({
+    where: { sourceKey: movie.sourceKey },
+    select: { playerConfigs: true },
+  });
+  const sourcePlayers = playersFromSourceConfig(source?.playerConfigs);
+  const players = [...sourcePlayers, ...DEFAULT_PLAYERS.filter((player) => !sourcePlayers.some((sourcePlayer) => sourcePlayer.code === player.code))];
+  const playback = selectPlayback(parsePlayGroups(movie.playFrom, movie.playUrl), players, {
     source: requestedSource,
     ep: requestedEpisode,
   });

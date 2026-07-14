@@ -36,6 +36,10 @@ export const DEFAULT_PLAYERS: readonly RegistryPlayer[] = [
   { code: 'm3u8', name: 'M3U8', mode: 'HLS', isEnabled: true, resolverUrl: null },
 ];
 
+function isPlayerMode(value: unknown): value is PlayerMode {
+  return value === 'HLS' || value === 'IFRAME_DIRECT' || value === 'IFRAME_RESOLVER';
+}
+
 function episodeFromValue(value: string, ep: number): PlaybackEpisode | null {
   const trimmed = value.trim();
   if (!trimmed || trimmed.toLowerCase() === 'no' || trimmed === '#') return null;
@@ -90,6 +94,29 @@ export function buildResolverUrl(resolverUrl: string | null | undefined, playbac
   }
 
   return null;
+}
+
+/** Converts persisted normalized source player JSON into safe playback records. */
+export function playersFromSourceConfig(config: unknown): RegistryPlayer[] {
+  if (!Array.isArray(config)) return [];
+
+  const codes = new Set<string>();
+  return config.flatMap((entry) => {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return [];
+    const player = entry as Record<string, unknown>;
+    const code = typeof player.code === 'string' ? player.code.trim() : '';
+    const name = typeof player.name === 'string' ? player.name.trim() : '';
+    if (!code || !name || codes.has(code) || !isPlayerMode(player.mode) || typeof player.isEnabled !== 'boolean') return [];
+
+    const resolverUrl = player.mode === 'IFRAME_RESOLVER' && typeof player.resolverUrl === 'string'
+      ? player.resolverUrl
+      : null;
+    const result: RegistryPlayer = { code, name, mode: player.mode, isEnabled: player.isEnabled, resolverUrl };
+    if (!hasSafeResolverConfiguration(result)) return [];
+
+    codes.add(code);
+    return [result];
+  });
 }
 
 function hasSafeResolverConfiguration(player: RegistryPlayer): boolean {
