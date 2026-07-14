@@ -89,7 +89,7 @@ it('pauses at a page boundary and resumes from the persisted next page', async (
 
   expect(collectPage).toHaveBeenCalledWith(expect.objectContaining({ page: 1 }));
   expect(prisma.collectTask.update).toHaveBeenCalledWith(expect.objectContaining({
-    data: expect.objectContaining({ status: 'PAUSED' }),
+    data: expect.objectContaining({ leaseToken: null, leaseExpiresAt: null }),
   }));
 
   prisma.collectTask.findUnique
@@ -118,9 +118,31 @@ it('honors a pause submitted while the final page is being collected', async () 
   await runTask('task-1');
 
   expect(prisma.collectTask.update).toHaveBeenCalledWith(expect.objectContaining({
-    data: expect.objectContaining({ status: 'PAUSED' }),
+    data: expect.objectContaining({ leaseToken: null, leaseExpiresAt: null }),
   }));
   expect(prisma.collectSource.update).not.toHaveBeenCalled();
+});
+
+it('does not overwrite a newer cancellation while releasing a paused task lease', async () => {
+  let persistentStatus = 'RUNNING';
+  prisma.collectTask.findUnique
+    .mockResolvedValueOnce(task())
+    .mockResolvedValueOnce(task())
+    .mockResolvedValueOnce(task({ status: 'PAUSED', nextPage: 2, pagesProcessed: 1, fetched: 20, saved: 20 }));
+  prisma.collectSource.findUnique.mockResolvedValue(source);
+  collectPage.mockResolvedValue({ fetched: 20, saved: 20, pageCount: 2, warnings: [] });
+  prisma.collectTask.update.mockImplementation(async ({ data }: { data: { status?: string } }) => {
+    if (data.currentPage === undefined) persistentStatus = 'CANCELLED';
+    if (data.status) persistentStatus = data.status;
+    return task({ status: persistentStatus });
+  });
+
+  await runTask('task-1');
+
+  expect(persistentStatus).toBe('CANCELLED');
+  expect(prisma.collectTask.update).toHaveBeenLastCalledWith(expect.objectContaining({
+    data: expect.not.objectContaining({ status: expect.any(String) }),
+  }));
 });
 
 it('preserves a pause submitted while a page exhausts retries', async () => {
@@ -139,7 +161,7 @@ it('preserves a pause submitted while a page exhausts retries', async () => {
 
   expect(collectPage).toHaveBeenCalledTimes(4);
   expect(prisma.collectTask.update).toHaveBeenCalledWith(expect.objectContaining({
-    data: expect.objectContaining({ status: 'PAUSED' }),
+    data: expect.objectContaining({ leaseToken: null, leaseExpiresAt: null }),
   }));
   expect(prisma.collectTask.updateMany).not.toHaveBeenCalledWith(expect.objectContaining({
     data: expect.objectContaining({ status: 'FAILED' }),

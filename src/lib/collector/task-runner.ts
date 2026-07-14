@@ -20,12 +20,10 @@ function errorMessage(error: unknown) {
   return error instanceof Error ? error.message.slice(0, 4_000) : '采集失败';
 }
 
-async function releaseTask(id: string, status: 'PAUSED' | 'CANCELLED') {
+async function releaseTaskLease(id: string) {
   await prisma.collectTask.update({
     where: { id },
     data: {
-      status,
-      ...(status === 'PAUSED' ? { pausedAt: new Date() } : {}),
       leaseToken: null,
       leaseExpiresAt: null,
     },
@@ -36,7 +34,7 @@ async function failTask(id: string, error: unknown) {
   const task = await prisma.collectTask.findUnique({ where: { id } });
   if (!task) return;
   if (task.status === 'PAUSED' || task.status === 'CANCELLED') {
-    await releaseTask(id, task.status);
+    await releaseTaskLease(id);
     return;
   }
   if (task.status !== 'RUNNING') return;
@@ -55,7 +53,7 @@ async function failTask(id: string, error: unknown) {
 
   const boundaryTask = await prisma.collectTask.findUnique({ where: { id } });
   if (boundaryTask?.status === 'PAUSED' || boundaryTask?.status === 'CANCELLED') {
-    await releaseTask(id, boundaryTask.status);
+    await releaseTaskLease(id);
   }
 }
 
@@ -99,7 +97,7 @@ export async function runTask(id: string): Promise<void> {
       const task = await prisma.collectTask.findUnique({ where: { id } });
       if (!task) return;
       if (task.status === 'PAUSED' || task.status === 'CANCELLED') {
-        await releaseTask(id, task.status);
+        await releaseTaskLease(id);
         return;
       }
       if (task.status !== 'RUNNING') return;
@@ -135,7 +133,7 @@ export async function runTask(id: string): Promise<void> {
       const checkpointedTask = await prisma.collectTask.findUnique({ where: { id } });
       if (!checkpointedTask) return;
       if (checkpointedTask.status === 'PAUSED' || checkpointedTask.status === 'CANCELLED') {
-        await releaseTask(id, checkpointedTask.status);
+        await releaseTaskLease(id);
         return;
       }
       if (checkpointedTask.status !== 'RUNNING') return;
