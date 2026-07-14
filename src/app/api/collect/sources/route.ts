@@ -8,6 +8,14 @@ import { suggestSourceKey } from '@/lib/collector/source-key';
 
 const sourceKeyPattern = /^[a-zA-Z0-9_-]{1,50}$/;
 
+function isSourceKeyConflict(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null || !('code' in error) || error.code !== 'P2002' || !('meta' in error)) return false;
+  const meta = error.meta;
+  if (typeof meta !== 'object' || meta === null || !('target' in meta)) return false;
+  const targets = Array.isArray(meta.target) ? meta.target : [meta.target];
+  return targets.some((target) => typeof target === 'string' && /(?:^|[^a-z0-9])source_?key(?:$|[^a-z0-9])/i.test(target));
+}
+
 function parsePlayerConfigs(value: unknown): Prisma.InputJsonValue | null {
   if (value === undefined || value === null || value === '') return null;
   try {
@@ -70,7 +78,7 @@ export async function POST(request: NextRequest) {
         });
         break;
       } catch (error: unknown) {
-        if (sourceKey !== undefined || typeof error !== 'object' || error === null || !('code' in error) || error.code !== 'P2002') throw error;
+        if (sourceKey !== undefined || !isSourceKeyConflict(error)) throw error;
       }
     }
 

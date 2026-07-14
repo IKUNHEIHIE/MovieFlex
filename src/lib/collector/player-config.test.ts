@@ -89,6 +89,14 @@ describe('normalizePlayerConfigs', () => {
     }]);
   });
 
+  it('drops an iframe resolver with a non-HTTP(S) prefix', () => {
+    expect(normalizePlayerConfigs([{
+      from: 'unsafe-resolver',
+      show: 'Unsafe resolver',
+      code: `MacPlayer.Html = '<iframe src="javascript:alert(1)'+MacPlayer.PlayUrl+'"></iframe>';`,
+    }])).toEqual([]);
+  });
+
   it('detects an HLS template for a nonstandard line code', () => {
     expect(normalizePlayerConfigs([{
       from: 'custom',

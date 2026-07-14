@@ -88,6 +88,16 @@ export function detectPlayerMode(code: string): PlayerModeDetection | null {
   return { mode: 'IFRAME_RESOLVER', resolverUrl: prefix };
 }
 
+function isHttpResolverUrl(value: string | undefined): boolean {
+  if (!value) return false;
+  try {
+    const protocol = new URL(value).protocol;
+    return protocol === 'http:' || protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export function normalizePlayerConfigs(input: unknown): NormalizedPlayerConfig[] {
   if (!Array.isArray(input)) return [];
 
@@ -102,6 +112,7 @@ export function normalizePlayerConfigs(input: unknown): NormalizedPlayerConfig[]
     const template = typeof config.code === 'string' ? config.code : '';
     const detected = detectPlayerMode(template);
     const isHls = /^(m3u8|hls)$/i.test(code) || /\.m3u8(?:[?#'"\s]|$)/i.test(template);
+    if (detected?.mode === 'IFRAME_RESOLVER' && !isHttpResolverUrl(detected.resolverUrl)) return [];
 
     return [{
       code,
