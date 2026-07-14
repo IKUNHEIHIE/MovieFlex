@@ -118,9 +118,20 @@ export async function runTask(id: string): Promise<void> {
         },
       });
 
-      if (nextPage > totalPages || (task.targetRecords !== null && saved >= task.targetRecords)) {
-        await prisma.collectTask.update({
-          where: { id },
+      const checkpointedTask = await prisma.collectTask.findUnique({ where: { id } });
+      if (!checkpointedTask) return;
+      if (checkpointedTask.status === 'PAUSED' || checkpointedTask.status === 'CANCELLED') {
+        await releaseTask(id, checkpointedTask.status);
+        return;
+      }
+      if (checkpointedTask.status !== 'RUNNING') return;
+
+      if (
+        checkpointedTask.nextPage > checkpointedTask.totalPages ||
+        (checkpointedTask.targetRecords !== null && checkpointedTask.saved >= checkpointedTask.targetRecords)
+      ) {
+        const completion = await prisma.collectTask.updateMany({
+          where: { id, status: 'RUNNING' },
           data: {
             status: 'SUCCEEDED',
             finishedAt: new Date(),
@@ -128,7 +139,9 @@ export async function runTask(id: string): Promise<void> {
             leaseExpiresAt: null,
           },
         });
-        await prisma.collectSource.update({ where: { sourceKey: task.sourceKey }, data: { lastSync: new Date() } });
+        if (completion.count === 1) {
+          await prisma.collectSource.update({ where: { sourceKey: task.sourceKey }, data: { lastSync: new Date() } });
+        }
         return;
       }
     }
