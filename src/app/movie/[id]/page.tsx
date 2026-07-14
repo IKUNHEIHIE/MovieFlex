@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import VideoPlayer from '@/components/video/VideoPlayer';
-import { buildResolverUrl, DEFAULT_PLAYERS, parsePlayGroups, playersFromSourceConfig, selectPlayback } from '@/lib/playback';
+import { buildResolverUrl, DEFAULT_PLAYERS, parsePlayGroups, playersFromSourceConfig, selectPlayback } from '@/lib/playback/playback';
 import FavoriteButton from '@/components/user/FavoriteButton';
 
 export const revalidate = 0; // 动态实时计算
