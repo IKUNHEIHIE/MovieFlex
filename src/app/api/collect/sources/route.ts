@@ -1,15 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import prisma from '@/lib/prisma';
-import { auth } from '@/lib/auth';
-import { validateCollectionUrl } from '@/lib/collection-url';
+import { requireAdmin, isAuthorizationFailure } from '@/lib/auth/authorization';
+import { validateCollectionUrl } from '@/lib/collector/collection-url';
+import { normalizePlayerConfigs } from '@/lib/collector/player-config';
+import { suggestSourceKey } from '@/lib/collector/source-key';
 
-// GET: 获取所有配置的采集源
+const sourceKeyPattern = /^[a-zA-Z0-9_-]{1,50}$/;
+
+function parsePlayerConfigs(value: unknown): Prisma.InputJsonValue | null {
+  if (value === undefined || value === null || value === '') return null;
+  try {
+    const parsed = typeof value === 'string' ? JSON.parse(value) : value;
+    if (!Array.isArray(parsed)) return null;
+    return normalizePlayerConfigs(parsed) as unknown as Prisma.InputJsonValue;
+  } catch {
+    return null;
+  }
+}
+
 export async function GET() {
   try {
-    const session = await auth();
-    if ((session?.user as { role?: string } | undefined)?.role !== 'ADMIN') {
-      return NextResponse.json({ success: false, error: '需要管理员权限' }, { status: 403 });
-    }
+    const actor = await requireAdmin();
+    if (isAuthorizationFailure(actor)) return actor;
 
     const sources = await prisma.collectSource.findMany({
       orderBy: { createdAt: 'desc' },
@@ -20,34 +33,46 @@ export async function GET() {
   }
 }
 
-// POST: 添加新采集源
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if ((session?.user as { role?: string } | undefined)?.role !== 'ADMIN') {
-      return NextResponse.json({ success: false, error: '需要管理员权限' }, { status: 403 });
-    }
+    const actor = await requireAdmin();
+    if (isAuthorizationFailure(actor)) return actor;
 
-    const { name, apiUrl, sourceKey, format } = await request.json();
+    const { name, apiUrl, sourceKey, format, playerConfigs } = await request.json();
     const normalizedUrl = validateCollectionUrl(apiUrl);
 
-    if (typeof name !== 'string' || !name.trim() || name.length > 100 || typeof sourceKey !== 'string' || !/^[a-zA-Z0-9_-]{1,50}$/.test(sourceKey) || !normalizedUrl) {
+    if (typeof name !== 'string' || !name.trim() || name.length > 100 || !normalizedUrl || (sourceKey !== undefined && (typeof sourceKey !== 'string' || !sourceKeyPattern.test(sourceKey)))) {
       return NextResponse.json({ success: false, error: '请填写所有必填字段' }, { status: 400 });
     }
 
-    // 校验 format 是否有效
     if (format !== 'JSON' && format !== 'XML') {
       return NextResponse.json({ success: false, error: '不支持的文件格式，只允许 JSON 或 XML' }, { status: 400 });
     }
 
-    const source = await prisma.collectSource.create({
-      data: {
-        name,
-        apiUrl: normalizedUrl,
-        sourceKey,
-        format,
-      },
-    });
+    const parsedPlayerConfigs = parsePlayerConfigs(playerConfigs);
+    if (playerConfigs !== undefined && playerConfigs !== null && playerConfigs !== '' && !parsedPlayerConfigs) {
+      return NextResponse.json({ success: false, error: '播放器配置格式无效' }, { status: 400 });
+    }
+
+    const baseSourceKey = sourceKey ?? suggestSourceKey(normalizedUrl);
+    let source;
+    for (let suffix = 1; ; suffix += 1) {
+      const candidate = suffix === 1 ? baseSourceKey : `${baseSourceKey.slice(0, 50 - String(suffix).length - 1)}-${suffix}`;
+      try {
+        source = await prisma.collectSource.create({
+          data: {
+            name: name.trim(),
+            apiUrl: normalizedUrl,
+            sourceKey: candidate,
+            format,
+            playerConfigs: parsedPlayerConfigs ?? Prisma.JsonNull,
+          },
+        });
+        break;
+      } catch (error: unknown) {
+        if (sourceKey !== undefined || typeof error !== 'object' || error === null || !('code' in error) || error.code !== 'P2002') throw error;
+      }
+    }
 
     return NextResponse.json({ success: true, data: source });
   } catch (error: unknown) {
