@@ -41,6 +41,8 @@ model Movie {
   actors      String?   @db.Text
   area        String?   @db.VarChar(100)
   language    String?   @db.VarChar(100)
+  areaClean   String?   @map("area_clean") @db.VarChar(50)
+  languageClean String? @map("language_clean") @db.VarChar(50)
   year        Int?
   remarks     String?   @db.VarChar(255)
   description String?   @db.Text
@@ -62,6 +64,8 @@ model Movie {
   @@index([area], name: "idx_area")
   @@index([year], name: "idx_year")
   @@index([language], name: "idx_language")
+  @@index([areaClean], name: "idx_area_clean")
+  @@index([languageClean], name: "idx_language_clean")
   @@map("movies")
 }
 

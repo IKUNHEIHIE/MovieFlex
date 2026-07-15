@@ -5,6 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import MouseTrail from '@/components/mouse-trail/MouseTrail';
 import Snowfall from '@/components/layout/Snowfall';
 import FurinaMascot from '@/components/mascot/FurinaMascot';
+import { auth } from '@/lib/auth/auth';
 import { getActiveThemeKey } from '@/lib/theme-registry';
 
 export const metadata: Metadata = {
@@ -13,11 +14,16 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const activeTheme = await getActiveThemeKey().catch(() => 'ice-blue');
+  const [activeTheme, session] = await Promise.all([
+    getActiveThemeKey().catch(() => 'ice-blue'),
+    auth(),
+  ]);
   return (
     <html lang="zh-CN" data-theme={activeTheme}>
-      <head><link rel="stylesheet" href={`/themes/${activeTheme}/style.css`} /></head>
-      <body><SessionProvider><Navbar /><MouseTrail /><Snowfall /><FurinaMascot />
+      <head>
+      <link rel="stylesheet" href={`/themes/${activeTheme}/style.css`} />
+    </head>
+      <body><SessionProvider session={session}><Navbar /><MouseTrail /><Snowfall /><FurinaMascot />
         <main style={{ minHeight: 'calc(100vh - var(--nav-height))' }}>{children}</main>
       </SessionProvider></body>
     </html>

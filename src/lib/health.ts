@@ -73,8 +73,6 @@ export async function getHealthStatus(): Promise<HealthData> {
     return cachedHealth.data;
   }
 
-  const startTime = Date.now();
-  
   const [dbResult, kafkaResult, metrics] = await Promise.all([
     checkDatabase(),
     checkKafka(),
@@ -84,7 +82,7 @@ export async function getHealthStatus(): Promise<HealthData> {
   const healthData: HealthData = {
     database: {
       status: dbResult.status,
-      latency: Date.now() - startTime,
+      latency: dbResult.latency,
     },
     kafka: {
       status: kafkaResult.status,
@@ -99,14 +97,22 @@ export async function getHealthStatus(): Promise<HealthData> {
   return healthData;
 }
 
-async function checkDatabase(): Promise<{ status: HealthStatus }> {
+export async function measureDatabaseHealth(
+  probe: () => Promise<unknown>,
+  now: () => number = Date.now,
+): Promise<{ status: HealthStatus; latency: number }> {
+  const start = now();
   try {
-    await prisma.$queryRaw`SELECT 1`;
-    return { status: 'ok' };
+    await probe();
+    return { status: 'ok', latency: now() - start };
   } catch (error) {
     console.error('Database health check failed:', error);
-    return { status: 'failed' };
+    return { status: 'failed', latency: now() - start };
   }
+}
+
+async function checkDatabase() {
+  return measureDatabaseHealth(() => prisma.$queryRaw`SELECT 1`);
 }
 
 async function checkKafka(): Promise<{ status: HealthStatus; connected: boolean }> {

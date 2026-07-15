@@ -22,7 +22,7 @@ interface MoviesPageProps {
 
 export default async function MoviesPage({ searchParams }: MoviesPageProps) {
   const params = await searchParams;
-  
+
   // 使用验证函数解析和验证参数
   const typeId = validateInteger(params.type, { min: 1, max: 10000 });
   const area = validateString(params.area, { maxLength: 100 });
@@ -30,7 +30,7 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
   const lang = validateString(params.lang, { maxLength: 50 });
   const sort = validateEnum(params.sort, ['latest', 'score', 'views'] as const) || 'latest';
   const page = validateInteger(params.page, { min: 1, max: 10000 }) || 1;
-  
+
   // 解析 pageSize 参数，支持 20/50/100，默认为 20
   const requestedSize = validateInteger(params.size, { min: 1, max: 100 }) || 20;
   const pageSizeOptions = [20, 50, 100];
@@ -38,18 +38,36 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
 
   const [categories, rawAreas, rawLanguages] = await Promise.all([
     prisma.category.findMany({ orderBy: { sortOrder: 'asc' } }),
-    prisma.movie.groupBy({ by: ['area'], where: { area: { not: null } } }),
-    prisma.movie.groupBy({ by: ['language'], where: { language: { not: null } } }),
+    prisma.movie.groupBy({ by: ['areaClean'], where: { areaClean: { not: null } }, orderBy: { _count: { areaClean: 'desc' } } }),
+    prisma.movie.groupBy({ by: ['languageClean'], where: { languageClean: { not: null } }, orderBy: { _count: { languageClean: 'desc' } } }),
   ]);
 
-  const areas = rawAreas.map((a: { area: string | null }) => a.area).filter(Boolean) as string[];
-  const languages = rawLanguages.map((l: { language: string | null }) => l.language).filter(Boolean) as string[];
+  const clean = (arr: { [k: string]: string | null }[], key: string, n: number, selected?: string): string[] => {
+    const values = arr.map(a => a[key]).filter((v): v is string => Boolean(v));
+    const set = new Set<string>();
+    if (selected) set.add(selected);
+    for (const v of values) { if (set.size >= n) break; set.add(v); }
+    return [...set];
+  };
+  const areas = clean(rawAreas, 'areaClean', 15, area);
+  const languages = clean(rawLanguages, 'languageClean', 15, lang);
 
   const where: Prisma.MovieWhereInput = {};
-  if (typeId) where.typeId = typeId;
-  if (area) where.area = area;
+  if (typeId) {
+    // 检查是否是父分类，如果是则包含所有子分类
+    const parentCategory = categories.find(c => c.id === typeId);
+    const children = categories.filter(c => c.parentId === typeId);
+    if (children.length > 0) {
+      // 是父分类，查询父分类和所有子分类
+      where.typeId = { in: [typeId, ...children.map(c => c.id)] };
+    } else {
+      // 是子分类，精确匹配
+      where.typeId = typeId;
+    }
+  }
+  if (area) where.areaClean = area;
   if (year) where.year = year;
-  if (lang) where.language = lang;
+  if (lang) where.languageClean = lang;
 
   const totalCount = await prisma.movie.count({ where });
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
@@ -74,7 +92,6 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
     if (lang) nextParams.set('lang', lang);
     if (sort !== 'latest') nextParams.set('sort', sort);
     if (pageSize !== 20) nextParams.set('size', String(pageSize));
-    if (page !== 1) nextParams.set('page', String(page));
 
     Object.entries(newParams).forEach(([key, value]) => {
       if (value === null || value === undefined || value === '') {
@@ -84,13 +101,23 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
       }
     });
 
-    if (!newParams.page && newParams.page !== null) {
+    if (!('page' in newParams)) {
       nextParams.delete('page');
     }
 
     const queryStr = nextParams.toString();
     return `/movies${queryStr ? '?' + queryStr : ''}`;
   };
+
+  // 构建分类树：父分类及其子分类
+  const parentCategories = categories.filter(c => !c.parentId);
+  const getChildCategories = (parentId: number) => categories.filter(c => c.parentId === parentId);
+
+  // 当前选中的父分类及其子分类
+  const selectedParent = typeId ? parentCategories.find(c => c.id === typeId) : null;
+  const displayCategories = selectedParent
+    ? [selectedParent, ...getChildCategories(selectedParent.id)]
+    : parentCategories;
 
   return (
     <div className="container" style={{ paddingBottom: '60px' }}>
@@ -102,7 +129,7 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <FilterRow
             label="分类"
-            items={categories.map((cat) => ({ id: cat.id, name: cat.name }))}
+            items={displayCategories.map((cat) => ({ id: cat.id, name: cat.name }))}
             activeId={typeId}
             getQueryUrl={getQueryUrl}
             paramName="type"

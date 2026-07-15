@@ -13,9 +13,11 @@ export default function MouseTrail({ config, enabled = true }: MouseTrailProps) 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const trailRef = useRef<MouseTrailEngine | null>(null);
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReducedMotion(media.matches);
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
@@ -24,6 +26,7 @@ export default function MouseTrail({ config, enabled = true }: MouseTrailProps) 
   }, []);
 
   const isVisible =
+    mounted &&
     enabled &&
     !reducedMotion &&
     !pathname.startsWith('/admin') &&

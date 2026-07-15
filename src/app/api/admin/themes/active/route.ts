@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, isAuthorizationFailure } from '@/lib/auth/authorization';
 import prisma from '@/lib/prisma';
+import { isBuiltInTheme } from '@/lib/theme-registry';
 
 export async function PATCH(request: NextRequest) {
   const actor = await requireAdmin();
   if (isAuthorizationFailure(actor)) return actor;
   const { themeKey } = await request.json();
   if (typeof themeKey !== 'string' || !/^[a-z0-9-]{1,50}$/.test(themeKey)) return NextResponse.json({ success: false, error: '主题标识无效' }, { status: 400 });
-  if (themeKey !== 'ice-blue' && !await prisma.theme.findUnique({ where: { themeKey }, select: { id: true } })) return NextResponse.json({ success: false, error: '主题不存在' }, { status: 404 });
+  // 内置主题不需要数据库记录
+  if (!isBuiltInTheme(themeKey) && !await prisma.theme.findUnique({ where: { themeKey }, select: { id: true } })) return NextResponse.json({ success: false, error: '主题不存在' }, { status: 404 });
   await prisma.systemSetting.upsert({ where: { key: 'active_theme' }, create: { key: 'active_theme', value: themeKey }, update: { value: themeKey } });
   return NextResponse.json({ success: true });
 }

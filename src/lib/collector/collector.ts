@@ -1,6 +1,7 @@
 import { XMLParser } from 'fast-xml-parser';
 import { toStringValue, toPositiveInteger, parseSourceTime } from './utils';
 import { getOrAutoMapCategory } from './category';
+import { normalizeMetadataValue } from '../metadata-normalization';
 import type { RawMovie, SourceFormat, CollectWarning, CollectResult, CollectPageInput } from './types';
 import prisma from '../prisma';
 
@@ -102,6 +103,8 @@ async function saveNormalizedMovies(
         actors: movie.vod_actor || null,
         area: movie.vod_area || null,
         language: movie.vod_lang || null,
+        areaClean: normalizeMetadataValue(movie.vod_area),
+        languageClean: normalizeMetadataValue(movie.vod_lang),
         year: toPositiveInteger(movie.vod_year) || null,
         remarks: movie.vod_remarks || null,
         description: movie.vod_content || null,

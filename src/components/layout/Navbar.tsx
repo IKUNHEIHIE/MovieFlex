@@ -24,9 +24,9 @@ export default function Navbar() {
         <nav className="primaryNav" aria-label="主导航">
           <Link href="/">首页</Link>
           <Link href="/movies?type=1">电影</Link>
-          <Link href="/movies?type=2">剧集</Link>
-          <Link href="/movies?type=3">综艺</Link>
-          <Link href="/movies?type=4">动漫</Link>
+          <Link href="/movies?type=10">剧集</Link>
+          <Link href="/movies?type=19">综艺</Link>
+          <Link href="/movies?type=24">动漫</Link>
         </nav>
         <div className="navActions">
           <form onSubmit={handleSearch} className="navSearch">

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizationFailure, requireAdmin } from '@/lib/auth/authorization';
+import { normalizeMetadataValue } from '@/lib/metadata-normalization';
 import prisma from '@/lib/prisma';
 
 function parseMoviePayload(body: Record<string, unknown>) {
@@ -13,6 +14,9 @@ function parseMoviePayload(body: Record<string, unknown>) {
   if (year !== null && (!Number.isSafeInteger(year) || year < 1900 || year > 2100)) return { error: '年份无效' } as const;
   if (!Number.isFinite(score) || score < 0 || score > 10) return { error: '评分无效' } as const;
 
+  const area = typeof body.area === 'string' ? body.area.trim() || null : null;
+  const language = typeof body.language === 'string' ? body.language.trim() || null : null;
+
   return {
     data: {
       title,
@@ -21,8 +25,10 @@ function parseMoviePayload(body: Record<string, unknown>) {
       actors: typeof body.actors === 'string' ? body.actors.trim() || null : null,
       description: typeof body.description === 'string' ? body.description.trim() || null : null,
       year,
-      area: typeof body.area === 'string' ? body.area.trim() || null : null,
-      language: typeof body.language === 'string' ? body.language.trim() || null : null,
+      area,
+      language,
+      areaClean: normalizeMetadataValue(area),
+      languageClean: normalizeMetadataValue(language),
       picUrl: typeof body.picUrl === 'string' ? body.picUrl.trim() || null : null,
       score,
     },
