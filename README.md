@@ -1,76 +1,74 @@
 # MovieFlex
 
-MovieFlex 是一个基于 Next.js 的影视内容平台，提供影片浏览、筛选、播放页、用户注册/登录、收藏与观看历史，并支持管理员配置影视采集源及用户行为事件投递。
+MovieFlex 是一个基于 Next.js 的影视内容平台，提供影片浏览、搜索、播放、用户收藏、观看历史、后台运营、AppleCMS 采集、分类映射、用户管理、行为事件投递、Kafka 统计消费和运营数据看板。
+
+## 功能概览
+
+- 前台观影：主页推荐、影片列表、搜索、详情页、HLS 播放、播放进度上报。
+- 用户体系：注册、登录、个人中心、账号管理、收藏、观看历史。
+- 后台运营：运营概览、影片库、用户管理、主题管理、数据大屏。
+- 采集管理：AppleCMS JSON/XML 采集源、采集任务、播放器配置、分类映射。
+- 数据统计：影片热度、分类分布、用户行为、时间趋势、DailyStats 聚合。
+- 事件管道：用户行为事件、EventOutbox、Kafka 投递、统计消费者。
+- 生产运维：PM2 应用进程、Kafka systemd 服务、健康检查和重试入口。
 
 ## 技术栈
 
-- Next.js 16 / React 19 / TypeScript
-- MySQL + Prisma
-- Auth.js（凭据登录）
-- Kafka（可选，用于用户行为事件）
+- Next.js 16 App Router / React 19 / TypeScript
+- Prisma 7 + MySQL/MariaDB adapter
+- Auth.js v5 credentials provider
+- Kafka + kafkajs
+- Recharts / Framer Motion
+- Vitest / Testing Library
+- PM2 / systemd
 
-## 运行环境
-
-- Node.js **20.9+**
-- MySQL 8.0+（必需）
-- Kafka（可选；未启动时事件投递会跳过，不影响页面基础使用）
-
-## 本地启动
+## 快速开始
 
 ```bash
 git clone https://github.com/IKUNHEIHIE/MovieFlex.git
 cd MovieFlex
 npm ci
 cp .env.example .env
-```
-
-编辑 `.env`，填入可用的 MySQL 连接信息和随机认证密钥，然后初始化数据库与 Prisma Client：
-
-```bash
 npx prisma generate
 npx prisma db push
 npm run dev
 ```
 
-打开 `http://localhost:3000`。首个注册用户会自动获得管理员角色。
+开发服务默认访问 `http://localhost:3000`。
 
-## 环境变量
+## 生产部署重点
 
-| 变量 | 是否必需 | 说明 |
-| --- | --- | --- |
-| `DATABASE_URL` | 是 | MySQL 连接串，例如 `mysql://USER:PASSWORD@HOST:3306/movieflex` |
-| `AUTH_SECRET` | 是 | Auth.js 会话加密密钥；可通过 `npx auth secret` 生成 |
-| `KAFKA_BROKER` | 否 | Kafka 地址，默认 `localhost:9092` |
+生产构建必须使用 webpack 构建模式：
 
-请勿提交 `.env` 或任何真实密钥。旧配置中的 `NEXTAUTH_SECRET` 建议迁移为 `AUTH_SECRET`。
+```bash
+npx next build --webpack
+pm2 start ecosystem.config.cjs
+pm2 save
+```
 
-## 生产部署
-
-1. 准备 Node.js 20.9+、MySQL，并配置上述环境变量。
-2. 在应用目录安装依赖并同步数据库结构：
-
-   ```bash
-   npm ci
-   npx prisma generate
-   npx prisma db push
-   ```
-
-3. 构建并启动服务：
-
-   ```bash
-   npm run build
-   npm run start
-   ```
-
-4. 通过反向代理将公网流量转发到应用端口（默认 `3000`）。如需行为分析，再部署 Kafka 并设置 `KAFKA_BROKER`。
-
-> 当前仓库尚未包含 Prisma migrations，因此首次部署使用 `prisma db push` 同步 `prisma/schema.prisma`。正式长期维护前，建议建立并提交迁移文件，后续改用 `prisma migrate deploy`。
+不要直接用默认 `next build` 作为生产部署构建命令；当前项目已验证生产构建应固定为 `npx next build --webpack`。
 
 ## 常用命令
 
 ```bash
-npm run dev      # 开发服务器
-npm run lint     # ESLint 检查
-npm run build    # 生产构建
-npm run start    # 启动生产服务
+npm run dev                 # 开发服务器
+npm test -- --run           # 全量测试
+npx next build --webpack    # 生产构建
+npm run db:generate         # 生成 Prisma Client
+npm run db:migrate:deploy   # 执行 Prisma migration
+npm run bootstrap:admin     # 引导管理员账号
 ```
+
+## 文档导航
+
+- [项目结构](docs/PROJECT_STRUCTURE.md)
+- [部署环境与运维](docs/DEPLOYMENT.md)
+- [API 文档](docs/API.md)
+- [模块介绍](docs/MODULES.md)
+- [分类管理需求](docs/REQUIREMENTS-catalog-management.md)
+
+## 安全说明
+
+- 不要提交 `.env`、数据库密码、GitHub token、管理员账号密码或任何真实密钥。
+- `.env.example` 只包含占位符。
+- 后台 API 需要管理员权限，普通用户会被重定向或返回未授权响应。
