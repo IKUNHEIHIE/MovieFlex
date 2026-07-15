@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeMetadataValue } from './metadata-normalization';
+import { normalizeMetadataValue, splitMetadataValues } from './metadata-normalization';
 
 describe('normalizeMetadataValue', () => {
   it('keeps a single normalized value unchanged', () => {
@@ -14,5 +14,9 @@ describe('normalizeMetadataValue', () => {
   it('returns null for blank source metadata', () => {
     expect(normalizeMetadataValue('   ')).toBeNull();
     expect(normalizeMetadataValue(null)).toBeNull();
+  });
+
+  it('splits every normalized value for multi-value metadata without duplicates', () => {
+    expect(splitMetadataValues('中国大陆 / 中国香港, 中国大陆')).toEqual(['中国大陆', '中国香港']);
   });
 });

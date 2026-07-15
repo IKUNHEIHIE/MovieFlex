@@ -7,17 +7,18 @@ const loginPage = readFileSync(join(root, 'src/app/login/page.tsx'), 'utf8');
 const registerRoute = readFileSync(join(root, 'src/app/api/auth/register/route.ts'), 'utf8');
 const userLayout = readFileSync(join(root, 'src/app/user/layout.tsx'), 'utf8');
 const authLib = readFileSync(join(root, 'src/lib/auth/auth.ts'), 'utf8');
+const callbackUrl = readFileSync(join(root, 'src/lib/auth/callback-url.ts'), 'utf8');
 
 describe('authentication and user route closure', () => {
   describe('login page callback URL validation', () => {
-    it('exports safeCallbackUrl function', () => {
-      expect(loginPage).toContain('export function safeCallbackUrl');
+    it('keeps page exports compatible with the Next.js page contract', () => {
+      expect(loginPage).not.toContain('export function safeCallbackUrl');
     });
 
     it('validates callback URL to prevent open redirects', () => {
-      expect(loginPage).toContain("value?.startsWith('/')");
-      expect(loginPage).toContain("!value.startsWith('//')");
-      expect(loginPage).toContain("? value : '/'");
+      expect(callbackUrl).toContain("value?.startsWith('/')");
+      expect(callbackUrl).toContain("!value.startsWith('//')");
+      expect(callbackUrl).toContain("? value : '/'");
     });
 
     it('uses safeCallbackUrl for post-login navigation', () => {

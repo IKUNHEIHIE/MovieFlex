@@ -1,15 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { categoryFindUnique, movieCreate, movieAggregate } = vi.hoisted(() => ({
+const { categoryFindUnique, movieCreate, movieAggregate, movieAreaDeleteMany, movieAreaCreateMany, movieLanguageDeleteMany, movieLanguageCreateMany } = vi.hoisted(() => ({
   categoryFindUnique: vi.fn(),
   movieCreate: vi.fn(),
   movieAggregate: vi.fn(),
+  movieAreaDeleteMany: vi.fn(),
+  movieAreaCreateMany: vi.fn(),
+  movieLanguageDeleteMany: vi.fn(),
+  movieLanguageCreateMany: vi.fn(),
 }));
 
 vi.mock('@/lib/prisma', () => ({
   default: {
     category: { findUnique: categoryFindUnique },
     movie: { aggregate: movieAggregate, create: movieCreate },
+    movieArea: { deleteMany: movieAreaDeleteMany, createMany: movieAreaCreateMany },
+    movieLanguage: { deleteMany: movieLanguageDeleteMany, createMany: movieLanguageCreateMany },
   },
 }));
 

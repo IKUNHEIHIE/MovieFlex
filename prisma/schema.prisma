@@ -23,6 +23,28 @@ model User {
   @@map("users")
 }
 
+model MovieArea {
+  movieId Int    @map("movie_id")
+  area    String @db.VarChar(50)
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, area])
+  @@index([area], name: "idx_movie_area")
+  @@map("movie_areas")
+}
+
+model MovieLanguage {
+  movieId  Int    @map("movie_id")
+  language String @db.VarChar(50)
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, language])
+  @@index([language], name: "idx_movie_language")
+  @@map("movie_languages")
+}
+
 enum UserRole {
   USER
   ADMIN
@@ -58,6 +80,8 @@ model Movie {
   favorites    UserFavorite[]
   ratings      UserRating[]
   watchHistory WatchHistory[]
+  areas        MovieArea[]
+  languages    MovieLanguage[]
 
   @@unique([sourceKey, vodId], name: "uk_source_vod")
   @@index([typeId], name: "idx_type")

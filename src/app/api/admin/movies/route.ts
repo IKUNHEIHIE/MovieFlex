@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizationFailure, requireAdmin } from '@/lib/auth/authorization';
 import { normalizeMetadataValue } from '@/lib/metadata-normalization';
+import { replaceMovieMetadataRelations } from '@/lib/movie-metadata-relations';
 import prisma from '@/lib/prisma';
 
 function parseMoviePayload(body: Record<string, unknown>) {
@@ -54,6 +55,7 @@ export async function POST(request: NextRequest) {
       vodId: (maxVodId._max.vodId ?? 0) + 1,
     },
   });
+  await replaceMovieMetadataRelations(prisma, data.id, parsed.data.area, parsed.data.language);
 
   return NextResponse.json({ success: true, data }, { status: 201 });
 }

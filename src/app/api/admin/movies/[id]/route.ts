@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthorizationFailure, requireAdmin } from '@/lib/auth/authorization';
 import { normalizeMetadataValue } from '@/lib/metadata-normalization';
+import { replaceMovieMetadataRelations } from '@/lib/movie-metadata-relations';
 import prisma from '@/lib/prisma';
 
 function parseId(value: string) {
@@ -90,6 +91,7 @@ export async function PUT(
         typeName: category.name,
       },
     });
+    await replaceMovieMetadataRelations(prisma, movie.id, parsed.data.area, parsed.data.language);
 
     return NextResponse.json({ success: true, data: movie });
   } catch (error) {

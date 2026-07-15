@@ -1,0 +1,18 @@
+[Unit]
+Description=MovieFlex Kafka broker
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties
+ExecStop=/opt/kafka/bin/kafka-server-stop.sh
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=100000
+StandardOutput=append:/var/log/movieflex-kafka.log
+StandardError=append:/var/log/movieflex-kafka.log
+
+[Install]
+WantedBy=multi-user.target

@@ -38,8 +38,8 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
 
   const [categories, rawAreas, rawLanguages] = await Promise.all([
     prisma.category.findMany({ orderBy: { sortOrder: 'asc' } }),
-    prisma.movie.groupBy({ by: ['areaClean'], where: { areaClean: { not: null } }, orderBy: { _count: { areaClean: 'desc' } } }),
-    prisma.movie.groupBy({ by: ['languageClean'], where: { languageClean: { not: null } }, orderBy: { _count: { languageClean: 'desc' } } }),
+    prisma.movieArea.groupBy({ by: ['area'], orderBy: { _count: { area: 'desc' } } }),
+    prisma.movieLanguage.groupBy({ by: ['language'], orderBy: { _count: { language: 'desc' } } }),
   ]);
 
   const clean = (arr: { [k: string]: string | null }[], key: string, n: number, selected?: string): string[] => {
@@ -49,8 +49,8 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
     for (const v of values) { if (set.size >= n) break; set.add(v); }
     return [...set];
   };
-  const areas = clean(rawAreas, 'areaClean', 15, area);
-  const languages = clean(rawLanguages, 'languageClean', 15, lang);
+  const areas = clean(rawAreas, 'area', 15, area);
+  const languages = clean(rawLanguages, 'language', 15, lang);
 
   const where: Prisma.MovieWhereInput = {};
   if (typeId) {
@@ -65,9 +65,9 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
       where.typeId = typeId;
     }
   }
-  if (area) where.areaClean = area;
+  if (area) where.areas = { some: { area } };
   if (year) where.year = year;
-  if (lang) where.languageClean = lang;
+  if (lang) where.languages = { some: { language: lang } };
 
   const totalCount = await prisma.movie.count({ where });
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));

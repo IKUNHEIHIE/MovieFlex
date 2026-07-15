@@ -2,6 +2,7 @@ import { XMLParser } from 'fast-xml-parser';
 import { toStringValue, toPositiveInteger, parseSourceTime } from './utils';
 import { getOrAutoMapCategory } from './category';
 import { normalizeMetadataValue } from '../metadata-normalization';
+import { replaceMovieMetadataRelations } from '../movie-metadata-relations';
 import type { RawMovie, SourceFormat, CollectWarning, CollectResult, CollectPageInput } from './types';
 import prisma from '../prisma';
 
@@ -115,10 +116,12 @@ async function saveNormalizedMovies(
 
       const existing = await prisma.movie.findUnique({ where: { uk_source_vod: { sourceKey, vodId } } });
       if (!existing) {
-        await prisma.movie.create({ data: { vodId, sourceKey, ...sharedData } });
+        const created = await prisma.movie.create({ data: { vodId, sourceKey, ...sharedData } });
+        await replaceMovieMetadataRelations(prisma, created.id, sharedData.area, sharedData.language);
       } else if (!existing.sourceTime || !sharedData.sourceTime || sharedData.sourceTime >= existing.sourceTime) {
         const update = Object.fromEntries(Object.entries(sharedData).map(([key, value]) => [key, value ?? existing[key as keyof typeof existing]]));
         await prisma.movie.update({ where: { id: existing.id }, data: update });
+        await replaceMovieMetadataRelations(prisma, existing.id, sharedData.area, sharedData.language);
       }
       saved += 1;
     } catch (error) {

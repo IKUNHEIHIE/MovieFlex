@@ -3,10 +3,7 @@
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
-
-export function safeCallbackUrl(value: string | null) {
-  return value?.startsWith('/') && !value.startsWith('//') ? value : '/';
-}
+import { safeCallbackUrl } from '@/lib/auth/callback-url';
 
 export default function LoginPage() {
   const [error, setError] = useState('');

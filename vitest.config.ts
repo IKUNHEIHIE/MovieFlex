@@ -4,6 +4,7 @@ import path from 'path';
 export default defineConfig({
   test: {
     setupFiles: ['./src/test/setup.ts'],
+    exclude: ['**/node_modules/**', '**/.worktrees/**'],
   },
   resolve: {
     alias: {
