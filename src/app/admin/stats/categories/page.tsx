@@ -1,5 +1,6 @@
 'use client';
 
+import '../admin-theme.css';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';

@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import styles from '../admin.module.css';
+import '../admin-theme.css';
 import ThemeButton from '@/components/admin/ThemeButton';
 import AdminPageHeader from '@/components/shared/AdminPageHeader';
 

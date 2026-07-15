@@ -1,5 +1,5 @@
+import '../../admin-theme.css';
 import CollectSourceManager from '@/components/admin/CollectSourceManager';
-import styles from '../../admin.module.css';
 import AdminPageHeader from '@/components/shared/AdminPageHeader';
 
 export default function CatalogSourcesPage() {

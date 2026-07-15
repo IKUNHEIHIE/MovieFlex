@@ -1,6 +1,9 @@
+import '../admin-theme.css';
 import prisma from '@/lib/prisma';
 import AdminPageHeader from '@/components/shared/AdminPageHeader';
 import UserManager from '@/components/admin/UserManager';
+
+export const revalidate = 0;
 
 export default async function AdminUsersPage() {
   const users = await prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 20, include: { _count: { select: { favorites: true, watchHistory: true } } } });
