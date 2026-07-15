@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import styles from '@/app/admin/admin.module.css';
 
 interface MovieEditFormProps {
   movie?: {
@@ -84,24 +85,18 @@ export default function MovieEditForm({ movie, categories }: MovieEditFormProps)
   };
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-      <h2 style={{ marginBottom: '20px' }}>{isEditing ? '编辑影片' : '新增影片'}</h2>
+    <div className={styles.stack}>
+      <h2>{isEditing ? '编辑影片' : '新增影片'}</h2>
 
       {error && (
-        <div style={{
-          padding: '10px',
-          marginBottom: '20px',
-          backgroundColor: '#fee',
-          color: '#c33',
-          borderRadius: '4px'
-        }}>
+        <div className={`${styles.message} ${styles.dangerText}`}>
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={`${styles.field} ${styles.fullWidth}`}>
+          <label>
             标题 *
           </label>
           <input
@@ -109,28 +104,18 @@ export default function MovieEditForm({ movie, categories }: MovieEditFormProps)
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             required
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ddd',
-              borderRadius: '4px'
-            }}
+            className={styles.input}
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+        <div className={styles.field}>
+          <label>
             分类
           </label>
           <select
             value={formData.typeId}
             onChange={(e) => setFormData({ ...formData, typeId: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ddd',
-              borderRadius: '4px'
-            }}
+            className={styles.select}
           >
             <option value="">选择分类</option>
             {categories.map((cat) => (
@@ -141,80 +126,56 @@ export default function MovieEditForm({ movie, categories }: MovieEditFormProps)
           </select>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+          <div className={styles.field}>
+            <label>
               导演
             </label>
             <input
               type="text"
               value={formData.director}
               onChange={(e) => setFormData({ ...formData, director: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
+              className={styles.input}
             />
           </div>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+          <div className={styles.field}>
+            <label>
               年份
             </label>
             <input
               type="number"
               value={formData.year}
               onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
+              className={styles.input}
             />
           </div>
-        </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+          <div className={styles.field}>
+            <label>
               地区
             </label>
             <input
               type="text"
               value={formData.area}
               onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
+              className={styles.input}
             />
           </div>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+          <div className={styles.field}>
+            <label>
               语言
             </label>
             <input
               type="text"
               value={formData.language}
               onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '8px',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }}
+              className={styles.input}
             />
           </div>
-        </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+        <div className={styles.field}>
+          <label>
             评分
           </label>
           <input
@@ -224,81 +185,51 @@ export default function MovieEditForm({ movie, categories }: MovieEditFormProps)
             max="10"
             value={formData.score}
             onChange={(e) => setFormData({ ...formData, score: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ddd',
-              borderRadius: '4px'
-            }}
+            className={styles.input}
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+        <div className={`${styles.field} ${styles.fullWidth}`}>
+          <label>
             海报 URL
           </label>
           <input
             type="url"
             value={formData.picUrl}
             onChange={(e) => setFormData({ ...formData, picUrl: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ddd',
-              borderRadius: '4px'
-            }}
+            className={styles.input}
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+        <div className={`${styles.field} ${styles.fullWidth}`}>
+          <label>
             演员
           </label>
           <textarea
             value={formData.actors}
             onChange={(e) => setFormData({ ...formData, actors: e.target.value })}
             rows={3}
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              resize: 'vertical'
-            }}
+            className={styles.textarea}
           />
         </div>
 
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+        <div className={`${styles.field} ${styles.fullWidth}`}>
+          <label>
             简介
           </label>
           <textarea
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             rows={5}
-            style={{
-              width: '100%',
-              padding: '8px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              resize: 'vertical'
-            }}
+            className={styles.textarea}
           />
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className={`${styles.actions} ${styles.fullWidth}`}>
           <button
             type="submit"
             disabled={loading}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#0070f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.6 : 1
-            }}
+            className={styles.button}
           >
             {loading ? '保存中...' : '保存'}
           </button>
@@ -307,14 +238,7 @@ export default function MovieEditForm({ movie, categories }: MovieEditFormProps)
             <button
               type="button"
               onClick={handleDelete}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#f44336',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
+              className={styles.buttonDanger}
             >
               删除
             </button>
@@ -323,14 +247,7 @@ export default function MovieEditForm({ movie, categories }: MovieEditFormProps)
           <button
             type="button"
             onClick={() => router.push('/admin/movies')}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#666',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
+            className={styles.buttonGhost}
           >
             取消
           </button>

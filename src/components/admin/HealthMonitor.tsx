@@ -7,8 +7,7 @@ import OutboxRetryButton from './OutboxRetryButton';
 import AdminPageHeader from '@/components/shared/AdminPageHeader';
 import AnimatedNumber from '@/components/animated/AnimatedNumber';
 import ChartContainer from '@/components/animated/ChartContainer';
-import StatusIndicator from '@/components/animated/StatusIndicator';
-import AdminCard from './AdminCard';
+import styles from '@/app/admin/admin.module.css';
 
 type Status = 'ok' | 'degraded' | 'failed';
 
@@ -97,15 +96,15 @@ function ServiceCard({
       transition={{ duration: 0.5 }}
       whileHover={{ scale: 1.02 }}
     >
-      <AdminCard hoverable>
+      <div className={styles.metricCard}>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
           <StatusDot status={status} />
-          <span style={{ fontWeight: 700, fontSize: '0.95rem', color: 'white' }}>{name}</span>
+          <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{name}</span>
         </div>
-        <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.85rem', display: 'grid', gap: 4 }}>
+        <div className={styles.muted} style={{ fontSize: '0.85rem', display: 'grid', gap: 4 }}>
           {detail}
         </div>
-      </AdminCard>
+      </div>
     </motion.div>
   );
 }
@@ -127,7 +126,7 @@ function LatencyGauge({ latency, status }: { latency: number; status: Status }) 
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <AdminCard>
+      <div className={styles.metricCard}>
         <div style={{ position: 'relative', width: 120, height: 120, margin: '0 auto' }}>
           <svg width="120" height="120" style={{ transform: 'rotate(-90deg)' }}>
             <circle
@@ -135,7 +134,7 @@ function LatencyGauge({ latency, status }: { latency: number; status: Status }) 
               cy="60"
               r="50"
               fill="none"
-              stroke="rgba(255, 255, 255, 0.1)"
+              stroke="#e5eaf3"
               strokeWidth="10"
             />
             <motion.circle
@@ -167,13 +166,13 @@ function LatencyGauge({ latency, status }: { latency: number; status: Status }) 
             >
               <AnimatedNumber value={latency} format={(v) => `${v}`} />
             </motion.div>
-            <div style={{ fontSize: 12, color: 'rgba(255, 255, 255, 0.6)' }}>ms</div>
+            <div className={styles.muted} style={{ fontSize: 12 }}>ms</div>
           </div>
         </div>
-        <div style={{ marginTop: 12, fontSize: 14, fontWeight: 600, color: 'white', textAlign: 'center' }}>
+        <div style={{ marginTop: 12, fontSize: 14, fontWeight: 600, textAlign: 'center' }}>
           数据库延迟
         </div>
-      </AdminCard>
+      </div>
     </motion.div>
   );
 }
@@ -239,14 +238,14 @@ export default function HealthMonitor({
   }));
 
   return (
-    <>
+    <div className={styles.pageStack}>
       <AdminPageHeader
         eyebrow="ANALYTICS"
         title="数据大屏"
         badge={`实时 · 已刷新 ${uptime}s`}
       />
 
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 22 }}>
+      <section className={styles.metricGrid} style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
         <ServiceCard
           name="数据库 (MySQL)"
           status={health.database.status}
@@ -271,11 +270,12 @@ export default function HealthMonitor({
         />
       </section>
 
-      <section style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16, marginBottom: 22 }}>
+      <section className={styles.metricGrid} style={{ gridTemplateColumns: '1fr 2fr' }}>
         <LatencyGauge latency={health.database.latency} status={health.database.status} />
-        <ChartContainer title="数据库延迟趋势（最近1小时）" loading={false}>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={chartData}>
+        <section className={styles.chartPanel}>
+          <ChartContainer title="数据库延迟趋势（最近1小时）" loading={false}>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="latencyGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#4f7df3" stopOpacity={0.8}/>
@@ -304,12 +304,14 @@ export default function HealthMonitor({
                 activeDot={{ r: 6, fill: '#4f7df3', stroke: '#fff', strokeWidth: 2 }}
                 animationDuration={1500}
               />
-            </AreaChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </section>
       </section>
 
-      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 22 }}>
+      <section className={styles.metricGrid} style={{ gridTemplateColumns: '1fr 1fr' }}>
+        <section className={styles.chartPanel}>
         <ChartContainer title="Kafka 待处理事件趋势" loading={false}>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={chartData}>
@@ -344,7 +346,9 @@ export default function HealthMonitor({
             </AreaChart>
           </ResponsiveContainer>
         </ChartContainer>
+        </section>
 
+        <section className={styles.chartPanel}>
         <ChartContainer title="影片库增长趋势" loading={false}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
@@ -372,29 +376,30 @@ export default function HealthMonitor({
             </LineChart>
           </ResponsiveContainer>
         </ChartContainer>
+        </section>
       </section>
 
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 22 }}>
+      <section className={styles.metricGrid}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <AdminCard hoverable>
-            <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.85rem' }}>影片库</span>
-            <strong style={{ display: 'block', marginTop: 8, fontSize: '1.65rem', color: 'white' }}>
+          <div className={styles.metricCard}>
+            <span>影片库</span>
+            <strong>
               <AnimatedNumber value={health.metrics.movieCount} />
             </strong>
-          </AdminCard>
+          </div>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <AdminCard hoverable>
-            <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.85rem' }}>最近采集</span>
-            <strong style={{ display: 'block', marginTop: 8, fontSize: '1.2rem', color: 'white' }}>
+          <div className={styles.metricCard}>
+            <span>最近采集</span>
+            <strong>
               {health.metrics.latestTask.status ? (
                 <>
                   <StatusDot status={health.metrics.latestTask.status === 'SUCCEEDED' ? 'ok' : health.metrics.latestTask.status === 'FAILED' ? 'failed' : 'degraded'} />
@@ -402,66 +407,64 @@ export default function HealthMonitor({
                 </>
               ) : '暂无'}
             </strong>
-          </AdminCard>
+          </div>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <AdminCard hoverable>
-            <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.85rem' }}>推荐批次</span>
-            <strong style={{ display: 'block', marginTop: 8, fontSize: '1.2rem', color: 'white' }}>
+          <div className={styles.metricCard}>
+            <span>推荐批次</span>
+            <strong>
               {health.metrics.latestRecommendation.batchId || '暂无'}
             </strong>
-          </AdminCard>
+          </div>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <AdminCard hoverable>
-            <span style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.85rem' }}>待投递事件</span>
-            <strong style={{ display: 'block', marginTop: 8, fontSize: '1.65rem', color: health.metrics.pendingEvents > 0 ? '#f59e0b' : 'white' }}>
+          <div className={styles.metricCard}>
+            <span>待投递事件</span>
+            <strong style={{ color: health.metrics.pendingEvents > 0 ? '#a86900' : undefined }}>
               <AnimatedNumber value={health.metrics.pendingEvents} />
             </strong>
-          </AdminCard>
+          </div>
         </motion.div>
       </section>
 
-      <section style={{ marginBottom: 22 }}>
-        <AdminCard title="Kafka 事件队列">
+      <section className={styles.panel}>
+        <h2>Kafka 事件队列</h2>
           <OutboxRetryButton />
-        </AdminCard>
       </section>
 
-      <section style={{ marginTop: 2 }}>
-        <AdminCard title="最近分析结果">
+      <section className={styles.panel}>
+        <h2>最近分析结果</h2>
           {analytics.length ? (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
+            <div className={styles.tableWrap}>
+              <table className={styles.table}>
                 <thead>
-                  <tr><th style={{ textAlign: 'left', padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)' }}>指标</th><th style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)' }}>键</th><th style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)' }}>数值</th><th style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)' }}>时间窗口</th><th style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)' }}>批次</th></tr>
+                  <tr><th>指标</th><th>键</th><th>数值</th><th>时间窗口</th><th>批次</th></tr>
                 </thead>
                 <tbody>
                   {analytics.map((item) => (
-                    <tr key={item.id} style={{ transition: 'background 200ms ease' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
-                      <td style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.9)' }}>{item.metricType}</td>
-                      <td style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.9)' }}>{item.metricKey}</td>
-                      <td style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.9)' }}>{Number(item.metricValue).toFixed(2)}</td>
-                      <td style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.9)' }}>{item.timeWindow}</td>
-                      <td style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.9)' }}>{item.batchId}</td>
+                    <tr key={item.id}>
+                      <td>{item.metricType}</td>
+                      <td>{item.metricKey}</td>
+                      <td>{Number(item.metricValue).toFixed(2)}</td>
+                      <td>{item.timeWindow}</td>
+                      <td>{item.batchId}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p style={{ color: 'rgba(255, 255, 255, 0.7)' }}>尚未写入 Spark 分析结果。Kafka 与 Spark 的运行状态需要由部署侧任务写入后才能显示。</p>
+            <p className={styles.muted}>尚未写入 Spark 分析结果。Kafka 与 Spark 的运行状态需要由部署侧任务写入后才能显示。</p>
           )}
-        </AdminCard>
       </section>
-    </>
+    </div>
   );
 }

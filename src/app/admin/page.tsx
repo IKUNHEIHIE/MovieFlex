@@ -11,11 +11,11 @@ export default async function AdminOverviewPage() {
     prisma.collectSource.findFirst({ orderBy: { lastSync: 'desc' }, select: { name: true, lastSync: true } }),
   ]);
 
-  return <>
+  return <div className={styles.pageStack}>
     <AdminPageHeader eyebrow="OPERATIONS" title="运营概览" badge="管理员专用" />
     <section className={styles.metrics}>
       <div><span>采集源总数</span><strong>{sources}</strong></div><div><span>启用采集源</span><strong>{activeSources}</strong></div><div><span>影片总数</span><strong>{movies}</strong></div><div><span>最近同步</span><strong>{latestSource?.lastSync ? new Date(latestSource.lastSync).toLocaleDateString() : '暂无'}</strong></div>
     </section>
-    <section className={styles.panel} style={{ marginTop: 22 }}><h2>内容采集</h2><p>管理 AppleCMS 采集源，执行增量或全量同步，并查看分类映射告警。</p><Link href="/admin/sources" className={styles.button}>进入采集源管理</Link></section>
-  </>;
+    <section className={styles.panel}><h2>内容采集</h2><p>管理 AppleCMS 采集源，执行增量或全量同步，并查看分类映射告警。</p><Link href="/admin/sources" className={styles.button}>进入采集源管理</Link></section>
+  </div>;
 }

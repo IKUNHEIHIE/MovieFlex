@@ -1,4 +1,3 @@
-import '../admin-theme.css';
 import prisma from '@/lib/prisma';
 import HealthMonitor from '@/components/admin/HealthMonitor';
 

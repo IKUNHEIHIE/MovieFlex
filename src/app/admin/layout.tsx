@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth/auth';
 import { OperationsSidebar } from '@/components/admin/OperationsSidebar';
+import AdminPageTransition from '@/components/admin/AdminPageTransition';
 import styles from './admin.module.css';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -12,7 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <OperationsSidebar />
     <main className={styles.main}>
       <div className={styles.ribbon}><strong>MovieFlex Operations</strong><span>采集与内容运营</span></div>
-      {children}
+      <AdminPageTransition>{children}</AdminPageTransition>
     </main>
   </div>;
 }

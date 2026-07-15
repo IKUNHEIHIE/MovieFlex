@@ -1,14 +1,13 @@
 'use client';
 
-import '../../admin-theme.css';
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, Legend } from 'recharts';
 import AnimatedCard from '@/components/animated/AnimatedCard';
 import AnimatedNumber from '@/components/animated/AnimatedNumber';
 import ChartContainer from '@/components/animated/ChartContainer';
-import AdminCard from '@/components/admin/AdminCard';
-import AdminButton from '@/components/admin/AdminButton';
+import AdminPageHeader from '@/components/shared/AdminPageHeader';
+import AdminChartTooltip from '@/components/admin/AdminChartTooltip';
+import styles from '../../admin.module.css';
 
 interface TrendData {
   date: string;
@@ -65,141 +64,83 @@ export default function TrendsStatsPage() {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          style={{
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(102, 126, 234, 0.2)',
-            padding: '16px 20px',
-            borderRadius: 12,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-          }}
-        >
-          <p style={{ fontWeight: 700, marginBottom: 10, fontSize: 14, color: '#1a1a2e' }}>
-            {label}
-          </p>
-          {payload.map((entry: any, index: number) => (
-            <div key={index} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: entry.color }} />
-              <span style={{ fontSize: 13, color: '#666', flex: 1 }}>{entry.name}:</span>
-              <strong style={{ fontSize: 13, color: '#1a1a2e' }}>{entry.value?.toLocaleString()}</strong>
-            </div>
-          ))}
-        </motion.div>
+        <AdminChartTooltip
+          title={label}
+          items={payload.map((entry: any) => ({
+            label: entry.name,
+            value: entry.value?.toLocaleString(),
+            color: entry.color,
+          }))}
+        />
       );
     }
     return null;
   };
 
   return (
-    <div style={{ padding: 24 }}>
-          <AdminCard title="时间趋势分析">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-              <span></span>
-              <div style={{ display: 'flex', gap: 8 }}>
+    <div className={styles.pageStack}>
+      <AdminPageHeader eyebrow="ANALYTICS" title="时间趋势分析" badge={summary ? `${summary.totalDays} 天` : '加载中'} />
+          <section className={styles.panel}>
+            <div className={styles.toolbar}>
+              <h2>统计周期</h2>
+              <div className={styles.toolbarActions}>
                 {[7, 30, 90].map((d) => (
-                  <motion.button
+                  <button
                     key={d}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
                     onClick={() => setDays(d)}
-                    style={{
-                      padding: '10px 20px',
-                      borderRadius: 8,
-                      border: 'none',
-                      background: days === d
-                        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                        : 'rgba(255, 255, 255, 0.08)',
-                      color: days === d ? 'white' : 'rgba(255, 255, 255, 0.8)',
-                      fontSize: 14,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      boxShadow: days === d
-                        ? '0 4px 15px rgba(102, 126, 234, 0.4)'
-                        : '0 2px 8px rgba(0,0,0,0.08)',
-                    }}
+                    className={days === d ? styles.button : styles.buttonSecondary}
                   >
                     最近 {d} 天
-                  </motion.button>
+                  </button>
                 ))}
               </div>
             </div>
-          </AdminCard>
+          </section>
 
       {/* Stats Cards */}
       {summary && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 20, marginBottom: 32 }}>
+        <div className={styles.metricGrid}>
           <AnimatedCard delay={0.1}>
-            <AdminCard hoverable>
-              <div style={{ 
-                padding: 24, 
-                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', 
-                borderRadius: 12, 
-                color: 'white' 
-              }}>
-                <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>日均观看量</p>
-                <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+              <div className={styles.metricCard}>
+                <span>日均观看量</span>
+                <strong>
                   <AnimatedNumber value={summary.avgDailyViews} />
-                </p>
+                </strong>
               </div>
-            </AdminCard>
           </AnimatedCard>
 
           <AnimatedCard delay={0.2}>
-            <AdminCard hoverable>
-              <div style={{ 
-                padding: 24, 
-                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', 
-                borderRadius: 12, 
-                color: 'white' 
-              }}>
-                <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>日均收藏量</p>
-                <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+              <div className={styles.metricCard}>
+                <span>日均收藏量</span>
+                <strong>
                   <AnimatedNumber value={summary.avgDailyFavorites} />
-                </p>
+                </strong>
               </div>
-            </AdminCard>
           </AnimatedCard>
 
           <AnimatedCard delay={0.3}>
-            <AdminCard hoverable>
-              <div style={{ 
-                padding: 24, 
-                background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', 
-                borderRadius: 12, 
-                color: 'white' 
-              }}>
-                <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>日均活跃用户</p>
-                <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+              <div className={styles.metricCard}>
+                <span>日均活跃用户</span>
+                <strong>
                   <AnimatedNumber value={summary.avgDAU} />
-                </p>
+                </strong>
               </div>
-            </AdminCard>
           </AnimatedCard>
 
           <AnimatedCard delay={0.4}>
-            <AdminCard hoverable>
-              <div style={{ 
-                padding: 24, 
-                background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', 
-                borderRadius: 12, 
-                color: 'white' 
-              }}>
-                <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>统计天数</p>
-                <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+              <div className={styles.metricCard}>
+                <span>统计天数</span>
+                <strong>
                   <AnimatedNumber value={summary.totalDays} />
-                </p>
+                </strong>
               </div>
-            </AdminCard>
           </AnimatedCard>
         </div>
       )}
 
       {/* Views Trend Chart */}
-      <div style={{ marginBottom: 32 }}>
-        <AdminCard>
+      <div className={styles.chartBlock}>
+        <section className={styles.chartPanel}>
           <ChartContainer title="观看量趋势" loading={loading}>
             <ResponsiveContainer width="100%" height={400}>
               <AreaChart data={chartData}>
@@ -218,35 +159,33 @@ export default function TrendsStatsPage() {
                     <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.05}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#eef2f8" vertical={false} />
                 <XAxis 
                   dataKey="date" 
-                  stroke="rgba(255, 255, 255, 0.5)" 
+                  stroke="#8290a8" 
                   fontSize={12} 
-                  tick={{ fill: 'rgba(255, 255, 255, 0.5)' }}
-                  axisLine={{ stroke: 'rgba(255, 255, 255, 0.2)' }}
+                  tick={{ fill: '#8290a8' }}
+                  axisLine={{ stroke: '#e5eaf3' }}
                 />
                 <YAxis 
-                  stroke="rgba(255, 255, 255, 0.5)" 
+                  stroke="#8290a8" 
                   fontSize={12} 
-                  tick={{ fill: 'rgba(255, 255, 255, 0.5)' }}
-                  axisLine={{ stroke: 'rgba(255, 255, 255, 0.2)' }}
+                  tick={{ fill: '#8290a8' }}
+                  axisLine={{ stroke: '#e5eaf3' }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend verticalAlign="top" height={36} />
-                <motion.g>
-                  <Area
-                    type="monotone"
-                    dataKey="观看量"
-                    stroke="#667eea"
-                    strokeWidth={3}
-                    fill="url(#viewsGradient)"
-                    dot={{ r: 4, fill: '#667eea', strokeWidth: 0 }}
-                    activeDot={{ r: 7, fill: '#667eea', stroke: '#fff', strokeWidth: 2 }}
-                    animationDuration={2000}
-                    animationEasing="ease-out"
-                  />
-                </motion.g>
+                <Area
+                  type="monotone"
+                  dataKey="观看量"
+                  stroke="#667eea"
+                  strokeWidth={3}
+                  fill="url(#viewsGradient)"
+                  dot={{ r: 4, fill: '#667eea', strokeWidth: 0 }}
+                  activeDot={{ r: 7, fill: '#667eea', stroke: '#fff', strokeWidth: 2 }}
+                  animationDuration={2000}
+                  animationEasing="ease-out"
+                />
                 <Area
                   type="monotone"
                   dataKey="用户观看"
@@ -272,27 +211,27 @@ export default function TrendsStatsPage() {
               </AreaChart>
             </ResponsiveContainer>
           </ChartContainer>
-        </AdminCard>
+        </section>
       </div>
 
       {/* Favorites & Users Trend */}
-      <AdminCard>
+      <section className={styles.chartPanel}>
         <ChartContainer title="收藏量与活跃用户趋势" loading={loading}>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#eef2f8" vertical={false} />
               <XAxis 
                 dataKey="date" 
-                stroke="rgba(255, 255, 255, 0.5)" 
+                stroke="#8290a8" 
                 fontSize={12} 
-                tick={{ fill: 'rgba(255, 255, 255, 0.5)' }}
-                axisLine={{ stroke: 'rgba(255, 255, 255, 0.2)' }}
+                tick={{ fill: '#8290a8' }}
+                axisLine={{ stroke: '#e5eaf3' }}
               />
               <YAxis 
-                stroke="rgba(255, 255, 255, 0.5)" 
+                stroke="#8290a8" 
                 fontSize={12} 
-                tick={{ fill: 'rgba(255, 255, 255, 0.5)' }}
-                axisLine={{ stroke: 'rgba(255, 255, 255, 0.2)' }}
+                tick={{ fill: '#8290a8' }}
+                axisLine={{ stroke: '#e5eaf3' }}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend verticalAlign="top" height={36} />
@@ -320,7 +259,7 @@ export default function TrendsStatsPage() {
             </LineChart>
           </ResponsiveContainer>
         </ChartContainer>
-      </AdminCard>
+      </section>
     </div>
   );
 }

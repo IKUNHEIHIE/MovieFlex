@@ -1,12 +1,13 @@
 'use client';
 
-import '../../admin-theme.css';
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import AnimatedCard from '@/components/animated/AnimatedCard';
 import AnimatedNumber from '@/components/animated/AnimatedNumber';
 import ChartContainer from '@/components/animated/ChartContainer';
+import AdminPageHeader from '@/components/shared/AdminPageHeader';
+import AdminChartTooltip from '@/components/admin/AdminChartTooltip';
+import styles from '../../admin.module.css';
 
 interface MovieStat {
   id: number;
@@ -77,118 +78,88 @@ export default function MoviesStatsPage() {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            padding: '12px 16px',
-            borderRadius: 8,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-            color: 'white'
-          }}
-        >
-          <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>{data.fullName}</p>
-          <p style={{ fontSize: 13, margin: '4px 0' }}>观看数: {data.观看数.toLocaleString()}</p>
-          <p style={{ fontSize: 13, margin: '4px 0' }}>收藏数: {data.收藏数.toLocaleString()}</p>
-          <p style={{ fontSize: 13, margin: '4px 0' }}>平均进度: {data.平均进度}%</p>
-        </motion.div>
+        <AdminChartTooltip
+          title={data.fullName}
+          items={[
+            { label: '观看数', value: data.观看数.toLocaleString() },
+            { label: '收藏数', value: data.收藏数.toLocaleString() },
+            { label: '平均进度', value: `${data.平均进度}%` },
+          ]}
+        />
       );
     }
     return null;
   };
 
   return (
-    <div style={{ padding: 24 }}>
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 24, color: '#1a1a2e' }}>
-          影片热度排行
-        </h1>
-      </motion.div>
+    <div className={styles.pageStack}>
+      <AdminPageHeader eyebrow="ANALYTICS" title="影片热度排行" badge={`${stats.totalMovies} 部`} />
 
       {/* Stats Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 20, marginBottom: 32 }}>
+      <div className={styles.metricGrid}>
         <AnimatedCard delay={0.1}>
-          <div style={{ padding: 24, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: 12, color: 'white' }}>
-            <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>总影片数</p>
-            <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+          <div className={styles.metricCard}>
+            <span>总影片数</span>
+            <strong>
               <AnimatedNumber value={stats.totalMovies} />
-            </p>
+            </strong>
           </div>
         </AnimatedCard>
 
         <AnimatedCard delay={0.2}>
-          <div style={{ padding: 24, background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', borderRadius: 12, color: 'white' }}>
-            <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>总观看次数</p>
-            <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+          <div className={styles.metricCard}>
+            <span>总观看次数</span>
+            <strong>
               <AnimatedNumber value={stats.totalViews} />
-            </p>
+            </strong>
           </div>
         </AnimatedCard>
 
         <AnimatedCard delay={0.3}>
-          <div style={{ padding: 24, background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', borderRadius: 12, color: 'white' }}>
-            <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>总收藏数</p>
-            <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+          <div className={styles.metricCard}>
+            <span>总收藏数</span>
+            <strong>
               <AnimatedNumber value={stats.totalFavorites} />
-            </p>
+            </strong>
           </div>
         </AnimatedCard>
 
         <AnimatedCard delay={0.4}>
-          <div style={{ padding: 24, background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', borderRadius: 12, color: 'white' }}>
-            <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>平均观看进度</p>
-            <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+          <div className={styles.metricCard}>
+            <span>平均观看进度</span>
+            <strong>
               <AnimatedNumber value={Math.round(stats.avgProgress * 100)} format={(v) => `${v}%`} />
-            </p>
+            </strong>
           </div>
         </AnimatedCard>
       </div>
 
       {/* Filters */}
       <AnimatedCard delay={0.5}>
-        <div style={{ padding: 20, background: 'white', borderRadius: 12, marginBottom: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 600, color: '#1a1a2e' }}>
+        <section className={styles.panel}>
+          <div className={styles.toolbarActions}>
+            <div className={styles.field}>
+              <label>
                 排序方式
               </label>
               <select 
                 value={sort} 
                 onChange={(e) => setSort(e.target.value)}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: 8,
-                  border: '2px solid #e0e0e0',
-                  fontSize: 14,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s'
-                }}
+                className={styles.select}
               >
                 <option value="viewCount">观看次数</option>
                 <option value="favoriteCount">收藏数</option>
                 <option value="avgProgress">平均进度</option>
               </select>
             </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: 8, fontSize: 14, fontWeight: 600, color: '#1a1a2e' }}>
+            <div className={styles.field}>
+              <label>
                 分类筛选
               </label>
               <select 
                 value={category} 
                 onChange={(e) => setCategory(e.target.value)}
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: 8,
-                  border: '2px solid #e0e0e0',
-                  fontSize: 14,
-                  cursor: 'pointer',
-                  transition: 'all 0.3s'
-                }}
+                className={styles.select}
               >
                 <option value="">全部分类</option>
                 <option value="1">动作片</option>
@@ -197,7 +168,7 @@ export default function MoviesStatsPage() {
               </select>
             </div>
           </div>
-        </div>
+        </section>
       </AnimatedCard>
 
       {/* Chart */}

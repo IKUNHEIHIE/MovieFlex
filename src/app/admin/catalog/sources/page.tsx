@@ -1,4 +1,3 @@
-import '../../admin-theme.css';
 import CollectSourceManager from '@/components/admin/CollectSourceManager';
 import AdminPageHeader from '@/components/shared/AdminPageHeader';
 

@@ -1,4 +1,3 @@
-import '../admin-theme.css';
 import prisma from '@/lib/prisma';
 import AdminPageHeader from '@/components/shared/AdminPageHeader';
 import UserManager from '@/components/admin/UserManager';

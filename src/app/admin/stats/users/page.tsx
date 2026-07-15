@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import AnimatedCard from '@/components/animated/AnimatedCard';
 import AnimatedNumber from '@/components/animated/AnimatedNumber';
 import ChartContainer from '@/components/animated/ChartContainer';
+import AdminPageHeader from '@/components/shared/AdminPageHeader';
+import AdminChartTooltip from '@/components/admin/AdminChartTooltip';
+import styles from '../../admin.module.css';
 
 interface UserStat {
   id: number;
@@ -77,21 +79,13 @@ export default function UsersStatsPage() {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            padding: '12px 16px',
-            borderRadius: 8,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-            color: 'white'
-          }}
-        >
-          <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>{data.name}</p>
-          <p style={{ fontSize: 13, margin: '4px 0' }}>人数: {data.value}</p>
-          <p style={{ fontSize: 13, margin: '4px 0' }}>占比: {((data.value / stats.totalUsers) * 100).toFixed(1)}%</p>
-        </motion.div>
+        <AdminChartTooltip
+          title={data.name}
+          items={[
+            { label: '人数', value: data.value },
+            { label: '占比', value: `${((data.value / stats.totalUsers) * 100).toFixed(1)}%` },
+          ]}
+        />
       );
     }
     return null;
@@ -101,80 +95,64 @@ export default function UsersStatsPage() {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            padding: '12px 16px',
-            borderRadius: 8,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
-            color: 'white'
-          }}
-        >
-          <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>{data.fullName}</p>
-          <p style={{ fontSize: 13, margin: '4px 0' }}>观看次数: {data.观看次数}</p>
-          <p style={{ fontSize: 13, margin: '4px 0' }}>收藏数: {data.收藏数}</p>
-          <p style={{ fontSize: 13, margin: '4px 0' }}>活跃度: {data.活跃度 === 'high' ? '高' : data.活跃度 === 'medium' ? '中' : '低'}</p>
-        </motion.div>
+        <AdminChartTooltip
+          title={data.fullName}
+          items={[
+            { label: '观看次数', value: data.观看次数 },
+            { label: '收藏数', value: data.收藏数 },
+            { label: '活跃度', value: data.活跃度 === 'high' ? '高' : data.活跃度 === 'medium' ? '中' : '低' },
+          ]}
+        />
       );
     }
     return null;
   };
 
   return (
-    <div style={{ padding: 24 }}>
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 24, color: '#1a1a2e' }}>
-          用户行为统计
-        </h1>
-      </motion.div>
+    <div className={styles.pageStack}>
+      <AdminPageHeader eyebrow="ANALYTICS" title="用户行为统计" badge={`${stats.totalUsers} 位用户`} />
 
       {/* Stats Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 20, marginBottom: 32 }}>
+      <div className={styles.metricGrid}>
         <AnimatedCard delay={0.1}>
-          <div style={{ padding: 24, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: 12, color: 'white' }}>
-            <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>用户总数</p>
-            <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+          <div className={styles.metricCard}>
+            <span>用户总数</span>
+            <strong>
               <AnimatedNumber value={stats.totalUsers} />
-            </p>
+            </strong>
           </div>
         </AnimatedCard>
 
         <AnimatedCard delay={0.2}>
-          <div style={{ padding: 24, background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', borderRadius: 12, color: 'white' }}>
-            <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>高活跃用户</p>
-            <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+          <div className={styles.metricCard}>
+            <span>高活跃用户</span>
+            <strong>
               <AnimatedNumber value={stats.highActive} />
-            </p>
+            </strong>
           </div>
         </AnimatedCard>
 
         <AnimatedCard delay={0.3}>
-          <div style={{ padding: 24, background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', borderRadius: 12, color: 'white' }}>
-            <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>中活跃用户</p>
-            <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+          <div className={styles.metricCard}>
+            <span>中活跃用户</span>
+            <strong>
               <AnimatedNumber value={stats.mediumActive} />
-            </p>
+            </strong>
           </div>
         </AnimatedCard>
 
         <AnimatedCard delay={0.4}>
-          <div style={{ padding: 24, background: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)', borderRadius: 12, color: 'white' }}>
-            <p style={{ fontSize: 14, opacity: 0.9, marginBottom: 8 }}>低活跃用户</p>
-            <p style={{ fontSize: 36, fontWeight: 700, margin: 0 }}>
+          <div className={styles.metricCard}>
+            <span>低活跃用户</span>
+            <strong>
               <AnimatedNumber value={stats.lowActive} />
-            </p>
+            </strong>
           </div>
         </AnimatedCard>
       </div>
 
       {/* Pie Chart */}
-      <div style={{ marginBottom: 32 }}>
+      <div className={styles.chartBlock}>
         <ChartContainer title="用户活跃度分布" loading={loading}>
           <ResponsiveContainer width="100%" height={450}>
             <PieChart>

@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import styles from '@/app/admin/admin.module.css';
 
 interface User {
   id: number;
@@ -87,67 +88,71 @@ export default function UserManager({ initialUsers, totalCount }: UserManagerPro
   };
 
   return (
-    <div>
-      <form action={async (form) => create(form)} style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
-        <input name="username" placeholder="用户名" required />
-        <input name="email" type="email" placeholder="邮箱" required />
-        <input name="password" type="password" placeholder="初始密码" minLength={6} required />
-        <select name="role"><option value="USER">用户</option><option value="ADMIN">管理员</option></select>
-        <button className="btn btn-primary">新增用户</button>
+    <div className={styles.pageStack}>
+      <form action={async (form) => create(form)} className={styles.toolbar}>
+        <input className={styles.input} name="username" placeholder="用户名" required />
+        <input className={styles.input} name="email" type="email" placeholder="邮箱" required />
+        <input className={styles.input} name="password" type="password" placeholder="初始密码" minLength={6} required />
+        <select className={styles.select} name="role"><option value="USER">用户</option><option value="ADMIN">管理员</option></select>
+        <button className={styles.button}>新增用户</button>
       </form>
-      {message && <p>{message}</p>}
+      {message && <p className={styles.message}>{message}</p>}
 
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="搜索用户名或邮箱" style={{ flex: 1 }} />
-        <button className="btn" type="submit">搜索</button>
+      <form onSubmit={handleSearch} className={styles.searchForm}>
+        <input className={styles.input} value={search} onChange={(e) => setSearch(e.target.value)} placeholder="搜索用户名或邮箱" />
+        <button className={styles.buttonSecondary} type="submit">搜索</button>
       </form>
 
-      <table>
-        <thead>
-          <tr>
-            <th>用户名</th>
-            <th>邮箱</th>
-            <th>角色</th>
-            <th>收藏</th>
-            <th>观看记录</th>
-            <th>注册时间</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.username}</td>
-              <td>{user.email}</td>
-              <td>{user.role === 'ADMIN' ? '管理员' : '用户'}</td>
-              <td>{user.favoritesCount}</td>
-              <td>{user.watchHistoryCount}</td>
-              <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-              <td>
-                <button className="btn" onClick={() => update(user)}>编辑</button>
-                <button className="btn" onClick={() => toggleRole(user.id, user.role)}>
-                  {user.role === 'ADMIN' ? '降为用户' : '设为管理员'}
-                </button>
-                <button className="btn" onClick={() => remove(user.id, user.username)}>删除</button>
-              </td>
+      <div className={styles.tableWrap}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>用户名</th>
+              <th>邮箱</th>
+              <th>角色</th>
+              <th>收藏</th>
+              <th>观看记录</th>
+              <th>注册时间</th>
+              <th>操作</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id}>
+                <td>{user.username}</td>
+                <td>{user.email}</td>
+                <td>{user.role === 'ADMIN' ? '管理员' : '用户'}</td>
+                <td>{user.favoritesCount}</td>
+                <td>{user.watchHistoryCount}</td>
+                <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                <td>
+                  <div className={styles.tableActions}>
+                    <button className={styles.buttonSecondary} onClick={() => update(user)}>编辑</button>
+                    <button className={styles.buttonSecondary} onClick={() => toggleRole(user.id, user.role)}>
+                      {user.role === 'ADMIN' ? '降为用户' : '设为管理员'}
+                    </button>
+                    <button className={styles.buttonDanger} onClick={() => remove(user.id, user.username)}>删除</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
-        <div>
+      <div className={styles.toolbar}>
+        <div className={styles.field}>
           <label>每页显示: </label>
-          <select value={pageSize} onChange={(e) => handlePageSizeChange(Number(e.target.value))}>
+          <select className={styles.select} value={pageSize} onChange={(e) => handlePageSizeChange(Number(e.target.value))}>
             <option value={20}>20</option>
             <option value={50}>50</option>
             <option value={100}>100</option>
           </select>
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <button className="btn" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>上一页</button>
+        <div className={styles.toolbarActions}>
+          <button className={styles.buttonSecondary} disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>上一页</button>
           <span>第 {currentPage} / {totalPages} 页，共 {totalUsers} 个用户</span>
-          <button className="btn" disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)}>下一页</button>
+          <button className={styles.buttonSecondary} disabled={currentPage === totalPages} onClick={() => setPage(currentPage + 1)}>下一页</button>
         </div>
       </div>
     </div>
