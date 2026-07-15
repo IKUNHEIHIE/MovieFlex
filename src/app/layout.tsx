@@ -5,6 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import MouseTrail from '@/components/mouse-trail/MouseTrail';
 import Snowfall from '@/components/layout/Snowfall';
 import FurinaMascot from '@/components/mascot/FurinaMascot';
+import ParticleBackground from '@/components/effects/ParticleBackground';
 import { getActiveThemeKey } from '@/lib/theme-registry';
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="zh-CN" data-theme={activeTheme}>
       <head><link rel="stylesheet" href={`/themes/${activeTheme}/style.css`} /></head>
-      <body><SessionProvider><Navbar /><MouseTrail /><Snowfall /><FurinaMascot />
+      <body><SessionProvider><Navbar /><MouseTrail /><Snowfall /><ParticleBackground /><FurinaMascot />
         <main style={{ minHeight: 'calc(100vh - var(--nav-height))' }}>{children}</main>
       </SessionProvider></body>
     </html>
