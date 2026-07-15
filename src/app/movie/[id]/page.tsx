@@ -32,7 +32,8 @@ export default async function MovieDetailPage({ params, searchParams }: MovieDet
   try {
     movie = await prisma.movie.findUnique({ where: { id: movieId } });
   } catch (error) {
-    movie = await prisma.movie.findUnique({ where: { id: movieId } });
+    console.error('数据库查询失败:', error);
+    movie = null;
   }
 
   if (!movie) return notFound();

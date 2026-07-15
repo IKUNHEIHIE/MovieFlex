@@ -112,7 +112,7 @@ export default function FurinaMascot() {
       onPointerMove={(event) => { if (pressedAt.current === event.pointerId && dragging.current) setPosition(bounded({ x: event.clientX - dragOffset.current.x, y: event.clientY - dragOffset.current.y })); }}
       onPointerUp={release} onPointerCancel={cleanupPointer} onLostPointerCapture={cleanupPointer} onClick={activateMascot}>
       {rippling && <span className={styles.ripple} aria-hidden="true" />}
-      <img src={`/mascot/furina/${POSES[pose]}`} alt="" draggable="false" onError={() => setImageFailed(true)} />
+      <img src={`/mascot/furina/${POSES[pose]}`} alt="" draggable="false" loading="lazy" onError={() => setImageFailed(true)} />
     </button>
   </aside>;
 }
