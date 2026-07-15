@@ -1,9 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import styles from '@/app/admin/admin.module.css';
 import OutboxRetryButton from './OutboxRetryButton';
 import AdminPageHeader from '@/components/shared/AdminPageHeader';
+import AnimatedNumber from '@/components/animated/AnimatedNumber';
+import ChartContainer from '@/components/animated/ChartContainer';
+import StatusIndicator from '@/components/animated/StatusIndicator';
 
 type Status = 'ok' | 'degraded' | 'failed';
 
@@ -28,6 +33,13 @@ interface AnalyticsItem {
   batchId: string;
 }
 
+interface HistoryPoint {
+  timestamp: string;
+  dbLatency: number;
+  pendingEvents: number;
+  movieCount: number;
+}
+
 const initialHealth: HealthData = {
   database: { status: 'ok', latency: 0 },
   kafka: { status: 'ok', connected: false },
@@ -46,15 +58,26 @@ function StatusDot({ status }: { status: Status }) {
     status === 'degraded' ? '#f59e0b' :
     '#ef4444';
   return (
-    <span style={{
-      display: 'inline-block',
-      width: 10,
-      height: 10,
-      borderRadius: '50%',
-      backgroundColor: color,
-      boxShadow: `0 0 6px ${color}`,
-      marginRight: 6,
-    }} />
+    <motion.span
+      animate={{
+        scale: [1, 1.2, 1],
+        opacity: [0.8, 1, 0.8]
+      }}
+      transition={{
+        duration: 2,
+        repeat: Infinity,
+        ease: 'easeInOut'
+      }}
+      style={{
+        display: 'inline-block',
+        width: 10,
+        height: 10,
+        borderRadius: '50%',
+        backgroundColor: color,
+        boxShadow: `0 0 6px ${color}`,
+        marginRight: 6,
+      }}
+    />
   );
 }
 
@@ -68,13 +91,19 @@ function ServiceCard({
   detail: React.ReactNode;
 }) {
   return (
-    <div style={{
-      border: '1px solid var(--line)',
-      borderRadius: 12,
-      background: 'var(--surface)',
-      padding: 20,
-      boxShadow: '0 8px 24px rgba(43, 74, 132, .045)',
-    }}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ scale: 1.02, boxShadow: '0 12px 32px rgba(43, 74, 132, .12)' }}
+      style={{
+        border: '1px solid var(--line)',
+        borderRadius: 12,
+        background: 'var(--surface)',
+        padding: 20,
+        boxShadow: '0 8px 24px rgba(43, 74, 132, .045)',
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
         <StatusDot status={status} />
         <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{name}</span>
@@ -82,7 +111,82 @@ function ServiceCard({
       <div style={{ color: 'var(--muted)', fontSize: '0.85rem', display: 'grid', gap: 4 }}>
         {detail}
       </div>
-    </div>
+    </motion.div>
+  );
+}
+
+function LatencyGauge({ latency, status }: { latency: number; status: Status }) {
+  const getColor = () => {
+    if (latency < 50) return '#22c55e';
+    if (latency < 100) return '#f59e0b';
+    return '#ef4444';
+  };
+
+  const getPercentage = () => {
+    return Math.min((latency / 200) * 100, 100);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: 20,
+        background: 'var(--surface)',
+        borderRadius: 12,
+        border: '1px solid var(--line)',
+      }}
+    >
+      <div style={{ position: 'relative', width: 120, height: 120 }}>
+        <svg width="120" height="120" style={{ transform: 'rotate(-90deg)' }}>
+          <circle
+            cx="60"
+            cy="60"
+            r="50"
+            fill="none"
+            stroke="#e5eaf3"
+            strokeWidth="10"
+          />
+          <motion.circle
+            cx="60"
+            cy="60"
+            r="50"
+            fill="none"
+            stroke={getColor()}
+            strokeWidth="10"
+            strokeLinecap="round"
+            strokeDasharray={`${2 * Math.PI * 50}`}
+            initial={{ strokeDashoffset: 2 * Math.PI * 50 }}
+            animate={{ strokeDashoffset: 2 * Math.PI * 50 * (1 - getPercentage() / 100) }}
+            transition={{ duration: 1, ease: 'easeOut' }}
+          />
+        </svg>
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          textAlign: 'center'
+        }}>
+          <motion.div
+            key={latency}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            style={{ fontSize: 24, fontWeight: 700, color: getColor() }}
+          >
+            <AnimatedNumber value={latency} format={(v) => `${v}`} />
+          </motion.div>
+          <div style={{ fontSize: 12, color: 'var(--muted)' }}>ms</div>
+        </div>
+      </div>
+      <div style={{ marginTop: 12, fontSize: 14, fontWeight: 600, color: 'var(--ink)' }}>
+        数据库延迟
+      </div>
+    </motion.div>
   );
 }
 
@@ -99,6 +203,7 @@ export default function HealthMonitor({
 }) {
   const [health, setHealth] = useState<HealthData>(initialHealth);
   const [tick, setTick] = useState(0);
+  const [history, setHistory] = useState<HistoryPoint[]>([]);
 
   useEffect(() => {
     let active = true;
@@ -111,14 +216,39 @@ export default function HealthMonitor({
         if (active) setHealth(prev => ({ ...prev, database: { ...prev.database, status: 'failed' }, kafka: { ...prev.kafka, status: 'failed', connected: false } }));
       }
     };
+
+    const fetchHistory = async () => {
+      try {
+        const res = await fetch('/api/admin/health/history', { cache: 'no-store' });
+        const data = await res.json();
+        if (active && data.success) setHistory(data.data);
+      } catch (error) {
+        console.error('Failed to fetch history:', error);
+      }
+    };
+
     fetchHealth();
-    const interval = setInterval(fetchHealth, 1000);
+    fetchHistory();
+    const interval = setInterval(fetchHealth, 5000);
+    const historyInterval = setInterval(fetchHistory, 5000);
     const tickInterval = setInterval(() => { if (active) setTick(t => t + 1); }, 1000);
-    return () => { active = false; clearInterval(interval); clearInterval(tickInterval); };
+    return () => { 
+      active = false; 
+      clearInterval(interval); 
+      clearInterval(historyInterval);
+      clearInterval(tickInterval); 
+    };
   }, []);
 
   const uptime = Math.floor(tick);
   const lastUpdate = new Date(health.timestamp).toLocaleTimeString('en-US', { hour12: false });
+
+  const chartData = history.map((point) => ({
+    time: new Date(point.timestamp).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+    延迟: point.dbLatency,
+    待处理事件: point.pendingEvents,
+    影片数: point.movieCount,
+  }));
 
   return (
     <>
@@ -153,9 +283,123 @@ export default function HealthMonitor({
         />
       </section>
 
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16, marginBottom: 22 }}>
+        <LatencyGauge latency={health.database.latency} status={health.database.status} />
+        <ChartContainer title="数据库延迟趋势（最近1小时）" loading={false}>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={chartData}>
+              <defs>
+                <linearGradient id="latencyGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#4f7df3" stopOpacity={0.8}/>
+                  <stop offset="100%" stopColor="#4f7df3" stopOpacity={0.1}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="time" stroke="#999" fontSize={12} />
+              <YAxis stroke="#999" fontSize={12} />
+              <Tooltip 
+                contentStyle={{
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(102, 126, 234, 0.2)',
+                  borderRadius: 12,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                }}
+              />
+              <Area
+                type="monotone"
+                dataKey="延迟"
+                stroke="#4f7df3"
+                strokeWidth={2}
+                fill="url(#latencyGradient)"
+                dot={{ r: 3, fill: '#4f7df3', strokeWidth: 0 }}
+                activeDot={{ r: 6, fill: '#4f7df3', stroke: '#fff', strokeWidth: 2 }}
+                animationDuration={1500}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </section>
+
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 22 }}>
+        <ChartContainer title="Kafka 待处理事件趋势" loading={false}>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={chartData}>
+              <defs>
+                <linearGradient id="eventsGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.8}/>
+                  <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.1}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="time" stroke="#999" fontSize={12} />
+              <YAxis stroke="#999" fontSize={12} />
+              <Tooltip 
+                contentStyle={{
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(102, 126, 234, 0.2)',
+                  borderRadius: 12,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                }}
+              />
+              <Area
+                type="monotone"
+                dataKey="待处理事件"
+                stroke="#f59e0b"
+                strokeWidth={2}
+                fill="url(#eventsGradient)"
+                dot={{ r: 3, fill: '#f59e0b', strokeWidth: 0 }}
+                activeDot={{ r: 6, fill: '#f59e0b', stroke: '#fff', strokeWidth: 2 }}
+                animationDuration={1500}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+
+        <ChartContainer title="影片库增长趋势" loading={false}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="time" stroke="#999" fontSize={12} />
+              <YAxis stroke="#999" fontSize={12} />
+              <Tooltip 
+                contentStyle={{
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(102, 126, 234, 0.2)',
+                  borderRadius: 12,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="影片数"
+                stroke="#22c55e"
+                strokeWidth={3}
+                dot={{ r: 4, fill: '#22c55e', strokeWidth: 0 }}
+                activeDot={{ r: 7, fill: '#22c55e', stroke: '#fff', strokeWidth: 2 }}
+                animationDuration={1500}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </section>
+
       <section className={styles.metrics} style={{ marginBottom: 22 }}>
-        <div><span>影片库</span><strong>{health.metrics.movieCount}</strong></div>
-        <div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <span>影片库</span>
+          <strong><AnimatedNumber value={health.metrics.movieCount} /></strong>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           <span>最近采集</span>
           <strong style={{ fontSize: '1.2rem' }}>
             {health.metrics.latestTask.status ? (
@@ -165,9 +409,25 @@ export default function HealthMonitor({
               </>
             ) : '暂无'}
           </strong>
-        </div>
-        <div><span>推荐批次</span><strong>{health.metrics.latestRecommendation.batchId || '暂无'}</strong></div>
-        <div><span>待投递事件</span><strong style={{ color: health.metrics.pendingEvents > 0 ? '#f59e0b' : undefined }}>{health.metrics.pendingEvents}</strong></div>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <span>推荐批次</span>
+          <strong>{health.metrics.latestRecommendation.batchId || '暂无'}</strong>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <span>待投递事件</span>
+          <strong style={{ color: health.metrics.pendingEvents > 0 ? '#f59e0b' : undefined }}>
+            <AnimatedNumber value={health.metrics.pendingEvents} />
+          </strong>
+        </motion.div>
       </section>
 
       <section className={styles.panel} style={{ marginTop: 2 }}>

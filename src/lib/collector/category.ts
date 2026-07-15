@@ -50,7 +50,32 @@ export async function getOrAutoMapCategory(
   });
 
   if (existing) {
-    return existing.status === 'IGNORED' ? 0 : (existing.localCategoryId ?? 0);
+    if (existing.status === 'IGNORED') return 0;
+
+    if (existing.status === 'PENDING_REVIEW') {
+      const normalizedName = sourceTypeName.trim();
+      const match = Object.entries(CATEGORY_SYNONYMS).find(([, aliases]) =>
+        aliases.some((alias) => normalizedName.includes(alias) || alias.includes(normalizedName)),
+      );
+
+      if (match) {
+        const [categoryName] = match;
+        let category = await prisma.category.findFirst({ where: { name: categoryName } });
+        if (!category) {
+          const slug = `auto-${sourceTypeId}-${Date.now()}`;
+          category = await prisma.category.create({ data: { name: categoryName, slug } });
+        }
+
+        await prisma.categoryMapping.update({
+          where: { id: existing.id },
+          data: { localCategoryId: category.id, status: 'MAPPED' },
+        });
+
+        return category.id;
+      }
+    }
+
+    return existing.localCategoryId ?? 0;
   }
 
   const normalizedName = sourceTypeName.trim();

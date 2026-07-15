@@ -198,6 +198,31 @@ export default function CategoryManagement() {
     }
   };
 
+  const handleSmartClassify = async () => {
+    const pendingCount = mappings.filter(m => m.status === 'PENDING_REVIEW').length;
+    if (pendingCount === 0) {
+      setStatus({ kind: 'error', message: '没有待审核的分类映射需要智能分类' });
+      return;
+    }
+    if (!confirm(`将自动分析 ${pendingCount} 个待审核的分类映射并尝试智能匹配，是否继续？`)) return;
+
+    try {
+      const url = selectedSource
+        ? `/api/admin/mappings/smart-classify?sourceKey=${encodeURIComponent(selectedSource)}`
+        : '/api/admin/mappings/smart-classify';
+      const res = await fetch(url, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setStatus({ kind: 'success', message: `智能分类完成：成功匹配 ${data.data.updated} 个分类，更新 ${data.data.totalMovies} 部影片` });
+        fetchData(selectedSource || undefined);
+      } else {
+        setStatus({ kind: 'error', message: data.error || '智能分类失败' });
+      }
+    } catch {
+      setStatus({ kind: 'error', message: '智能分类失败' });
+    }
+  };
+
   if (loading) {
     return <div>加载中...</div>;
   }
@@ -261,6 +286,9 @@ export default function CategoryManagement() {
                 重新分类已采集影片
               </button>
             )}
+            <button className={styles.button} onClick={handleSmartClassify}>
+              一键智能分类
+            </button>
           </div>
         </div>
         {mappings.length === 0 ? (

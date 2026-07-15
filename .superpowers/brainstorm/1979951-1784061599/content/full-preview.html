@@ -646,11 +646,9 @@ img { display: block; max-width: 100%; }
     return { x: x1, y: y1, z: z2 };
   }
   
-  // 预分配排序数组，避免每帧创建对象
-  var sortBuffer = new Array(icons.length);
-  for (var i = 0; i < sortBuffer.length; i++) {
-    sortBuffer[i] = { index: 0, z: 0 };
-  }
+  // 预分配排序数组，避免每帧创建对象。
+  // It must be populated after the Fibonacci sphere has created every icon.
+  var sortBuffer = [];
   
   function animate() {
     ctx.clearRect(0, 0, displayWidth, displayHeight);
@@ -787,7 +785,6 @@ img { display: block; max-width: 100%; }
   canvas.addEventListener('click', function(e) {
     if (hoveredIcon >= 0) {
       var icon = icons[hoveredIcon];
-      // 点击后旋转到该图标正面
       var targetX = -Math.atan2(icon.y, Math.sqrt(icon.x * icon.x + icon.z * icon.z));
       var targetY = Math.atan2(icon.x, icon.z);
       
@@ -799,13 +796,14 @@ img { display: block; max-width: 100%; }
         startTime: performance.now(),
         duration: 1200
       };
-      
-      console.log('点击分类:', icon.category.name);
     }
   });
   
   canvas.style.cursor = 'grab';
   initIcons();
+  sortBuffer = icons.map(function(_, index) {
+    return { index: index, z: 0 };
+  });
   animate();
 })();
 

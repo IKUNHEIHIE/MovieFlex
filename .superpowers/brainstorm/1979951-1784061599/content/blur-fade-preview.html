@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MovieFlex Blur Fade Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #3a8bbf;
+    --primary-soft: rgba(58, 139, 191, .09);
+    --bg: #edf5f8;
+    --surface: #fff;
+    --text: #1c3039;
+    --muted: #6e7e86;
+    --border: #d4e8f2;
+    --shadow: 0 10px 30px rgba(30, 99, 132, .10);
+  }
+  * { box-sizing: border-box; }
+  body { min-height: 100vh; margin: 0; overflow-x: hidden; background: radial-gradient(circle at 12% 0%, #d9f2fc 0, transparent 28rem), var(--bg); color: var(--text); font: 14px/1.57 "Noto Sans SC", sans-serif; }
+  .snow { position: fixed; inset: 64px 0 0; pointer-events: none; z-index: 1; overflow: hidden; }
+  .snow i { position: absolute; top: -10px; width: 6px; height: 6px; border-radius: 50%; background: rgba(113, 192, 232, .45); box-shadow: 0 0 12px rgba(255,255,255,.9); animation: snow 12s linear infinite; }
+  .snow i:nth-child(1) { left: 9%; animation-delay: -2s; } .snow i:nth-child(2) { left: 24%; animation-delay: -9s; animation-duration: 16s; } .snow i:nth-child(3) { left: 42%; animation-delay: -4s; } .snow i:nth-child(4) { left: 63%; animation-delay: -11s; animation-duration: 15s; } .snow i:nth-child(5) { left: 78%; animation-delay: -6s; } .snow i:nth-child(6) { left: 93%; animation-delay: -1s; animation-duration: 17s; }
+  @keyframes snow { to { transform: translate3d(16px, 105vh, 0); } }
+  header { position: sticky; top: 0; z-index: 10; height: 64px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,.9); backdrop-filter: blur(16px); }
+  .nav, main { width: min(1320px, calc(100% - 48px)); margin: auto; }
+  .nav { height: 100%; display: flex; align-items: center; gap: 28px; }
+  .logo { display: flex; gap: 8px; align-items: center; color: var(--text); font-size: 20px; font-weight: 700; letter-spacing: -.03em; }
+  .logo-mark { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 7px; background: linear-gradient(135deg,#3a8bbf,#75c7e9); color: white; font-size: 13px; }
+  .logo b { color: var(--primary); }
+  .nav-links { display: flex; gap: 5px; color: var(--muted); }
+  .nav-links span { padding: 6px 13px; border-radius: 6px; }
+  .nav-links .active { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+  main { position: relative; z-index: 2; padding: 34px 0 100px; }
+  .hero { position: relative; min-height: 285px; overflow: hidden; border-radius: 16px; background: linear-gradient(120deg,#0b3e5a,#19739b); box-shadow: var(--shadow); }
+  .hero::after { position: absolute; inset: 0; background: linear-gradient(90deg,rgba(6,38,56,.88),rgba(14,96,137,.2)); content: ""; }
+  .hero-content { position: relative; z-index: 1; padding: 62px 52px; color: white; }
+  .eyebrow { display: flex; gap: 8px; align-items: center; margin: 0; color: #c7edff; font-size: 11px; font-weight: 700; letter-spacing: .14em; }
+  .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; background: #83dcff; box-shadow: 0 0 12px #83dcff; content: ""; }
+  .hero h1 { margin: 10px 0 5px; font: 700 clamp(32px,5vw,52px)/1.12 "Noto Serif SC", serif; }
+  .hero p:last-child { max-width: 480px; margin: 10px 0 0; color: #dceffd; }
+  .section-head { display: flex; justify-content: space-between; align-items: end; margin: 46px 0 17px; padding-bottom: 13px; border-bottom: 1px solid var(--border); }
+  .section-head small { display: block; color: var(--primary); font-size: 10px; font-weight: 700; letter-spacing: .12em; }
+  .section-head h2 { margin: 2px 0 0; font: 700 25px/1.2 "Noto Serif SC", serif; }
+  button { padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--primary); font: 600 13px "Noto Sans SC", sans-serif; cursor: pointer; }
+  button:hover { border-color: var(--primary); background: var(--primary-soft); }
+  .rail { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 16px; }
+  .movie { min-width: 0; }
+  .poster { position: relative; aspect-ratio: 2/3; overflow: hidden; border-radius: 12px; background: linear-gradient(140deg,#5ca4c5,#143f5f); box-shadow: 0 5px 14px rgba(30,93,123,.13); }
+  .poster::before { position: absolute; inset: 0; background: linear-gradient(160deg,transparent 40%,rgba(3,31,49,.42)); content: ""; }
+  .poster span { position: absolute; right: 8px; top: 8px; padding: 3px 7px; border-radius: 4px; background: rgba(5,35,54,.7); color: #ffe58f; font-size: 11px; font-weight: 700; }
+  .poster em { position: absolute; bottom: 10px; left: 10px; color: #fff; font-style: normal; font-size: 23px; }
+  .movie h3 { overflow: hidden; margin: 9px 0 1px; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+  .movie p { margin: 0; color: var(--muted); font-size: 12px; }
+  /* Magic UI BlurFade equivalent: 0.35s duration, 4px blur, 8px offset. */
+  .blur-fade { opacity: 0; filter: blur(4px); transform: translateY(8px); animation: blur-fade-in .35s cubic-bezier(.16,1,.3,1) forwards; animation-delay: var(--delay); }
+  @keyframes blur-fade-in { to { opacity: 1; filter: blur(0); transform: translateY(0); } }
+  .note { margin-top: 28px; padding: 14px 16px; border: 1px solid #bce2f2; border-radius: 10px; background: rgba(255,255,255,.72); color: #416475; font-size: 13px; }
+  .note b { color: var(--primary); }
+  .mascot { position: fixed; right: 14px; bottom: 10px; z-index: 900; width: 126px; pointer-events: none; filter: drop-shadow(0 12px 12px rgba(29,89,167,.25)); animation: mascot 3.8s ease-in-out infinite; }
+  .mascot img { width: 100%; }
+  @keyframes mascot { 50% { transform: translateY(-7px) rotate(-1deg); } }
+  @media (max-width: 800px) { .nav,main { width: min(100% - 32px,1320px); } .nav-links { display:none; } .hero-content { padding: 48px 28px; } .rail { grid-template-columns: repeat(3,minmax(0,1fr)); } .movie:nth-child(n+7) { display:none; } }
+  @media (prefers-reduced-motion: reduce) { .snow { display:none; } .blur-fade,.mascot { animation:none; opacity:1; filter:none; transform:none; } }
+</style>
+</head>
+<body>
+<div class="snow" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<header><div class="nav"><div class="logo"><i class="logo-mark">M</i>Movie<b>Flex</b></div><div class="nav-links"><span class="active">首页</span><span>电影</span><span>剧集</span><span>综艺</span><span>动漫</span></div></div></header>
+<main>
+  <section class="hero blur-fade" style="--delay:0ms"><div class="hero-content"><p class="eyebrow">本周人气放映</p><h1>长安三万里</h1><p>一段跨越半生的知己之情，在大唐山河间徐徐展开。</p></div></section>
+  <section>
+    <div class="section-head blur-fade" style="--delay:110ms"><div><small>RECOMMENDED</small><h2>为你推荐</h2></div><button id="replay" type="button">重放动画</button></div>
+    <div id="rail" class="rail">
+      <article class="movie blur-fade" style="--delay:150ms"><div class="poster"><span>★ 8.5</span><em>🎬</em></div><h3>长安三万里</h3><p>动画 · 2023</p></article>
+      <article class="movie blur-fade" style="--delay:190ms"><div class="poster" style="background:linear-gradient(140deg,#8a5c46,#302233)"><span>★ 9.1</span><em>⚛</em></div><h3>奥本海默</h3><p>剧情 · 2023</p></article>
+      <article class="movie blur-fade" style="--delay:230ms"><div class="poster" style="background:linear-gradient(140deg,#9d466c,#34274b)"><span>★ 7.8</span><em>🌸</em></div><h3>繁花</h3><p>剧情 · 2024</p></article>
+      <article class="movie blur-fade" style="--delay:270ms"><div class="poster" style="background:linear-gradient(140deg,#b27e3d,#202b45)"><span>★ 8.3</span><em>◐</em></div><h3>沙丘2</h3><p>科幻 · 2024</p></article>
+      <article class="movie blur-fade" style="--delay:310ms"><div class="poster" style="background:linear-gradient(140deg,#397f76,#183953)"><span>★ 8.9</span><em>⚔</em></div><h3>庆余年 第二季</h3><p>古装 · 2024</p></article>
+      <article class="movie blur-fade" style="--delay:350ms"><div class="poster" style="background:linear-gradient(140deg,#816b44,#3b2633)"><span>★ 7.6</span><em>♟</em></div><h3>周处除三害</h3><p>动作 · 2024</p></article>
+      <article class="movie blur-fade" style="--delay:390ms"><div class="poster" style="background:linear-gradient(140deg,#7670b8,#27375b)"><span>★ 8.7</span><em>✦</em></div><h3>你的名字</h3><p>动画 · 2016</p></article>
+    </div>
+  </section>
+  <p class="note"><b>演示参数：</b>标题延迟 110ms，海报从 150ms 起每张增加 40ms，总时序不超过 390ms。首次出现才播放；实际实现会遵守系统“减少动态效果”设置。</p>
+</main>
+<div class="mascot"><img src="http://35.213.128.99:3001/mascot/furina/pose-01.png" alt="" onerror="this.parentElement.style.display='none'"></div>
+<script>
+document.getElementById('replay').addEventListener('click', function () {
+  var nodes = document.querySelectorAll('.blur-fade');
+  nodes.forEach(function (node) { node.style.animation = 'none'; });
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () { nodes.forEach(function (node) { node.style.animation = ''; }); });
+  });
+});
+</script>
+</body>
+</html>

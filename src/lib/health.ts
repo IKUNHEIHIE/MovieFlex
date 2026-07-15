@@ -27,8 +27,44 @@ export interface HealthData {
   timestamp: string;
 }
 
+export interface HealthHistoryPoint {
+  timestamp: string;
+  dbLatency: number;
+  pendingEvents: number;
+  movieCount: number;
+}
+
 let cachedHealth: { data: HealthData; timestamp: number } | null = null;
 const CACHE_TTL_MS = 3000;
+
+// In-memory history storage (last 1 hour, 1 point per 10 seconds = 360 points max)
+const healthHistory: HealthHistoryPoint[] = [];
+const HISTORY_MAX_POINTS = 360;
+const HISTORY_INTERVAL_MS = 10000; // 10 seconds
+let lastHistoryUpdate = 0;
+
+function addHistoryPoint(data: HealthData) {
+  const now = Date.now();
+  if (now - lastHistoryUpdate < HISTORY_INTERVAL_MS) {
+    return;
+  }
+  lastHistoryUpdate = now;
+
+  healthHistory.push({
+    timestamp: data.timestamp,
+    dbLatency: data.database.latency,
+    pendingEvents: data.metrics.pendingEvents,
+    movieCount: data.metrics.movieCount,
+  });
+
+  if (healthHistory.length > HISTORY_MAX_POINTS) {
+    healthHistory.shift();
+  }
+}
+
+export function getHealthHistory(): HealthHistoryPoint[] {
+  return [...healthHistory];
+}
 
 export async function getHealthStatus(): Promise<HealthData> {
   const now = Date.now();
@@ -59,6 +95,7 @@ export async function getHealthStatus(): Promise<HealthData> {
   };
 
   cachedHealth = { data: healthData, timestamp: now };
+  addHistoryPoint(healthData);
   return healthData;
 }
 
