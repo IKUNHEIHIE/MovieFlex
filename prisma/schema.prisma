@@ -298,3 +298,23 @@ model DoubanMovie {
 
   @@map("douban_movies")
 }
+
+model DailyStats {
+  id             Int      @id @default(autoincrement())
+  date           DateTime @db.Date
+  dimension      String   @map("dimension") @db.VarChar(50)
+  dimensionId    Int?     @map("dimension_id")
+  totalViews     Int      @default(0) @map("total_views")
+  userViews      Int      @default(0) @map("user_views")
+  guestViews     Int      @default(0) @map("guest_views")
+  uniqueUsers    Int      @default(0) @map("unique_users")
+  totalFavorites Int      @default(0) @map("total_favorites")
+  avgProgress    Decimal  @default(0) @map("avg_progress") @db.Decimal(5, 4)
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@unique([date, dimension, dimensionId], name: "uk_dimension_date")
+  @@index([dimension, date], name: "idx_dimension_date")
+  @@index([date], name: "idx_date")
+  @@map("daily_stats")
+}

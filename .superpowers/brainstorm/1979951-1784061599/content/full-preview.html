@@ -372,6 +372,12 @@ img { display: block; max-width: 100%; }
   <div class="hero-dots"><span class="hero-dot active"></span><span class="hero-dot"></span><span class="hero-dot"></span><span class="hero-dot"></span></div>
 </div>
 
+<!-- ===== ICON CLOUD ===== -->
+<div class="label-bar" style="margin-top:32px;"><span class="label-pill">Icon Cloud</span><span class="label-hint">3D 交互式影片分类球体 · 鼠标拖拽/悬停旋转 · 点击跳转</span></div>
+<div id="icon-cloud-container" style="display:flex;justify-content:center;align-items:center;padding:24px 0;"><canvas id="icon-cloud-canvas" width="360" height="360" aria-label="3D 影片分类球体" role="img"></canvas></div>
+<div id="icon-cloud-tooltip" style="position:fixed;padding:6px 14px;background:rgba(0,0,0,0.85);color:#fff;font-size:12px;border-radius:6px;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:9000;"></div>
+<!-- ===== END ICON CLOUD ===== -->
+
 <div style="margin-top:24px;">
   <div class="segmented">
     <div class="segmented-item segmented-item-active">为你推荐</div>
@@ -527,6 +533,280 @@ img { display: block; max-width: 100%; }
   document.addEventListener('touchend',function(){mouseInPage=false;});
   window.addEventListener('resize',resize);
   resize();requestAnimationFrame(animate);
+})();
+
+// ===== ICON CLOUD (Optimized with offscreen canvas) =====
+(function() {
+  var canvas = document.getElementById('icon-cloud-canvas');
+  var tooltip = document.getElementById('icon-cloud-tooltip');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  
+  // DPR 缩放
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var displayWidth = 360;
+  var displayHeight = 360;
+  canvas.width = displayWidth * dpr;
+  canvas.height = displayHeight * dpr;
+  canvas.style.width = displayWidth + 'px';
+  canvas.style.height = displayHeight + 'px';
+  ctx.scale(dpr, dpr);
+  
+  // 影片分类数据
+  var categories = [
+    { name: '电影', icon: '🎬', color: '#3a8bbf' },
+    { name: '电视剧', icon: '📺', color: '#5aa3d1' },
+    { name: '综艺', icon: '🎤', color: '#7cc8ef' },
+    { name: '动漫', icon: '🎭', color: '#4a9bc7' },
+    { name: '纪录片', icon: '🎥', color: '#2d7aab' },
+    { name: '动作', icon: '💥', color: '#d95252' },
+    { name: '喜剧', icon: '😄', color: '#f5a623' },
+    { name: '科幻', icon: '🚀', color: '#7b61ff' },
+    { name: '爱情', icon: '💕', color: '#ff6b9d' },
+    { name: '悬疑', icon: '🔍', color: '#6b7280' },
+    { name: '恐怖', icon: '👻', color: '#4b5563' },
+    { name: '奇幻', icon: '✨', color: '#a855f7' }
+  ];
+  
+  // 预渲染图标到离屏 canvas
+  var offscreenCanvases = [];
+  var ICON_SIZE = 64; // 预渲染尺寸
+  
+  function createOffscreenIcon(category) {
+    var offscreen = document.createElement('canvas');
+    offscreen.width = ICON_SIZE;
+    offscreen.height = ICON_SIZE;
+    var offCtx = offscreen.getContext('2d');
+    
+    // 绘制圆形背景
+    offCtx.beginPath();
+    offCtx.arc(ICON_SIZE/2, ICON_SIZE/2, ICON_SIZE/2 - 2, 0, Math.PI * 2);
+    offCtx.fillStyle = category.color;
+    offCtx.fill();
+    
+    // 绘制图标
+    offCtx.font = (ICON_SIZE * 0.5) + 'px Arial';
+    offCtx.textAlign = 'center';
+    offCtx.textBaseline = 'middle';
+    offCtx.fillText(category.icon, ICON_SIZE/2, ICON_SIZE/2);
+    
+    return offscreen;
+  }
+  
+  // 初始化离屏 canvas
+  categories.forEach(function(cat) {
+    offscreenCanvases.push(createOffscreenIcon(cat));
+  });
+  
+  // 3D 球体参数
+  var icons = [];
+  var rotation = { x: 0, y: 0 };
+  var isDragging = false;
+  var lastMousePos = { x: 0, y: 0 };
+  var mousePos = { x: 0, y: 0 };
+  var hoveredIcon = -1;
+  var targetRotation = null;
+  
+  // Fibonacci 球体分布
+  function initIcons() {
+    var n = categories.length;
+    var offset = 2 / n;
+    var increment = Math.PI * (3 - Math.sqrt(5));
+    
+    for (var i = 0; i < n; i++) {
+      var y = i * offset - 1 + offset / 2;
+      var r = Math.sqrt(1 - y * y);
+      var phi = i * increment;
+      var x = Math.cos(phi) * r;
+      var z = Math.sin(phi) * r;
+      
+      icons.push({
+        x: x * 120,
+        y: y * 120,
+        z: z * 120,
+        category: categories[i],
+        id: i
+      });
+    }
+  }
+  
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+  
+  function rotatePoint(p, rx, ry) {
+    var cosX = Math.cos(rx), sinX = Math.sin(rx);
+    var cosY = Math.cos(ry), sinY = Math.sin(ry);
+    
+    var x1 = p.x * cosY - p.z * sinY;
+    var z1 = p.x * sinY + p.z * cosY;
+    var y1 = p.y * cosX - z1 * sinX;
+    var z2 = p.y * sinX + z1 * cosX;
+    
+    return { x: x1, y: y1, z: z2 };
+  }
+  
+  // 预分配排序数组，避免每帧创建对象
+  var sortBuffer = new Array(icons.length);
+  for (var i = 0; i < sortBuffer.length; i++) {
+    sortBuffer[i] = { index: 0, z: 0 };
+  }
+  
+  function animate() {
+    ctx.clearRect(0, 0, displayWidth, displayHeight);
+    
+    // 自动旋转
+    if (!isDragging && !targetRotation) {
+      rotation.x += 0.003;
+      rotation.y += 0.005;
+    }
+    
+    // 目标旋转动画
+    if (targetRotation) {
+      var elapsed = performance.now() - targetRotation.startTime;
+      var progress = Math.min(1, elapsed / targetRotation.duration);
+      var eased = easeOutCubic(progress);
+      
+      rotation.x = targetRotation.startX + (targetRotation.x - targetRotation.startX) * eased;
+      rotation.y = targetRotation.startY + (targetRotation.y - targetRotation.startY) * eased;
+      
+      if (progress >= 1) {
+        targetRotation = null;
+      }
+    }
+    
+    // 计算所有图标的旋转后位置并排序
+    for (var i = 0; i < icons.length; i++) {
+      var rotated = rotatePoint(icons[i], rotation.x, rotation.y);
+      sortBuffer[i].index = i;
+      sortBuffer[i].z = rotated.z;
+    }
+    sortBuffer.sort(function(a, b) { return a.z - b.z; });
+    
+    // 绘制所有图标（使用预渲染的离屏 canvas）
+    for (var j = 0; j < sortBuffer.length; j++) {
+      var idx = sortBuffer[j].index;
+      var icon = icons[idx];
+      var rotated = rotatePoint(icon, rotation.x, rotation.y);
+      var scale = (rotated.z + 200) / 300;
+      var opacity = Math.max(0.3, Math.min(1, (rotated.z + 150) / 200));
+      
+      var screenX = displayWidth / 2 + rotated.x;
+      var screenY = displayHeight / 2 + rotated.y;
+      var size = 56 * scale;
+      
+      ctx.save();
+      ctx.globalAlpha = opacity;
+      
+      // 使用 drawImage 代替 fillText（性能提升 10x+）
+      ctx.drawImage(offscreenCanvases[idx], screenX - size/2, screenY - size/2, size, size);
+      
+      // 悬停高亮
+      if (idx === hoveredIcon) {
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, size/2, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      
+      // 绘制文字标签（只在前面时绘制）
+      if (rotated.z > -50) {
+        ctx.font = '11px "Noto Sans SC", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(255,255,255,' + opacity + ')';
+        ctx.fillText(icon.category.name, screenX, screenY + size/2 + 14);
+      }
+      
+      ctx.restore();
+    }
+    
+    requestAnimationFrame(animate);
+  }
+  
+  // 鼠标交互
+  canvas.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    lastMousePos = { x: e.clientX, y: e.clientY };
+    canvas.style.cursor = 'grabbing';
+  });
+  
+  canvas.addEventListener('mousemove', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    mousePos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    
+    if (isDragging) {
+      var dx = e.clientX - lastMousePos.x;
+      var dy = e.clientY - lastMousePos.y;
+      rotation.y += dx * 0.005;
+      rotation.x += dy * 0.005;
+      lastMousePos = { x: e.clientX, y: e.clientY };
+    } else {
+      // 检测悬停
+      hoveredIcon = -1;
+      for (var i = 0; i < icons.length; i++) {
+        var rotated = rotatePoint(icons[i], rotation.x, rotation.y);
+        var scale = (rotated.z + 200) / 300;
+        var screenX = displayWidth / 2 + rotated.x;
+        var screenY = displayHeight / 2 + rotated.y;
+        var size = 56 * scale;
+        
+        var dx = mousePos.x - screenX;
+        var dy = mousePos.y - screenY;
+        
+        if (dx * dx + dy * dy < (size/2) * (size/2)) {
+          hoveredIcon = i;
+          canvas.style.cursor = 'pointer';
+          tooltip.textContent = icons[i].category.name;
+          tooltip.style.left = (e.clientX + 10) + 'px';
+          tooltip.style.top = (e.clientY - 30) + 'px';
+          tooltip.style.opacity = '1';
+          break;
+        }
+      }
+      
+      if (hoveredIcon === -1) {
+        canvas.style.cursor = 'grab';
+        tooltip.style.opacity = '0';
+      }
+    }
+  });
+  
+  canvas.addEventListener('mouseup', function() {
+    isDragging = false;
+    canvas.style.cursor = 'grab';
+  });
+  
+  canvas.addEventListener('mouseleave', function() {
+    isDragging = false;
+    hoveredIcon = -1;
+    tooltip.style.opacity = '0';
+    canvas.style.cursor = 'grab';
+  });
+  
+  canvas.addEventListener('click', function(e) {
+    if (hoveredIcon >= 0) {
+      var icon = icons[hoveredIcon];
+      // 点击后旋转到该图标正面
+      var targetX = -Math.atan2(icon.y, Math.sqrt(icon.x * icon.x + icon.z * icon.z));
+      var targetY = Math.atan2(icon.x, icon.z);
+      
+      targetRotation = {
+        x: targetX,
+        y: targetY,
+        startX: rotation.x,
+        startY: rotation.y,
+        startTime: performance.now(),
+        duration: 1200
+      };
+      
+      console.log('点击分类:', icon.category.name);
+    }
+  });
+  
+  canvas.style.cursor = 'grab';
+  initIcons();
+  animate();
 })();
 
 // ===== FURINA MASCOT =====

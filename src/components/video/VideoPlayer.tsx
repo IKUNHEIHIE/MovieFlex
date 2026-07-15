@@ -15,6 +15,7 @@ export default function VideoPlayer({ url, movieId, episodeName, mode }: VideoPl
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState<string | null>(null);
   const lastReportedTime = useRef<number>(0);
+  const viewEventSent = useRef(false);
 
   // 发送行为事件给后端 Kafka 事件采集器
   const sendBehaviorEvent = async (eventType: string, extraData: Record<string, unknown> = {}) => {
@@ -34,6 +35,7 @@ export default function VideoPlayer({ url, movieId, episodeName, mode }: VideoPl
             currentTime: video ? Math.round(video.currentTime) : 0,
             duration: video ? Math.round(video.duration) : 0,
             progress: progress.toFixed(2),
+            playerMode: mode,
             ...extraData
           }
         }),
@@ -45,6 +47,15 @@ export default function VideoPlayer({ url, movieId, episodeName, mode }: VideoPl
     }
   };
 
+  // 页面加载时发送 view 事件（所有播放模式）
+  useEffect(() => {
+    if (!viewEventSent.current) {
+      viewEventSent.current = true;
+      sendBehaviorEvent('view');
+    }
+  }, [movieId, episodeName]);
+
+  // HLS 模式：初始化播放器和详细追踪
   useEffect(() => {
     const video = videoRef.current;
     if (!video || mode !== 'HLS') return;

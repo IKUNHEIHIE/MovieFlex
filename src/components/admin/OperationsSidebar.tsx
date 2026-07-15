@@ -10,8 +10,12 @@ export function OperationsSidebar() {
   const [catalogExpanded, setCatalogExpanded] = useState(
     pathname.startsWith('/admin/catalog')
   );
+  const [statsExpanded, setStatsExpanded] = useState(
+    pathname.startsWith('/admin/stats')
+  );
 
   const isCatalogActive = pathname.startsWith('/admin/catalog');
+  const isStatsActive = pathname.startsWith('/admin/stats');
 
   return (
     <aside className={styles.sidebar}>
@@ -79,6 +83,61 @@ export function OperationsSidebar() {
         >
           用户管理
         </Link>
+
+        <div className={styles.menuGroup}>
+          <button
+            className={styles.menuGroupButton}
+            onClick={() => setStatsExpanded(!statsExpanded)}
+            aria-expanded={statsExpanded}
+            aria-controls="stats-submenu"
+          >
+            <span>数据统计</span>
+            <span
+              className={`${styles.chevron} ${
+                statsExpanded ? styles.chevronExpanded : ''
+              }`}
+            >
+              ›
+            </span>
+          </button>
+          {statsExpanded && (
+            <div id="stats-submenu" className={styles.submenu}>
+              <Link
+                href="/admin/stats/movies"
+                className={
+                  pathname === '/admin/stats/movies' ? styles.activeLink : ''
+                }
+              >
+                影片热度
+              </Link>
+              <Link
+                href="/admin/stats/categories"
+                className={
+                  pathname === '/admin/stats/categories' ? styles.activeLink : ''
+                }
+              >
+                分类分布
+              </Link>
+              <Link
+                href="/admin/stats/users"
+                className={
+                  pathname === '/admin/stats/users' ? styles.activeLink : ''
+                }
+              >
+                用户行为
+              </Link>
+              <Link
+                href="/admin/stats/trends"
+                className={
+                  pathname === '/admin/stats/trends' ? styles.activeLink : ''
+                }
+              >
+                时间趋势
+              </Link>
+            </div>
+          )}
+        </div>
+
         <Link
           href="/admin/themes"
           className={pathname === '/admin/themes' ? styles.activeLink : ''}
