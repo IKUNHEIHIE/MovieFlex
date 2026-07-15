@@ -25,7 +25,7 @@ export async function getRecommendationRail(userId: number | undefined) {
     select: { batchId: true },
   });
 
-  if (!latestRecommendation) return selectRecommendationRail([], popularMovies);
+  if (!latestRecommendation) return getBehaviorRecommendationRail(userId, popularMovies);
 
   const recommendations = await prisma.recommendation.findMany({
     where: { userId, batchId: latestRecommendation.batchId },
@@ -35,7 +35,7 @@ export async function getRecommendationRail(userId: number | undefined) {
   });
   const movieIds = recommendations.map(({ movieId }) => movieId);
 
-  if (movieIds.length === 0) return selectRecommendationRail([], popularMovies);
+  if (movieIds.length === 0) return getBehaviorRecommendationRail(userId, popularMovies);
 
   const movies = await prisma.movie.findMany({ where: { id: { in: movieIds } } });
   const moviesById = new Map(movies.map((movie) => [movie.id, movie]));
@@ -45,4 +45,19 @@ export async function getRecommendationRail(userId: number | undefined) {
   });
 
   return selectRecommendationRail(personalizedMovies, popularMovies);
+}
+
+async function getBehaviorRecommendationRail(userId: number, popularMovies: Awaited<ReturnType<(typeof import('./prisma'))['default']['movie']['findMany']>>) {
+  const prisma = (await import('./prisma')).default;
+  const [favorites, history] = await Promise.all([
+    prisma.userFavorite.findMany({ where: { userId }, select: { movieId: true, movie: { select: { typeId: true } } } }),
+    prisma.watchHistory.findMany({ where: { userId }, take: 40, orderBy: { lastWatchedAt: 'desc' }, select: { movieId: true, movie: { select: { typeId: true } } } }),
+  ]);
+  const viewedIds = [...new Set([...favorites, ...history].map((item) => item.movieId))];
+  const typeCounts = new Map<number, number>();
+  for (const item of [...favorites, ...history]) typeCounts.set(item.movie.typeId, (typeCounts.get(item.movie.typeId) ?? 0) + 1);
+  const typeIds = [...typeCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([typeId]) => typeId);
+  if (!typeIds.length) return selectRecommendationRail([], popularMovies);
+  const movies = await prisma.movie.findMany({ where: { typeId: { in: typeIds }, id: { notIn: viewedIds } }, orderBy: [{ viewCount: 'desc' }, { score: 'desc' }], take: 12 });
+  return movies.length ? { title: '根据你的观看与收藏推荐', movies } : selectRecommendationRail([], popularMovies);
 }
