@@ -44,4 +44,16 @@ describe('admin style unification', () => {
       expect(source, page).not.toContain("color: 'white'");
     }
   });
+
+  it('renders the admin overview as an operations cockpit', () => {
+    const source = readFileSync(join(process.cwd(), 'src/app/admin/page.tsx'), 'utf8');
+
+    expect(source).toContain('getAdminOverviewData');
+    expect(source).toContain('今日待处理');
+    expect(source).toContain('采集状态');
+    expect(source).toContain('内容库健康');
+    expect(source).toContain('热门影片');
+    expect(source).toContain('快捷操作');
+    expect(source).not.toMatch(/admin-theme\.css|AdminButton|AdminCard|AdminTable/);
+  });
 });

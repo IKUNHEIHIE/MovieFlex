@@ -241,6 +241,67 @@
 
 .chartBlock { display: grid; gap: 18px; }
 
+.overviewGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+  gap: 18px;
+}
+
+.overviewTwoColumn {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.todoList { display: grid; gap: 10px; }
+
+.todoItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.todoItem strong { display: block; }
+
+.todoItem span {
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #eef3fb;
+  color: var(--blue);
+  font-size: .72rem;
+  font-weight: 800;
+}
+
+.statusWarning {
+  background: #fff6df;
+  color: #a86900;
+}
+
+.statusDanger {
+  background: #fff4f4;
+  color: var(--danger);
+}
+
+.quickActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.panelActions { margin-top: 14px; }
+
 .panel h2,
 .chartPanel h2 {
   margin: 0 0 14px;
@@ -528,6 +589,9 @@
 @media (max-width: 900px) {
   .metrics,
   .metricGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .overviewGrid,
+  .overviewTwoColumn { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 760px) {
