@@ -38,8 +38,7 @@ export default function Navbar() {
               <button className="accountButton" onClick={() => setShowDropdown((open) => !open)} aria-expanded={showDropdown}>我的 <span aria-hidden="true">⌄</span></button>
               {showDropdown && <div className="accountDropdown">
                 <Link href="/user/profile" onClick={() => setShowDropdown(false)}>个人中心</Link>
-                <Link href="/user/favorites" onClick={() => setShowDropdown(false)}>我的收藏</Link>
-                <Link href="/user/history" onClick={() => setShowDropdown(false)}>观看历史</Link>
+                <Link href="/user/account" onClick={() => setShowDropdown(false)}>账号管理</Link>
                 {(session.user as { role?: string }).role === 'ADMIN' && <Link href="/admin" onClick={() => setShowDropdown(false)}>管理后台</Link>}
                 <button onClick={() => signOut({ callbackUrl: '/' })}>退出登录</button>
               </div>}
