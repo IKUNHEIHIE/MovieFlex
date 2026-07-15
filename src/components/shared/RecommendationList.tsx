@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { formatMovieScore } from '@/lib/format';
 
 interface RecommendationListProps {
   recommendations: Array<{
@@ -31,7 +32,7 @@ export default function RecommendationList({ recommendations }: RecommendationLi
                 {rec.title}
               </h3>
               <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                评分：<span style={{ color: 'var(--color-accent)', fontWeight: 'bold' }}>⭐ {Number(rec.score) > 0 ? Number(rec.score).toFixed(1) : '8.0'}</span>
+                评分：<span style={{ color: 'var(--color-accent)', fontWeight: 'bold' }}>⭐ {formatMovieScore(rec.score)}</span>
               </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
                 {rec.typeName}

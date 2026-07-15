@@ -9,10 +9,9 @@ interface PaginationProps {
   pageSize?: number;
   prevUrl: string;
   nextUrl: string;
-  baseUrl: string;
 }
 
-export default function Pagination({ currentPage, totalPages, pageSize, prevUrl, nextUrl, baseUrl }: PaginationProps) {
+export default function Pagination({ currentPage, totalPages, pageSize, prevUrl, nextUrl }: PaginationProps) {
   const [jumpPage, setJumpPage] = useState('');
   const pageSizeOptions = [20, 50, 100];
 

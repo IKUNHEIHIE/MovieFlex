@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { clampCarouselIndex } from '@/lib/home-carousel';
+import { formatMovieScore } from '@/lib/format';
 import styles from './PopularCarousel.module.css';
 
 export type CarouselMovie = {
@@ -15,8 +16,6 @@ export type CarouselMovie = {
   remarks: string | null;
   description: string | null;
 };
-
-function scoreLabel(score: number) { return score > 0 ? score.toFixed(1) : '8.0'; }
 
 export default function PopularCarousel({ movies }: { movies: CarouselMovie[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -66,7 +65,7 @@ export default function PopularCarousel({ movies }: { movies: CarouselMovie[] })
     <div className={styles.content}>
       <p className={styles.eyebrow}>本周人气放映</p>
       <h1>{activeMovie.title}</h1>
-      <div className={styles.details}><strong>{scoreLabel(activeMovie.score)}</strong><span>{activeMovie.typeName || '热门影片'}</span>{activeMovie.year && <span>{activeMovie.year}</span>}</div>
+      <div className={styles.details}><strong>{formatMovieScore(activeMovie.score)}</strong><span>{activeMovie.typeName || '热门影片'}</span>{activeMovie.year && <span>{activeMovie.year}</span>}</div>
       <p className={styles.description}>{activeMovie.description || activeMovie.remarks || '一起走进这场值得反复回味的幻想放映。'}</p>
       <div className={styles.actions}><Link href={`/movie/${activeMovie.id}?autoplay=1`} className={styles.playButton}><span aria-hidden="true">▶</span> 立即播放</Link><Link href={`/movie/${activeMovie.id}`} className={styles.detailsButton}>详情介绍 <span aria-hidden="true">→</span></Link></div>
     </div>

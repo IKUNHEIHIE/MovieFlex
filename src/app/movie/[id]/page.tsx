@@ -1,12 +1,13 @@
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
-import { auth } from '@/lib/auth/auth';
 import VideoPlayer from '@/components/video/VideoPlayer';
 import { buildResolverUrl, DEFAULT_PLAYERS, parsePlayGroups, playersFromSourceConfig, selectPlayback } from '@/lib/playback/playback';
 import FavoriteButton from '@/components/user/FavoriteButton';
 import MovieInfo from '@/components/shared/MovieInfo';
 import RecommendationList from '@/components/shared/RecommendationList';
 import EpisodeSelector from '@/components/shared/EpisodeSelector';
+import { getRecommendationMovies } from '@/lib/recommendations';
+import { getValidSessionUserId } from '@/lib/auth/session-user';
 
 export const revalidate = 0;
 
@@ -28,12 +29,7 @@ export default async function MovieDetailPage({ params, searchParams }: MovieDet
 
   if (isNaN(movieId)) return notFound();
 
-  let movie;
-  try {
-    movie = await prisma.movie.findUnique({ where: { id: movieId } });
-  } catch (error) {
-    movie = await prisma.movie.findUnique({ where: { id: movieId } });
-  }
+  const movie = await prisma.movie.findUnique({ where: { id: movieId } });
 
   if (!movie) return notFound();
 
@@ -51,28 +47,12 @@ export default async function MovieDetailPage({ params, searchParams }: MovieDet
   const activeEpisode = playback.selection;
 
   let recommendations: { id: number; title: string; picUrl: string | null; score: { toString(): string } | number; typeName: string | null }[] = [];
-  const session = await auth();
-  const sessionUserId = Number(session?.user?.id);
-  const isLoggedIn = Number.isSafeInteger(sessionUserId) && sessionUserId > 0;
+  const sessionUserId = await getValidSessionUserId();
+  const isLoggedIn = typeof sessionUserId === 'number';
   const existingFavorite = isLoggedIn ? await prisma.userFavorite.findUnique({ where: { uk_user_movie: { userId: sessionUserId, movieId: movie.id } }, select: { id: true } }) : null;
 
   if (isLoggedIn) {
-    const userId = sessionUserId;
-    const latestBatch = await prisma.recommendation.findFirst({ where: { userId }, orderBy: { createdAt: 'desc' }, select: { batchId: true } });
-    const recList = latestBatch ? await prisma.recommendation.findMany({
-      where: { userId, batchId: latestBatch.batchId },
-      orderBy: { rankPos: 'asc' },
-      take: 6,
-    }) : [];
-
-    if (recList.length > 0) {
-      const recMovieIds = recList.map((r: { movieId: number }) => r.movieId);
-      const recommendationMovies = await prisma.movie.findMany({
-        where: { id: { in: recMovieIds } },
-      });
-      const byId = new Map(recommendationMovies.map((item) => [item.id, item]));
-      recommendations = recMovieIds.flatMap((id) => { const item = byId.get(id); return item ? [item] : []; });
-    }
+    recommendations = await getRecommendationMovies(sessionUserId, 6);
   }
 
   if (recommendations.length === 0) {

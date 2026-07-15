@@ -1,30 +1,28 @@
 import Link from 'next/link';
-import { auth } from '@/lib/auth/auth';
 import prisma from '@/lib/prisma';
 import { getRecommendationRail } from '@/lib/recommendations';
 import PopularCarousel from '@/components/home/PopularCarousel';
+import { formatMovieScore } from '@/lib/format';
+import { getValidSessionUserId } from '@/lib/auth/session-user';
 import styles from './page.module.css';
 
 export const revalidate = 0;
 
 type Movie = { id: number; title: string; picUrl: string | null; score: { toString(): string } | number; typeName: string | null; year: number | null; remarks: string | null; description: string | null; };
-function scoreLabel(score: Movie['score']) { const value = Number(score); return value > 0 ? value.toFixed(1) : '8.0'; }
 
 function MovieRail({ title, href, movies }: { title: string; href: string; movies: Movie[] }) {
   if (!movies.length) return null;
   return <section className={styles.railSection}>
     <div className={styles.sectionHeading}><div><p className={styles.sectionLabel}>片单</p><h2>{title}</h2></div><Link href={href} className={styles.moreLink}>查看全部 <span aria-hidden="true">→</span></Link></div>
     <div className={styles.movieRail}>{movies.map((movie) => <Link href={`/movie/${movie.id}`} key={movie.id} className={styles.movieCard}>
-      <div className={styles.poster}>{movie.picUrl ? <img src={movie.picUrl} alt={movie.title} loading="lazy" /> : <div className={styles.posterFallback}>MOVIEFLEX</div>}<span className={styles.score}>评分 {scoreLabel(movie.score)}</span>{movie.remarks && <span className={styles.remarks}>{movie.remarks}</span>}</div>
+      <div className={styles.poster}>{movie.picUrl ? <img src={movie.picUrl} alt={movie.title} loading="lazy" /> : <div className={styles.posterFallback}>MOVIEFLEX</div>}<span className={styles.score}>评分 {formatMovieScore(movie.score)}</span>{movie.remarks && <span className={styles.remarks}>{movie.remarks}</span>}</div>
       <div className={styles.movieMeta}><h3>{movie.title}</h3><p>{movie.typeName || '精选影片'}{movie.year ? ` · ${movie.year}` : ''}</p></div>
     </Link>)}</div>
   </section>;
 }
 
 export default async function Home() {
-  const session = await auth();
-  const sessionUser = session?.user as { id?: number } | undefined;
-  const userId = typeof sessionUser?.id === 'number' && sessionUser.id > 0 ? sessionUser.id : undefined;
+  const userId = await getValidSessionUserId();
   const [recommendationRail, latestMovies, popularMovieRows, animeMovies, showMovies] = await Promise.all([
     getRecommendationRail(userId),
     prisma.movie.findMany({ orderBy: { sourceTime: 'desc' }, take: 12 }),

@@ -85,7 +85,6 @@ export default async function AdminMoviesPage({ searchParams }: { searchParams: 
         pageSize={pageSize}
         prevUrl={getQueryUrl({ page: currentPage > 1 ? currentPage - 1 : null })}
         nextUrl={getQueryUrl({ page: currentPage < totalPages ? currentPage + 1 : null })}
-        baseUrl="/admin/movies"
       />
     </section>
   </>;

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { formatMovieScore } from '@/lib/format';
 
 interface MovieCardProps {
   movie: {
@@ -38,7 +39,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
             fontSize: '0.7rem',
             fontWeight: 'bold'
           }}>
-            ⭐ {Number(movie.score) > 0 ? Number(movie.score).toFixed(1) : '8.0'}
+            ⭐ {formatMovieScore(movie.score)}
           </div>
           {movie.remarks && (
             <div style={{

@@ -1,10 +1,13 @@
-import { auth } from '@/lib/auth/auth';
 import prisma from '@/lib/prisma';
 import { getRecommendationRail } from '@/lib/recommendations';
-import MovieCard from '@/components/shared/MovieCard';
+import MovieGridSection from '@/components/user/MovieGridSection';
+import { getSessionUser } from '@/lib/auth/session-user';
+import { redirect } from 'next/navigation';
 
 export default async function ProfilePage() {
-  const session = await auth(); const user = session!.user as { id?: number; username?: string; email?: string; role?: string }; const userId = Number(user.id);
+  const user = await getSessionUser();
+  if (!user) redirect('/login');
+  const userId = Number(user.id);
   const [favoriteCount, historyCount, favorites, history, recommendations] = await Promise.all([prisma.userFavorite.count({ where: { userId } }), prisma.watchHistory.count({ where: { userId } }), prisma.userFavorite.findMany({ where: { userId }, include: { movie: true }, orderBy: { createdAt: 'desc' }, take: 4 }), prisma.watchHistory.findMany({ where: { userId }, include: { movie: true }, orderBy: { lastWatchedAt: 'desc' }, take: 4 }), getRecommendationRail(userId)]);
-  return <main className="container" style={{ paddingTop: 36, paddingBottom: 60 }}><section className="glass" style={{ padding: 28, borderRadius: 12, marginBottom: 20 }}><h1>个人中心</h1><p>{user.username} · {user.role === 'ADMIN' ? '管理员' : '用户'}</p><div style={{ display: 'flex', gap: 24 }}><strong>{favoriteCount} 个收藏</strong><strong>{historyCount} 条观看记录</strong></div></section><section style={{ marginTop: 28 }}><h2>最近观看</h2>{history.length ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: 16 }}>{history.map(({ movie }) => <MovieCard key={movie.id} movie={movie} />)}</div> : <p>开始观看影片后，这里会记录你的足迹。</p>}</section><section style={{ marginTop: 28 }}><h2>最近收藏</h2>{favorites.length ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: 16 }}>{favorites.map(({ movie }) => <MovieCard key={movie.id} movie={movie} />)}</div> : <p>收藏喜欢的影片，方便下次继续观看。</p>}</section><section style={{ marginTop: 28 }}><h2>{recommendations.title}</h2><div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: 16 }}>{recommendations.movies.slice(0, 8).map((movie) => <MovieCard key={movie.id} movie={movie} />)}</div></section></main>;
+  return <main className="container" style={{ paddingTop: 36, paddingBottom: 60 }}><section className="glass" style={{ padding: 28, borderRadius: 12, marginBottom: 20 }}><h1>个人中心</h1><p>{user.username} · {user.role === 'ADMIN' ? '管理员' : '用户'}</p><div style={{ display: 'flex', gap: 24 }}><strong>{favoriteCount} 个收藏</strong><strong>{historyCount} 条观看记录</strong></div></section><MovieGridSection title="最近观看" movies={history.map(({ movie }) => movie)} emptyMessage="开始观看影片后，这里会记录你的足迹。" /><MovieGridSection title="最近收藏" movies={favorites.map(({ movie }) => movie)} emptyMessage="收藏喜欢的影片，方便下次继续观看。" /><MovieGridSection title={recommendations.title} movies={recommendations.movies.slice(0, 8)} emptyMessage="" /></main>;
 }

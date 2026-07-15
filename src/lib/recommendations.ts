@@ -9,6 +9,39 @@ export function selectRecommendationRail<T>(
   return { title: '热门推荐', movies: popularMovies };
 }
 
+export async function getRecommendationMovies(userId: number | undefined, limit: number): Promise<Awaited<ReturnType<(typeof import('./prisma'))['default']['movie']['findMany']>>> {
+  const prisma = (await import('./prisma')).default;
+
+  if (!userId) return [];
+
+  const latestRecommendation = await prisma.recommendation.findFirst({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    select: { batchId: true },
+  });
+
+  if (!latestRecommendation) return [];
+
+  const recommendations = await prisma.recommendation.findMany({
+    where: { userId, batchId: latestRecommendation.batchId },
+    orderBy: { rankPos: 'asc' },
+    take: limit,
+    select: { movieId: true },
+  });
+  const movieIds = recommendations.map(({ movieId }) => movieId);
+
+  if (movieIds.length === 0) return [];
+
+  const movies = await prisma.movie.findMany({ where: { id: { in: movieIds } } });
+  const moviesById = new Map(movies.map((movie) => [movie.id, movie]));
+  const orderedMovies = movieIds.flatMap((movieId) => {
+    const movie = moviesById.get(movieId);
+    return movie ? [movie] : [];
+  });
+
+  return orderedMovies;
+}
+
 export async function getRecommendationRail(userId: number | undefined) {
   const prisma = (await import('./prisma')).default;
 
