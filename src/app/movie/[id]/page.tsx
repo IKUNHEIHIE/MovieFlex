@@ -89,6 +89,19 @@ export default async function MovieDetailPage({ params, searchParams }: MovieDet
 
   return (
     <div className="container" style={{ paddingBottom: '60px' }}>
+      {/* 影片头部信息 */}
+      <div style={{ padding: '24px 0 20px', borderBottom: '1px solid var(--color-border)', marginBottom: '24px' }}>
+        <h1 style={{ fontSize: '1.8rem', fontWeight: 700, margin: '0 0 8px 0', color: 'var(--color-text-primary)' }}>{movie.title}</h1>
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+          <span>⭐ {Number(movie.score) > 0 ? Number(movie.score).toFixed(1) : '暂无评分'}</span>
+          {movie.typeName && <span>📂 {movie.typeName}</span>}
+          {movie.area && <span>🌍 {movie.area}</span>}
+          {movie.language && <span>🗣 {movie.language}</span>}
+          {movie.year && <span>📅 {movie.year}</span>}
+          {movie.director && <span>🎬 {movie.director}</span>}
+        </div>
+      </div>
+
       {activeEpisode ? (
         <section style={{ marginBottom: '30px' }}>
           <div style={{ marginBottom: '12px' }}>
