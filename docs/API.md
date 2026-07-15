@@ -1,52 +1,52 @@
-# API Documentation
+# API 文档
 
-All APIs are implemented as Next.js route handlers under `src/app/api`.
+项目 API 均使用 Next.js Route Handler 实现，源码位于 `src/app/api`。
 
-## Response Shape
+## 响应格式
 
-Most JSON endpoints return:
+大多数 JSON 接口成功时返回：
 
 ```json
 { "success": true, "data": {} }
 ```
 
-Failures generally return:
+失败时通常返回：
 
 ```json
-{ "success": false, "error": "message" }
+{ "success": false, "error": "错误信息" }
 ```
 
-## Authentication
+## 认证规则
 
-- Public APIs are available without login unless noted.
-- User APIs require a logged-in user.
-- Admin APIs require `ADMIN` role via `requireAdmin()`.
-- Internal retry endpoints require a server-side token when configured.
+- 未特别说明的公开接口不需要登录。
+- 用户接口需要普通登录用户。
+- 后台接口需要 `ADMIN` 角色，并通过 `requireAdmin()` 校验。
+- 内部重试接口需要服务端令牌。
 
-## Auth APIs
+## 认证接口
 
-| Method | Route | Auth | Purpose |
+| 方法 | 路由 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `POST` | `/api/auth/register` | Public | Register a user. The first registered user becomes admin by project logic. |
-| `GET/POST` | `/api/auth/[...nextauth]` | Public | Auth.js handlers for credentials login, session, CSRF, and signout. |
+| `POST` | `/api/auth/register` | 公开 | 注册用户。项目逻辑会把首个注册用户设为管理员。 |
+| `GET/POST` | `/api/auth/[...nextauth]` | 公开 | Auth.js 处理器，包含登录、会话、CSRF 和退出登录。 |
 
-## User APIs
+## 用户接口
 
-| Method | Route | Auth | Purpose |
+| 方法 | 路由 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `GET/PATCH` | `/api/user/profile` | User | Read or update user profile. |
-| `POST/DELETE` | `/api/user/favorites/[movieId]` | User | Add or remove a favorite movie. |
-| `DELETE` | `/api/user/history/[id]` | User | Delete a watch-history entry. |
+| `GET/PATCH` | `/api/user/profile` | 用户 | 读取或更新用户资料。 |
+| `POST/DELETE` | `/api/user/favorites/[movieId]` | 用户 | 收藏或取消收藏影片。 |
+| `DELETE` | `/api/user/history/[id]` | 用户 | 删除观看历史。 |
 
-## Behavior Event API
+## 行为事件接口
 
 ### `POST /api/events`
 
-Auth: optional user session.
+权限：可匿名，也可带用户会话。
 
-Purpose: record playback behavior and enqueue Kafka analytics events through EventOutbox.
+用途：记录播放行为，同步更新登录用户观看历史，并通过 EventOutbox 投递 Kafka 分析事件。
 
-Body:
+请求体：
 
 ```json
 {
@@ -61,26 +61,26 @@ Body:
 }
 ```
 
-Supported `eventType` values: `play_start`, `play_progress`, `play_end`, `view`.
+支持的 `eventType`：`play_start`、`play_progress`、`play_end`、`view`。
 
-Response:
+响应示例：
 
 ```json
 { "success": true, "kafkaDelivered": true }
 ```
 
-## Collection APIs
+## 采集接口
 
-| Method | Route | Auth | Purpose |
+| 方法 | 路由 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `GET` | `/api/collect/sources` | Admin | List collection sources. |
-| `POST` | `/api/collect/sources` | Admin | Create a collection source. |
-| `PATCH/DELETE` | `/api/collect/sources/[sourceKey]` | Admin | Update or delete a collection source. |
-| `GET/POST` | `/api/collect/tasks` | Admin | List or create collection tasks. |
-| `PATCH` | `/api/collect/tasks/[id]` | Admin | Pause, resume, or cancel collection tasks. |
-| `POST` | `/api/collect/run` | Admin | Deprecated. Returns `410`; use `/api/collect/tasks`. |
+| `GET` | `/api/collect/sources` | 管理员 | 获取采集源列表。 |
+| `POST` | `/api/collect/sources` | 管理员 | 创建采集源。 |
+| `PATCH/DELETE` | `/api/collect/sources/[sourceKey]` | 管理员 | 更新或删除采集源。 |
+| `GET/POST` | `/api/collect/tasks` | 管理员 | 获取或创建采集任务。 |
+| `PATCH` | `/api/collect/tasks/[id]` | 管理员 | 暂停、继续或取消采集任务。 |
+| `POST` | `/api/collect/run` | 管理员 | 已废弃，返回 `410`，请使用 `/api/collect/tasks`。 |
 
-Collection source body example:
+采集源请求体示例：
 
 ```json
 {
@@ -92,22 +92,22 @@ Collection source body example:
 }
 ```
 
-## Admin Movie APIs
+## 后台影片接口
 
-| Method | Route | Auth | Purpose |
+| 方法 | 路由 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `POST` | `/api/admin/movies` | Admin | Create a manual movie record. |
-| `PATCH/PUT/DELETE` | `/api/admin/movies/[id]` | Admin | Update or delete a movie. |
+| `POST` | `/api/admin/movies` | 管理员 | 创建手动影片记录。 |
+| `PATCH/PUT/DELETE` | `/api/admin/movies/[id]` | 管理员 | 更新或删除影片。 |
 
-Movie create body summary:
+创建影片请求体摘要：
 
 ```json
 {
-  "title": "Movie title",
+  "title": "影片名称",
   "typeId": 1,
-  "director": "Director",
-  "actors": "Actor A, Actor B",
-  "description": "Summary",
+  "director": "导演",
+  "actors": "演员 A, 演员 B",
+  "description": "剧情简介",
   "year": 2026,
   "area": "中国大陆",
   "language": "国语",
@@ -116,51 +116,51 @@ Movie create body summary:
 }
 ```
 
-## Admin User APIs
+## 后台用户接口
 
-| Method | Route | Auth | Purpose |
+| 方法 | 路由 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `GET` | `/api/admin/users?search=&page=1&pageSize=20` | Admin | Paginated user search. |
-| `POST` | `/api/admin/users` | Admin | Create a user. |
-| `PATCH/DELETE` | `/api/admin/users/[id]` | Admin | Update role/profile/password or delete a user. |
+| `GET` | `/api/admin/users?search=&page=1&pageSize=20` | 管理员 | 分页搜索用户。 |
+| `POST` | `/api/admin/users` | 管理员 | 创建用户。 |
+| `PATCH/DELETE` | `/api/admin/users/[id]` | 管理员 | 修改角色、资料、密码或删除用户。 |
 
-## Admin Catalog and Mapping APIs
+## 后台分类和映射接口
 
-| Method | Route | Auth | Purpose |
+| 方法 | 路由 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `GET/POST` | `/api/admin/catalog/categories` | Admin | List or create categories. |
-| `PATCH/DELETE` | `/api/admin/catalog/categories/[id]` | Admin | Update or delete a category. |
-| `GET` | `/api/admin/mappings` | Admin | List source-category mappings. |
-| `PATCH/DELETE` | `/api/admin/mappings/[id]` | Admin | Update or delete a mapping. |
-| `POST` | `/api/admin/mappings/reclassify` | Admin | Reclassify mapped movies. |
-| `POST` | `/api/admin/mappings/smart-classify` | Admin | Run smart classification. |
+| `GET/POST` | `/api/admin/catalog/categories` | 管理员 | 获取或创建分类。 |
+| `PATCH/DELETE` | `/api/admin/catalog/categories/[id]` | 管理员 | 更新或删除分类。 |
+| `GET` | `/api/admin/mappings` | 管理员 | 获取来源分类映射。 |
+| `PATCH/DELETE` | `/api/admin/mappings/[id]` | 管理员 | 更新或删除映射。 |
+| `POST` | `/api/admin/mappings/reclassify` | 管理员 | 按映射重新归类影片。 |
+| `POST` | `/api/admin/mappings/smart-classify` | 管理员 | 执行智能分类。 |
 
-## Admin Stats APIs
+## 后台统计接口
 
-| Method | Route | Auth | Purpose |
+| 方法 | 路由 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `GET` | `/api/admin/stats/movies?sort=viewCount&category=1` | Admin | Movie popularity and engagement stats. |
-| `GET` | `/api/admin/stats/categories` | Admin | Category distribution stats. |
-| `GET` | `/api/admin/stats/users` | Admin | User behavior stats. |
-| `GET` | `/api/admin/stats/trends?days=30` | Admin | Daily global view/favorite/user trends. |
-| `GET` | `/api/admin/health/history` | Admin | In-memory health history for the dashboard. |
+| `GET` | `/api/admin/stats/movies?sort=viewCount&category=1` | 管理员 | 影片热度和互动统计。 |
+| `GET` | `/api/admin/stats/categories` | 管理员 | 分类分布统计。 |
+| `GET` | `/api/admin/stats/users` | 管理员 | 用户行为统计。 |
+| `GET` | `/api/admin/stats/trends?days=30` | 管理员 | 全局每日观看、收藏和活跃用户趋势。 |
+| `GET` | `/api/admin/health/history` | 管理员 | 数据大屏使用的内存健康历史。 |
 
-## Admin Operations APIs
+## 后台运维接口
 
-| Method | Route | Auth | Purpose |
+| 方法 | 路由 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `PATCH` | `/api/admin/themes/active` | Admin | Set active frontend theme. |
-| `POST` | `/api/admin/outbox/retry` | Admin | Retry pending Kafka events. |
+| `PATCH` | `/api/admin/themes/active` | 管理员 | 设置前台当前主题。 |
+| `POST` | `/api/admin/outbox/retry` | 管理员 | 重试待投递 Kafka 事件。 |
 
-## Internal APIs
+## 内部接口
 
-| Method | Route | Auth | Purpose |
+| 方法 | 路由 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `GET` | `/api/internal/health` | Internal/Admin UI | Database, Kafka, movie count, outbox, task, and recommendation health. |
-| `POST` | `/api/internal/outbox/retry` | Token | Retry pending outbox events using `MOVIEFLEX_OUTBOX_TOKEN`. |
+| `GET` | `/api/internal/health` | 内部/后台 UI | 返回数据库、Kafka、影片数量、outbox、采集任务和推荐批次健康信息。 |
+| `POST` | `/api/internal/outbox/retry` | 令牌 | 使用 `MOVIEFLEX_OUTBOX_TOKEN` 重试待处理 outbox 事件。 |
 
-## Assistant API
+## 助手接口
 
-| Method | Route | Auth | Purpose |
+| 方法 | 路由 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `POST` | `/api/assistant` | Public/Frontend | Optional assistant endpoint backed by SenseNova configuration. |
+| `POST` | `/api/assistant` | 前台 | 可选助手接口，依赖 SenseNova 配置。 |

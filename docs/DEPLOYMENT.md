@@ -1,30 +1,30 @@
-# Deployment
+# 部署与运维
 
-This document describes the production setup used by MovieFlex.
+本文说明 MovieFlex 的生产部署方式和常用运维命令。
 
-## Runtime Requirements
+## 运行环境
 
-- Node.js 20.9 or newer
-- MySQL-compatible database
-- Kafka broker for behavior analytics and stats consumer
-- PM2 for application processes
-- systemd for Kafka broker management when Kafka runs on the same host
+- Node.js 20.9 或更高版本
+- MySQL 兼容数据库
+- Kafka broker，用于行为分析和统计消费者
+- PM2，用于管理应用进程
+- systemd，用于在同一台机器上管理 Kafka broker
 
-## Environment Variables
+## 环境变量
 
-| Variable | Required | Description |
+| 变量 | 是否必需 | 说明 |
 | --- | --- | --- |
-| `DATABASE_URL` | Yes | MySQL connection string, for example `mysql://USER:PASSWORD@HOST:3306/movieflex`. |
-| `AUTH_SECRET` | Yes | Auth.js session encryption secret. Use a long random value. |
-| `AUTH_URL` | Recommended | Public application URL, for example `https://example.com` or `http://HOST:3060`. |
-| `KAFKA_BROKER` | Optional | Kafka broker address. Defaults to `localhost:9092`. |
-| `MOVIEFLEX_OUTBOX_TOKEN` | Recommended | Token for the internal outbox retry endpoint. |
-| `SENSENOVA_API_KEY` | Optional | API key for the assistant endpoint. |
-| `SENSENOVA_MODEL` | Optional | Assistant model name. Defaults to `sensenova-6.7-flash-lite`. |
+| `DATABASE_URL` | 必需 | MySQL 连接串，例如 `mysql://USER:PASSWORD@HOST:3306/movieflex`。 |
+| `AUTH_SECRET` | 必需 | Auth.js 会话加密密钥，请使用足够长的随机值。 |
+| `AUTH_URL` | 建议 | 应用公网地址，例如 `https://example.com` 或 `http://HOST:3060`。 |
+| `KAFKA_BROKER` | 可选 | Kafka broker 地址，默认 `localhost:9092`。 |
+| `MOVIEFLEX_OUTBOX_TOKEN` | 建议 | 内部 outbox 重试接口使用的令牌。 |
+| `SENSENOVA_API_KEY` | 可选 | 助手接口使用的模型服务 API Key。 |
+| `SENSENOVA_MODEL` | 可选 | 助手接口模型名，默认 `sensenova-6.7-flash-lite`。 |
 
-Never commit real values. Use `.env.example` as the template.
+不要提交真实环境变量。请以 `.env.example` 为模板创建本地 `.env`。
 
-## Install and Database Setup
+## 安装和数据库准备
 
 ```bash
 npm ci
@@ -32,28 +32,28 @@ npx prisma generate
 npm run db:migrate:deploy
 ```
 
-If a migration baseline has not been established for a new environment, use Prisma carefully according to the current release procedure. Avoid changing production schema manually.
+如果新环境还没有建立 migration 基线，请按当前发布流程谨慎处理 Prisma schema。不要直接手工修改生产表结构。
 
-## Production Build
+## 生产构建
 
-Use webpack mode for production builds:
+生产构建必须使用 webpack 模式：
 
 ```bash
 npx next build --webpack
 ```
 
-Do not replace this with default `next build` unless the build artifact behavior has been revalidated.
+不要替换为默认 `next build`，除非已经重新验证生产构建产物和运行行为。
 
-## PM2 Processes
+## PM2 进程
 
-`ecosystem.config.cjs` defines two processes:
+`ecosystem.config.cjs` 定义了两个进程：
 
-| Process | Purpose |
+| 进程名 | 说明 |
 | --- | --- |
-| `movieflex` | Next.js production web server on port `3060`. |
-| `movieflex-stats-consumer` | Kafka stats consumer running `scripts/run-stats-consumer.ts`. |
+| `movieflex` | Next.js 生产 Web 服务，监听 `3060` 端口。 |
+| `movieflex-stats-consumer` | Kafka 统计消费者，运行 `scripts/run-stats-consumer.ts`。 |
 
-Start or restart production:
+启动或重启：
 
 ```bash
 pm2 start ecosystem.config.cjs
@@ -63,11 +63,11 @@ pm2 save
 pm2 status
 ```
 
-## Kafka systemd Service
+## Kafka systemd 服务
 
-The repository includes `deploy/movieflex-kafka.service` for a local Kafka broker installed under `/opt/kafka`.
+仓库提供 `deploy/movieflex-kafka.service`，用于管理安装在 `/opt/kafka` 的本机 Kafka broker。
 
-Install example:
+安装示例：
 
 ```bash
 sudo cp deploy/movieflex-kafka.service /etc/systemd/system/movieflex-kafka.service
@@ -76,11 +76,11 @@ sudo systemctl enable --now movieflex-kafka.service
 sudo systemctl status movieflex-kafka.service
 ```
 
-Logs are appended to `/var/log/movieflex-kafka.log`.
+日志会追加到 `/var/log/movieflex-kafka.log`。
 
-## Health and Smoke Checks
+## 健康检查和冒烟测试
 
-After deployment:
+部署后执行：
 
 ```bash
 npm test -- --run
@@ -90,31 +90,31 @@ curl -I http://HOST:3060/admin
 pm2 status
 ```
 
-Expected behavior:
+预期结果：
 
-- `/` returns `200`.
-- `/admin` redirects unauthenticated users to login with `307`.
-- Authenticated administrators can access `/admin` and admin child pages.
-- `movieflex` and `movieflex-stats-consumer` are online in PM2.
-- Kafka is active if analytics ingestion is required.
+- `/` 返回 `200`。
+- 未登录访问 `/admin` 返回登录重定向 `307`。
+- 管理员登录后可以访问 `/admin` 和后台子页面。
+- PM2 中 `movieflex` 和 `movieflex-stats-consumer` 均为 online。
+- 如果需要分析能力，Kafka 服务应处于 active 状态。
 
-## Administrator Bootstrap
+## 管理员账号引导
 
-Use the bootstrap script when an admin account is needed:
+需要创建管理员账号时执行：
 
 ```bash
 npm run bootstrap:admin
 ```
 
-Do not document or commit real administrator credentials.
+不要在文档、提交记录或 Issue 中暴露真实管理员账号和密码。
 
-## Release Checklist
+## 发布 Checklist
 
-1. Pull latest `main`.
-2. Install dependencies if `package-lock.json` changed.
-3. Run `npm test -- --run`.
-4. Run `npx next build --webpack`.
-5. Apply migrations with `npm run db:migrate:deploy` when needed.
-6. Restart PM2 processes.
-7. Verify public and admin routes.
-8. Verify Kafka and stats consumer if analytics changed.
+1. 拉取最新 `main`。
+2. 如果依赖发生变化，执行 `npm ci`。
+3. 执行 `npm test -- --run`。
+4. 执行 `npx next build --webpack`。
+5. 如有数据库变更，执行 `npm run db:migrate:deploy`。
+6. 重启 PM2 进程。
+7. 验证前台和后台关键路由。
+8. 如涉及统计或事件管道，验证 Kafka 和统计消费者。 
