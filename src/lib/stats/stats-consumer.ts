@@ -1,5 +1,6 @@
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import prisma from '../prisma';
+import { normalizeBehaviorEvent } from './event-normalization';
 
 interface BehaviorEvent {
   eventType: string;
@@ -47,7 +48,7 @@ class StatsConsumer {
       await this.consumer.run({
         eachMessage: async ({ topic, partition, message }: EachMessagePayload) => {
           try {
-            const event: BehaviorEvent = JSON.parse(message.value?.toString() || '{}');
+            const event = normalizeBehaviorEvent(JSON.parse(message.value?.toString() || '{}')) as BehaviorEvent;
             await this.processEvent(event);
           } catch (error) {
             console.error('Error processing message:', error);
@@ -89,7 +90,7 @@ class StatsConsumer {
     // Aggregate based on event type
     if (eventType === 'view' || eventType === 'play_start') {
       const isGuest = userId === -1;
-      const progress = parseFloat(data?.progress || '0') || 0;
+      const progress = (parseFloat(data?.progress || '0') || 0) / 100;
 
       // Update movie dimension
       if (movieId) {
