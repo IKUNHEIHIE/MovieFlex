@@ -8,6 +8,8 @@ interface Particle {
   vx: number;
   vy: number;
   radius: number;
+  update(): void;
+  draw(): void;
 }
 
 export default function ParticleBackground() {
