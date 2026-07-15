@@ -44,8 +44,8 @@ export default function AntdTheme({ children }: { children: React.ReactNode }) {
             borderRadius: 6,
           },
           Tabs: {
-            horizontalItemActiveColor: '#3a8bbf',
-            horizontalLineColor: '#d4e8f2',
+            itemActiveColor: '#3a8bbf',
+            inkBarColor: '#d4e8f2',
           },
           Menu: {
             itemSelectedBg: 'rgba(58,139,191,0.10)',

@@ -13,6 +13,9 @@ export const DEFAULT_CATEGORIES = [
       { name: '剧情片', slug: 'drama', sortOrder: 6 },
       { name: '战争片', slug: 'war', sortOrder: 7 },
       { name: '伦理片', slug: 'erotic', sortOrder: 8 },
+      { name: '记录片', slug: 'documentary-film', sortOrder: 9 },
+      { name: '预告片', slug: 'trailer', sortOrder: 10 },
+      { name: '动画片', slug: 'animation-film', sortOrder: 11 },
     ],
   },
   {
@@ -52,7 +55,28 @@ export const DEFAULT_CATEGORIES = [
     children: [],
   },
   {
-    name: '其他', slug: 'other', sortOrder: 6,
+    name: '电影解说', slug: 'movie-commentary', sortOrder: 6,
+    children: [],
+  },
+  {
+    name: '体育', slug: 'sports', sortOrder: 7,
+    children: [
+      { name: '足球', slug: 'football', sortOrder: 1 },
+      { name: '篮球', slug: 'basketball', sortOrder: 2 },
+      { name: '网球', slug: 'tennis', sortOrder: 3 },
+      { name: '斯诺克', slug: 'snooker', sortOrder: 4 },
+    ],
+  },
+  {
+    name: '短剧', slug: 'mini-drama', sortOrder: 8,
+    children: [],
+  },
+  {
+    name: 'AI漫剧', slug: 'ai-comic', sortOrder: 9,
+    children: [],
+  },
+  {
+    name: '其他', slug: 'other', sortOrder: 10,
     children: [],
   },
 ];

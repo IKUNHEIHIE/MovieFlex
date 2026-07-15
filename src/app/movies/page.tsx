@@ -16,6 +16,7 @@ interface MoviesPageProps {
     lang?: string;
     sort?: string;
     page?: string;
+    size?: string;
   }>;
 }
 
@@ -29,7 +30,11 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
   const lang = validateString(params.lang, { maxLength: 50 });
   const sort = validateEnum(params.sort, ['latest', 'score', 'views'] as const) || 'latest';
   const page = validateInteger(params.page, { min: 1, max: 10000 }) || 1;
-  const pageSize = 18;
+  
+  // 解析 pageSize 参数，支持 20/50/100，默认为 20
+  const requestedSize = validateInteger(params.size, { min: 1, max: 100 }) || 20;
+  const pageSizeOptions = [20, 50, 100];
+  const pageSize = pageSizeOptions.find(size => size >= requestedSize) || 20;
 
   const [categories, rawAreas, rawLanguages] = await Promise.all([
     prisma.category.findMany({ orderBy: { sortOrder: 'asc' } }),
@@ -68,6 +73,7 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
     if (year) nextParams.set('year', String(year));
     if (lang) nextParams.set('lang', lang);
     if (sort !== 'latest') nextParams.set('sort', sort);
+    if (pageSize !== 20) nextParams.set('size', String(pageSize));
     if (page !== 1) nextParams.set('page', String(page));
 
     Object.entries(newParams).forEach(([key, value]) => {
@@ -160,7 +166,10 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              getQueryUrl={getQueryUrl}
+              pageSize={pageSize}
+              prevUrl={getQueryUrl({ page: currentPage > 1 ? currentPage - 1 : null })}
+              nextUrl={getQueryUrl({ page: currentPage < totalPages ? currentPage + 1 : null })}
+              baseUrl="/movies"
             />
           </div>
         )}

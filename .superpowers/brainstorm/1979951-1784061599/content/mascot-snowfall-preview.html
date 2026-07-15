@@ -601,6 +601,9 @@ img { display: block; max-width: 100%; }
 
 <main class="container" style="padding-bottom: 80px;">
 
+<div style="position:relative;">
+<canvas id="mouse-trail-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:19;"></canvas>
+
 <!-- ===== HOME HERO ===== -->
 <div class="label-bar">
   <span class="label-pill">Home 首页</span>
@@ -918,6 +921,8 @@ img { display: block; max-width: 100%; }
 
 </main>
 
+</div>
+
 <!-- ===== FURINA MASCOT ===== -->
 <aside class="mascot" id="mascot" aria-label="芙宁娜看板娘">
   <div class="mascot-speech" id="mascot-speech">灯光就位，下一幕由你决定！</div>
@@ -928,6 +933,120 @@ img { display: block; max-width: 100%; }
 </aside>
 
 <script>
+// ===== Mouse Trail Logic =====
+(function() {
+  const canvas = document.getElementById('mouse-trail-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let mouseX = -100, mouseY = -100;
+  let mouseInPage = false;
+  let animId = null;
+  let lastFrameTime = performance.now();
+
+  const CONFIG = {
+    shape: 'star',
+    colorMode: 'gradient',
+    color1: '#7cc8ef',
+    color2: '#3a8bbf',
+    particleSize: 8,
+    particleLife: 1.8,
+    particleDensity: 2,
+    spreadRange: 26,
+    particleOpacity: 0.9,
+    glow: true,
+    densityMap: { 1: 15, 2: 30, 3: 50, 4: 80, 5: 120 }
+  };
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+  }
+
+  function hexToRgb(hex) {
+    const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return r ? { r: parseInt(r[1],16), g: parseInt(r[2],16), b: parseInt(r[3],16) } : { r:100,g:100,b:100 };
+  }
+
+  function interpolateColor(c1, c2, f) {
+    const a = hexToRgb(c1), b = hexToRgb(c2);
+    return { r: Math.round(a.r+(b.r-a.r)*f), g: Math.round(a.g+(b.g-a.g)*f), b: Math.round(a.b+(b.b-a.b)*f) };
+  }
+
+  function getColor(lifeRatio) {
+    const rgb = interpolateColor(CONFIG.color1, CONFIG.color2, 1-lifeRatio);
+    return 'rgba('+rgb.r+','+rgb.g+','+rgb.b+','+(CONFIG.particleOpacity*lifeRatio)+')';
+  }
+
+  function drawShape(x, y, size, lifeRatio) {
+    const s = size * (0.3 + 0.7 * lifeRatio);
+    ctx.beginPath();
+    for(let i=0;i<5;i++){const a=(i*4*Math.PI)/5-Math.PI/2;const ox=x+Math.cos(a)*s,oy=y+Math.sin(a)*s;i===0?ctx.moveTo(ox,oy):ctx.lineTo(ox,oy);const ia=a+(2*Math.PI)/10;ctx.lineTo(x+Math.cos(ia)*s*0.38,y+Math.sin(ia)*s*0.38);} ctx.closePath(); ctx.fill();
+  }
+
+  function animate(ts) {
+    if(!lastFrameTime)lastFrameTime=ts;
+    let dt=(ts-lastFrameTime)/1000;
+    if(dt<=0)dt=0.016;if(dt>0.1)dt=0.1;
+    lastFrameTime=ts;
+
+    if(mouseInPage){
+      const density=CONFIG.densityMap[CONFIG.particleDensity]||50;
+      const ppf=Math.max(1,Math.round(density*dt));
+      for(let s=0;s<ppf;s++){
+        const ox=mouseX+(Math.random()-0.5)*2;
+        const oy=mouseY+(Math.random()-0.5)*2;
+        const angle=Math.random()*Math.PI*2;
+        const speed=Math.random()*CONFIG.spreadRange*0.8+CONFIG.spreadRange*0.2;
+        particles.push({
+          x:ox,y:oy,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,
+          birthTime:Date.now(),life:CONFIG.particleLife,maxLife:CONFIG.particleLife,
+          birthHue:Math.random()*360,size:CONFIG.particleSize*(0.7+Math.random()*0.6)
+        });
+      }
+    }
+
+    const now=Date.now();
+    for(let i=particles.length-1;i>=0;i--){
+      const p=particles[i];
+      p.life=Math.max(0,p.maxLife-(now-p.birthTime)/1000);
+      if(p.life<=0){particles.splice(i,1);continue;}
+      p.x+=p.vx*dt;p.y+=p.vy*dt;
+      p.vx*=0.96;p.vy*=0.96;
+    }
+
+    const maxP=CONFIG.particleDensity*60;
+    while(particles.length>maxP)particles.shift();
+
+    const w=canvas.width/(Math.min(window.devicePixelRatio||1,2));
+    const h=canvas.height/(Math.min(window.devicePixelRatio||1,2));
+    ctx.clearRect(0,0,w,h);
+
+    if(CONFIG.glow){ctx.shadowBlur=CONFIG.particleSize*1.4;ctx.shadowColor=CONFIG.color1;}
+    for(const p of particles){
+      const lr=p.life/p.maxLife;
+      ctx.fillStyle=getColor(lr);
+      drawShape(p.x,p.y,p.size*lr,lr);
+    }
+    ctx.shadowBlur=0;
+    animId=requestAnimationFrame(animate);
+  }
+
+  document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY;mouseInPage=true;});
+  document.addEventListener('mouseleave',()=>{mouseInPage=false;});
+  document.addEventListener('mouseenter',e=>{mouseX=e.clientX;mouseY=e.clientY;mouseInPage=true;});
+  document.addEventListener('touchmove',e=>{if(e.touches[0]){mouseX=e.touches[0].clientX;mouseY=e.touches[0].clientY;mouseInPage=true;}},{passive:true});
+  document.addEventListener('touchend',()=>{mouseInPage=false;});
+  window.addEventListener('resize', resize);
+  resize();
+  animId=requestAnimationFrame(animate);
+})();
+
 // ===== Furina Mascot Logic =====
 const POSES = ['pose-01.png','pose-02.png','pose-03.png','pose-04.png','pose-05.png','pose-06.png'];
 const DIALOGUES = [
@@ -958,7 +1077,7 @@ function randomDialogue() {
 
 function nextPose() {
   currentPose = (currentPose + 1) % POSES.length;
-  mascotImg.src = '/mascot/furina/' + POSES[currentPose];
+  mascotImg.src = 'http://35.213.128.99:3001/mascot/furina/' + POSES[currentPose];
 }
 
 function triggerMascot() {
@@ -971,7 +1090,7 @@ function triggerMascot() {
 }
 
 // Initialize pose
-mascotImg.src = '/mascot/furina/' + POSES[0];
+mascotImg.src = 'http://35.213.128.99:3001/mascot/furina/' + POSES[0];
 mascotImg.onerror = function() { this.parentElement.parentElement.style.display = 'none'; };
 
 mascotBtn.addEventListener('click', triggerMascot);

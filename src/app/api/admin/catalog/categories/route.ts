@@ -18,20 +18,28 @@ export async function GET() {
     });
 
     const categoriesWithCount = await Promise.all(
-      categories.map(async (cat) => ({
-        ...cat,
-        movieCount: await prisma.movie.count({
-          where: { typeId: cat.id }
-        }),
-        children: await Promise.all(
-          cat.children.map(async (child) => ({
-            ...child,
-            movieCount: await prisma.movie.count({
-              where: { typeId: child.id }
-            })
-          }))
-        )
-      }))
+      categories.map(async (cat) => {
+        const childrenCategories = await prisma.category.findMany({
+          where: { parentId: cat.id },
+          select: { id: true }
+        });
+        const allCategoryIds = [cat.id, ...childrenCategories.map(c => c.id)];
+
+        return {
+          ...cat,
+          movieCount: await prisma.movie.count({
+            where: { typeId: { in: allCategoryIds } }
+          }),
+          children: await Promise.all(
+            cat.children.map(async (child) => ({
+              ...child,
+              movieCount: await prisma.movie.count({
+                where: { typeId: child.id }
+              })
+            }))
+          )
+        };
+      })
     );
 
     return NextResponse.json({ success: true, data: categoriesWithCount });

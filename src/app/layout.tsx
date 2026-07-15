@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { SessionProvider } from 'next-auth/react';
 import Navbar from '@/components/layout/Navbar';
+import MouseTrail from '@/components/mouse-trail/MouseTrail';
 import Snowfall from '@/components/layout/Snowfall';
 import FurinaMascot from '@/components/mascot/FurinaMascot';
 import { getActiveThemeKey } from '@/lib/theme-registry';
@@ -16,7 +17,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="zh-CN" data-theme={activeTheme}>
       <head><link rel="stylesheet" href={`/themes/${activeTheme}/style.css`} /></head>
-      <body><SessionProvider><Navbar /><Snowfall /><FurinaMascot />
+      <body><SessionProvider><Navbar /><MouseTrail /><Snowfall /><FurinaMascot />
         <main style={{ minHeight: 'calc(100vh - var(--nav-height))' }}>{children}</main>
       </SessionProvider></body>
     </html>
