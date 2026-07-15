@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import MovieCard from '@/components/shared/MovieCard';
 import prisma from '@/lib/prisma';
 

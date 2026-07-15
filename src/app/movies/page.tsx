@@ -23,13 +23,20 @@ interface MoviesPageProps {
 export default async function MoviesPage({ searchParams }: MoviesPageProps) {
   const params = await searchParams;
   
-  // 使用验证函数解析和验证参数
-  const typeId = validateInteger(params.type, { min: 1, max: 10000 });
-  const area = validateString(params.area, { maxLength: 100 });
-  const year = validateInteger(params.year, { min: 1800, max: 2100 });
-  const lang = validateString(params.lang, { maxLength: 50 });
-  const sort = validateEnum(params.sort, ['latest', 'score', 'views'] as const) || 'latest';
-  const page = validateInteger(params.page, { min: 1, max: 10000 }) || 1;
+  // 使用验证函数解析和验证参数（无效参数自动降级为默认值）
+  let typeId: number | undefined;
+  let area: string | undefined;
+  let year: number | undefined;
+  let lang: string | undefined;
+  let sort: string = 'latest';
+  let page = 1;
+
+  try { typeId = validateInteger(params.type, { min: 1, max: 10000 }); } catch { typeId = undefined; }
+  try { area = validateString(params.area, { maxLength: 100 }); } catch { area = undefined; }
+  try { year = validateInteger(params.year, { min: 1800, max: 2100 }); } catch { year = undefined; }
+  try { lang = validateString(params.lang, { maxLength: 50 }); } catch { lang = undefined; }
+  try { sort = validateEnum(params.sort, ['latest', 'score', 'views'] as const) || 'latest'; } catch { sort = 'latest'; }
+  try { page = validateInteger(params.page, { min: 1, max: 10000 }) || 1; } catch { page = 1; }
   
   // 解析 pageSize 参数，支持 20/50/100，默认为 20
   const requestedSize = validateInteger(params.size, { min: 1, max: 100 }) || 20;
@@ -84,7 +91,7 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
       }
     });
 
-    if (!newParams.page && newParams.page !== null) {
+    if (!('page' in newParams)) {
       nextParams.delete('page');
     }
 
