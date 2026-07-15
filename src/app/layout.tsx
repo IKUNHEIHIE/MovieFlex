@@ -21,7 +21,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="zh-CN" data-theme={activeTheme}>
       <head><link rel="stylesheet" href={`/themes/${activeTheme}/style.css`} /></head>
       <body><SessionProvider><ErrorBoundary><Suspense fallback={null}><Navbar /></Suspense></ErrorBoundary><MouseTrail /><ErrorBoundary><Snowfall /></ErrorBoundary><ParticleBackground /><ErrorBoundary><FurinaMascot /></ErrorBoundary>
-        <main style={{ minHeight: 'calc(100vh - var(--nav-height))' }}><ErrorBoundary><Suspense fallback={<div style={{textAlign:'center',padding:'60px',color:'var(--color-text-muted)'}}>加载中…</div>}>{children}</Suspense></ErrorBoundary></main>
+        <main style={{ minHeight: 'calc(100vh - var(--nav-height))', position: 'relative', zIndex: 1 }}><ErrorBoundary><Suspense fallback={<div style={{textAlign:'center',padding:'60px',color:'var(--color-text-muted)'}}>加载中…</div>}>{children}</Suspense></ErrorBoundary></main>
       </SessionProvider></body>
     </html>
   );
