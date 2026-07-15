@@ -5,6 +5,9 @@ import Navbar from '@/components/layout/Navbar';
 import MouseTrail from '@/components/mouse-trail/MouseTrail';
 import Snowfall from '@/components/layout/Snowfall';
 import FurinaMascot from '@/components/mascot/FurinaMascot';
+import ParticleBackground from '@/components/effects/ParticleBackground';
+import ErrorBoundary from '@/components/shared/ErrorBoundary';
+import { Suspense } from 'react';
 import { getActiveThemeKey } from '@/lib/theme-registry';
 
 export const metadata: Metadata = {
@@ -17,8 +20,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="zh-CN" data-theme={activeTheme}>
       <head><link rel="stylesheet" href={`/themes/${activeTheme}/style.css`} /></head>
-      <body><SessionProvider><Navbar /><MouseTrail /><Snowfall /><FurinaMascot />
-        <main style={{ minHeight: 'calc(100vh - var(--nav-height))' }}>{children}</main>
+      <body><SessionProvider><ErrorBoundary><Suspense fallback={null}><Navbar /></Suspense></ErrorBoundary><MouseTrail /><ErrorBoundary><Snowfall /></ErrorBoundary><ParticleBackground /><ErrorBoundary><FurinaMascot /></ErrorBoundary>
+        <main style={{ minHeight: 'calc(100vh - var(--nav-height))' }}><ErrorBoundary><Suspense fallback={<div style={{textAlign:'center',padding:'60px',color:'var(--color-text-muted)'}}>加载中…</div>}>{children}</Suspense></ErrorBoundary></main>
       </SessionProvider></body>
     </html>
   );

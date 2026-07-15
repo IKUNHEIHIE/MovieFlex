@@ -24,8 +24,11 @@ export default function MovieCard({ movie }: MovieCardProps) {
         flexDirection: 'column'
       }}>
         <div style={{ position: 'relative', aspectRatio: '2/3', background: '#222' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={movie.picUrl || ''} alt={movie.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          {movie.picUrl ? (
+            <img src={movie.picUrl} alt={movie.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555', fontSize: '0.75rem', fontWeight: 700 }}>MOVIEFLEX</div>
+          )}
           <div style={{
             position: 'absolute',
             top: '8px',
