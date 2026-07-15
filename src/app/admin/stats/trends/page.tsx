@@ -1,6 +1,6 @@
 'use client';
 
-import '../admin-theme.css';
+import '../../admin-theme.css';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, Legend } from 'recharts';

@@ -102,14 +102,12 @@ export default async function AdminMoviesPage({ searchParams }: { searchParams: 
             </thead>
             <tbody>
               {movies.map((movie, index) => (
-                <tr 
+                <tr
                   key={movie.id}
                   style={{
                     borderBottom: index < movies.length - 1 ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
                     transition: 'background 200ms ease',
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                 >
                   <td style={{ padding: '16px 20px', color: 'rgba(255, 255, 255, 0.9)' }}>
                     <Link href={`/movie/${movie.id}`} style={{ color: '#5267cf', textDecoration: 'none' }}>{movie.title}</Link>

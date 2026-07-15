@@ -25,6 +25,10 @@ export default function PageTransition({ children, pathname }: PageTransitionPro
       opacity: 0,
       y: 20,
       scale: 0.98,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut" as const,
+      },
     },
     center: {
       opacity: 1,
@@ -32,7 +36,7 @@ export default function PageTransition({ children, pathname }: PageTransitionPro
       scale: 1,
       transition: {
         duration: 0.3,
-        ease: 'easeOut',
+        ease: "easeOut" as const,
       },
     },
     exit: {
@@ -41,7 +45,7 @@ export default function PageTransition({ children, pathname }: PageTransitionPro
       scale: 0.98,
       transition: {
         duration: 0.2,
-        ease: 'easeIn',
+        ease: "easeIn" as const,
       },
     },
   };
@@ -52,7 +56,7 @@ export default function PageTransition({ children, pathname }: PageTransitionPro
         initial="enter"
         animate="center"
         exit="exit"
-        variants={variants}
+        variants={variants as any}
         style={{ minHeight: 'calc(100vh - 200px)' }}
       >
         {children}

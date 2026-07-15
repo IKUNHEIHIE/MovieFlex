@@ -1,4 +1,6 @@
-import '../admin-theme.css';
+'use client';
+
+import '../../admin-theme.css';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';

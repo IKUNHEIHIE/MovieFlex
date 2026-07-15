@@ -440,18 +440,18 @@ export default function HealthMonitor({
         <AdminCard title="最近分析结果">
           {analytics.length ? (
             <div style={{ overflowX: 'auto' }}>
-              <table className={styles.table}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                 <thead>
-                  <tr><th style={{ textAlign: 'left' }}>指标</th><th>键</th><th>数值</th><th>时间窗口</th><th>批次</th></tr>
+                  <tr><th style={{ textAlign: 'left', padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)' }}>指标</th><th style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)' }}>键</th><th style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)' }}>数值</th><th style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)' }}>时间窗口</th><th style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.7)' }}>批次</th></tr>
                 </thead>
                 <tbody>
                   {analytics.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.metricType}</td>
-                      <td>{item.metricKey}</td>
-                      <td>{Number(item.metricValue).toFixed(2)}</td>
-                      <td>{item.timeWindow}</td>
-                      <td>{item.batchId}</td>
+                    <tr key={item.id} style={{ transition: 'background 200ms ease' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.9)' }}>{item.metricType}</td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.9)' }}>{item.metricKey}</td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.9)' }}>{Number(item.metricValue).toFixed(2)}</td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.9)' }}>{item.timeWindow}</td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.9)' }}>{item.batchId}</td>
                     </tr>
                   ))}
                 </tbody>
