@@ -13,6 +13,7 @@ const homeCss = readFileSync(join(root, 'src/app/page.module.css'), 'utf8');
 const globalCss = readFileSync(join(root, 'src/app/globals.css'), 'utf8');
 const moviesPage = readFileSync(join(root, 'src/app/movies/page.tsx'), 'utf8');
 const profilePage = readFileSync(join(root, 'src/app/user/profile/page.tsx'), 'utf8');
+const assistantHistoryPanel = readFileSync(join(root, 'src/components/user/AssistantHistoryPanel.tsx'), 'utf8');
 const mascot = readFileSync(join(root, 'src/components/mascot/FurinaMascot.tsx'), 'utf8');
 
 describe('anime public home contract', () => {
@@ -83,6 +84,15 @@ describe('anime public home contract', () => {
     expect(profilePage).toContain('take: 2');
     expect(profilePage).not.toContain('个 AI 会话');
     expect(profilePage.indexOf('MovieGridSection title={recommendations.title}')).toBeLessThan(profilePage.indexOf('<AssistantHistoryPanel conversations={aiConversations} />'));
+  });
+
+  it('renders profile AI history as a compact low-emphasis summary', () => {
+    expect(assistantHistoryPanel).toContain('aria-label="AI 助手记录摘要"');
+    expect(assistantHistoryPanel).toContain('padding: 16');
+    expect(assistantHistoryPanel).toContain("fontSize: '1rem'");
+    expect(assistantHistoryPanel).toContain('暂无 AI 对话记录，可从右下角助手开始。');
+    expect(assistantHistoryPanel).toContain("whiteSpace: 'nowrap'");
+    expect(assistantHistoryPanel).toContain("textOverflow: 'ellipsis'");
   });
 
   it('keeps pointer cancellation non-interactive and supports one keyboard activation path', () => {
