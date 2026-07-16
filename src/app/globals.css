@@ -74,6 +74,7 @@ button, input { font: inherit; }
 .navLoading { color: var(--color-text-muted); font-size: 0.82rem; }
 
 .movie-card-link { text-decoration: none; }
+.movie-card-link:active .glass { transform: translateY(1px) scale(.985); box-shadow: var(--shadow-sm); }
 
 .filter-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--color-border, #edf5f8); }
 .filter-row:last-child { border-bottom: 0; }
@@ -85,3 +86,4 @@ button, input { font: inherit; }
 
 @media (max-width: 860px) { .container { padding: 0 20px; } .navInner { gap: 20px; } .primaryNav { gap: 14px; } .primaryNav a { font-size: 0.82rem; } }
 @media (max-width: 680px) { :root { --nav-height: 58px; } .container { padding: 0 16px; } .navInner { gap: 14px; } .brand { font-size: 1.17rem; } .primaryNav { display: none; } .navSearch { width: min(42vw, 180px); } .navSearch input { height: 33px; } .navSearch button { height: 33px; } }
+@media (prefers-reduced-motion: reduce) { .movie-card-link:active .glass { transform: none; } }

@@ -8,6 +8,8 @@ const rootLayout = readFileSync(join(root, 'src/app/layout.tsx'), 'utf8');
 const adminLayout = readFileSync(join(root, 'src/app/admin/layout.tsx'), 'utf8');
 const carousel = readFileSync(join(root, 'src/components/home/PopularCarousel.tsx'), 'utf8');
 const carouselCss = readFileSync(join(root, 'src/components/home/PopularCarousel.module.css'), 'utf8');
+const homeCss = readFileSync(join(root, 'src/app/page.module.css'), 'utf8');
+const globalCss = readFileSync(join(root, 'src/app/globals.css'), 'utf8');
 const mascot = readFileSync(join(root, 'src/components/mascot/FurinaMascot.tsx'), 'utf8');
 
 describe('anime public home contract', () => {
@@ -38,6 +40,18 @@ describe('anime public home contract', () => {
     expect(carouselCss).toContain('@keyframes backdropIn');
     expect(carouselCss).toContain('@keyframes backdropOut');
     expect(carouselCss).toContain('@media (prefers-reduced-motion: reduce)');
+  });
+
+  it('adds tactile pressed states to public homepage controls', () => {
+    expect(carouselCss).toContain('.playButton:active');
+    expect(carouselCss).toContain('.detailsButton:active');
+    expect(carouselCss).toContain('.controls button:active');
+    expect(carouselCss).toContain('.dots button:active');
+    expect(carouselCss).toContain('scale(.98)');
+    expect(homeCss).toContain('.movieCard:active');
+    expect(homeCss).toContain('.moreLink:active');
+    expect(homeCss).toContain('scale(.985)');
+    expect(globalCss).toContain('.movie-card-link:active .glass');
   });
 
   it('keeps pointer cancellation non-interactive and supports one keyboard activation path', () => {
