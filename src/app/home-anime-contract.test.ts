@@ -79,6 +79,14 @@ describe('anime public home contract', () => {
     expect(globalCss).toContain('.navProgress');
   });
 
+  it('keeps primary navigation visible on mobile as a horizontal scroll row', () => {
+    expect(globalCss).not.toContain('.primaryNav { display: none; }');
+    expect(globalCss).toContain('overflow-x: auto');
+    expect(globalCss).toContain('scrollbar-width: none');
+    expect(globalCss).toContain('.primaryNav::-webkit-scrollbar');
+    expect(globalCss).toContain('flex-wrap: wrap');
+  });
+
   it('softens movie category route changes with a listing entry animation', () => {
     expect(moviesPage).toContain('listingMotionKey');
     expect(moviesPage).toContain('className="movieListingShell"');
