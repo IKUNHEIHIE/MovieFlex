@@ -54,11 +54,26 @@ export default function TrendsStatsPage() {
 
   const chartData = trends.map((trend) => ({
     date: trend.date.substring(5),
+    fullDate: trend.date,
     观看量: trend.totalViews,
     用户观看: trend.userViews,
     游客观看: trend.guestViews,
     收藏数: trend.totalFavorites,
     活跃用户: trend.uniqueUsers,
+    收藏转化率: trend.totalViews > 0 ? Number(((trend.totalFavorites / trend.totalViews) * 100).toFixed(2)) : 0,
+  }));
+
+  const peakDay = [...trends].sort((a, b) => b.totalViews - a.totalViews)[0];
+  const bestConversionDay = [...trends].sort((a, b) => {
+    const bRate = b.totalViews > 0 ? b.totalFavorites / b.totalViews : 0;
+    const aRate = a.totalViews > 0 ? a.totalFavorites / a.totalViews : 0;
+    return bRate - aRate;
+  })[0];
+  const maxViews = Math.max(1, ...trends.map((trend) => trend.totalViews));
+  const heatmapData = trends.map((trend) => ({
+    date: trend.date.substring(5),
+    views: trend.totalViews,
+    intensity: Math.max(0.08, trend.totalViews / maxViews),
   }));
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -138,124 +153,78 @@ export default function TrendsStatsPage() {
         </div>
       )}
 
-      {/* Views Trend Chart */}
-      <div className={styles.chartBlock}>
-        <section className={styles.chartPanel}>
-          <ChartContainer title="观看量趋势" loading={loading}>
-            <ResponsiveContainer width="100%" height={400}>
+      <section className={styles.showcaseGrid}>
+        <ChartContainer title="用户/游客观看趋势" loading={loading}>
+          <div className={styles.heroChart}>
+            <ResponsiveContainer width="100%" height={460}>
               <AreaChart data={chartData}>
                 <defs>
-                  <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#667eea" stopOpacity={0.8}/>
-                    <stop offset="50%" stopColor="#667eea" stopOpacity={0.3}/>
-                    <stop offset="100%" stopColor="#667eea" stopOpacity={0.05}/>
-                  </linearGradient>
-                  <linearGradient id="userViewsGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#22c55e" stopOpacity={0.6}/>
-                    <stop offset="100%" stopColor="#22c55e" stopOpacity={0.05}/>
-                  </linearGradient>
-                  <linearGradient id="guestViewsGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.6}/>
-                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.05}/>
-                  </linearGradient>
+                  <linearGradient id="viewsGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#4f7df3" stopOpacity={0.55}/><stop offset="100%" stopColor="#4f7df3" stopOpacity={0.04}/></linearGradient>
+                  <linearGradient id="userViewsGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#22c55e" stopOpacity={0.55}/><stop offset="100%" stopColor="#22c55e" stopOpacity={0.04}/></linearGradient>
+                  <linearGradient id="guestViewsGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#f59e0b" stopOpacity={0.48}/><stop offset="100%" stopColor="#f59e0b" stopOpacity={0.04}/></linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#eef2f8" vertical={false} />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="#8290a8" 
-                  fontSize={12} 
-                  tick={{ fill: '#8290a8' }}
-                  axisLine={{ stroke: '#e5eaf3' }}
-                />
-                <YAxis 
-                  stroke="#8290a8" 
-                  fontSize={12} 
-                  tick={{ fill: '#8290a8' }}
-                  axisLine={{ stroke: '#e5eaf3' }}
-                />
+                <XAxis dataKey="date" stroke="#8290a8" fontSize={12} tick={{ fill: '#8290a8' }} axisLine={{ stroke: '#e5eaf3' }} />
+                <YAxis stroke="#8290a8" fontSize={12} tick={{ fill: '#8290a8' }} axisLine={{ stroke: '#e5eaf3' }} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend verticalAlign="top" height={36} />
-                <Area
-                  type="monotone"
-                  dataKey="观看量"
-                  stroke="#667eea"
-                  strokeWidth={3}
-                  fill="url(#viewsGradient)"
-                  dot={{ r: 4, fill: '#667eea', strokeWidth: 0 }}
-                  activeDot={{ r: 7, fill: '#667eea', stroke: '#fff', strokeWidth: 2 }}
-                  animationDuration={2000}
-                  animationEasing="ease-out"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="用户观看"
-                  stroke="#22c55e"
-                  strokeWidth={2}
-                  fill="url(#userViewsGradient)"
-                  dot={{ r: 3, fill: '#22c55e', strokeWidth: 0 }}
-                  activeDot={{ r: 6, fill: '#22c55e', stroke: '#fff', strokeWidth: 2 }}
-                  animationDuration={2000}
-                  animationBegin={200}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="游客观看"
-                  stroke="#f59e0b"
-                  strokeWidth={2}
-                  fill="url(#guestViewsGradient)"
-                  dot={{ r: 3, fill: '#f59e0b', strokeWidth: 0 }}
-                  activeDot={{ r: 6, fill: '#f59e0b', stroke: '#fff', strokeWidth: 2 }}
-                  animationDuration={2000}
-                  animationBegin={400}
-                />
+                <Area type="monotone" dataKey="观看量" stroke="#4f7df3" strokeWidth={3} fill="url(#viewsGradient)" dot={{ r: 3, fill: '#4f7df3', strokeWidth: 0 }} activeDot={{ r: 7, fill: '#4f7df3', stroke: '#fff', strokeWidth: 2 }} animationDuration={2000} />
+                <Area type="monotone" dataKey="用户观看" stackId="views" stroke="#22c55e" strokeWidth={2} fill="url(#userViewsGradient)" dot={false} animationDuration={2000} animationBegin={160} />
+                <Area type="monotone" dataKey="游客观看" stackId="views" stroke="#f59e0b" strokeWidth={2} fill="url(#guestViewsGradient)" dot={false} animationDuration={2000} animationBegin={320} />
               </AreaChart>
             </ResponsiveContainer>
-          </ChartContainer>
-        </section>
-      </div>
+          </div>
+        </ChartContainer>
 
-      {/* Favorites & Users Trend */}
-      <section className={styles.chartPanel}>
-        <ChartContainer title="收藏量与活跃用户趋势" loading={loading}>
-          <ResponsiveContainer width="100%" height={400}>
+        <div className={styles.stack}>
+          <section className={styles.insightGrid}>
+            <article className={styles.insightCard}>
+              <span>趋势洞察</span>
+              <strong>{peakDay ? peakDay.date.substring(5) : '暂无'}</strong>
+              <p>峰值观看 {peakDay ? peakDay.totalViews.toLocaleString() : 0}，适合讲运营活动效果。</p>
+            </article>
+            <article className={styles.insightCard}>
+              <span>最佳转化</span>
+              <strong>{bestConversionDay ? bestConversionDay.date.substring(5) : '暂无'}</strong>
+              <p>收藏转化 {bestConversionDay && bestConversionDay.totalViews > 0 ? `${((bestConversionDay.totalFavorites / bestConversionDay.totalViews) * 100).toFixed(1)}%` : '0%'}</p>
+            </article>
+          </section>
+
+          <section className={styles.chartPanel}>
+            <h2>活跃日历热力图</h2>
+            <p className={styles.chartNarrative}>颜色越深代表当天观看越集中，适合展示采集后的持续运营数据。</p>
+            <div className={styles.heatmapGrid}>
+              {heatmapData.map((day) => (
+                <div key={day.date} className={styles.heatmapCell} title={`${day.date}: ${day.views} 次观看`} style={{ background: `rgba(79,125,243,${day.intensity})` }} />
+              ))}
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section className={styles.miniChartGrid}>
+        <ChartContainer title="收藏转化率趋势" loading={loading}>
+          <ResponsiveContainer width="100%" height={380}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#eef2f8" vertical={false} />
-              <XAxis 
-                dataKey="date" 
-                stroke="#8290a8" 
-                fontSize={12} 
-                tick={{ fill: '#8290a8' }}
-                axisLine={{ stroke: '#e5eaf3' }}
-              />
-              <YAxis 
-                stroke="#8290a8" 
-                fontSize={12} 
-                tick={{ fill: '#8290a8' }}
-                axisLine={{ stroke: '#e5eaf3' }}
-              />
+              <XAxis dataKey="date" stroke="#8290a8" fontSize={12} tick={{ fill: '#8290a8' }} axisLine={{ stroke: '#e5eaf3' }} />
+              <YAxis stroke="#8290a8" fontSize={12} tick={{ fill: '#8290a8' }} axisLine={{ stroke: '#e5eaf3' }} />
+              <Tooltip content={<CustomTooltip />} />
+              <Line type="monotone" dataKey="收藏转化率" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4, fill: '#f59e0b', strokeWidth: 0 }} activeDot={{ r: 7, fill: '#f59e0b', stroke: '#fff', strokeWidth: 2 }} animationDuration={2000} />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+
+        <ChartContainer title="收藏量与活跃用户趋势" loading={loading}>
+          <ResponsiveContainer width="100%" height={380}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#eef2f8" vertical={false} />
+              <XAxis dataKey="date" stroke="#8290a8" fontSize={12} tick={{ fill: '#8290a8' }} axisLine={{ stroke: '#e5eaf3' }} />
+              <YAxis stroke="#8290a8" fontSize={12} tick={{ fill: '#8290a8' }} axisLine={{ stroke: '#e5eaf3' }} />
               <Tooltip content={<CustomTooltip />} />
               <Legend verticalAlign="top" height={36} />
-              <Line
-                type="monotone"
-                dataKey="收藏数"
-                stroke="#f5576c"
-                strokeWidth={3}
-                dot={{ r: 4, fill: '#f5576c', strokeWidth: 0 }}
-                activeDot={{ r: 7, fill: '#f5576c', stroke: '#fff', strokeWidth: 2 }}
-                animationDuration={2000}
-                animationEasing="ease-out"
-              />
-              <Line
-                type="monotone"
-                dataKey="活跃用户"
-                stroke="#43e97b"
-                strokeWidth={3}
-                dot={{ r: 4, fill: '#43e97b', strokeWidth: 0 }}
-                activeDot={{ r: 7, fill: '#43e97b', stroke: '#fff', strokeWidth: 2 }}
-                animationDuration={2000}
-                animationBegin={300}
-                strokeDasharray="5 5"
-              />
+              <Line type="monotone" dataKey="收藏数" stroke="#f5576c" strokeWidth={3} dot={{ r: 4, fill: '#f5576c', strokeWidth: 0 }} activeDot={{ r: 7, fill: '#f5576c', stroke: '#fff', strokeWidth: 2 }} animationDuration={2000} />
+              <Line type="monotone" dataKey="活跃用户" stroke="#43e97b" strokeWidth={3} dot={{ r: 4, fill: '#43e97b', strokeWidth: 0 }} activeDot={{ r: 7, fill: '#43e97b', stroke: '#fff', strokeWidth: 2 }} animationDuration={2000} animationBegin={300} strokeDasharray="5 5" />
             </LineChart>
           </ResponsiveContainer>
         </ChartContainer>
