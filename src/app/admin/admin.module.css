@@ -259,48 +259,55 @@
 .funnelItem span, .rankItem span { color: var(--muted); font-size: .8rem; }
 .funnelItem strong, .rankItem strong { color: var(--ink); }
 
-.commandCenter { position: relative; isolation: isolate; display: grid; gap: 18px; margin: -28px -32px; min-height: calc(100vh - var(--nav-height)); padding: 28px 32px 42px; overflow: hidden; background: radial-gradient(circle at 18% 6%, rgba(56,189,248,.28), transparent 28%), radial-gradient(circle at 82% 12%, rgba(245,158,11,.18), transparent 26%), linear-gradient(135deg, #07111f 0%, #0d1b33 48%, #050b16 100%); color: #e5f4ff; }
-.screenGlow { position: absolute; inset: 0; z-index: -1; background-image: linear-gradient(rgba(148,163,184,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.08) 1px, transparent 1px); background-size: 46px 46px; mask-image: radial-gradient(circle at 50% 28%, #000, transparent 74%); }
-.commandHero { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 24px; border: 1px solid rgba(56,189,248,.2); border-radius: 22px; background: linear-gradient(135deg, rgba(15,23,42,.88), rgba(15,30,58,.72)); box-shadow: 0 24px 70px rgba(0,0,0,.28); }
-.commandHero p { margin: 0 0 8px; color: #7dd3fc; font: 800 .72rem var(--font-utility); letter-spacing: .18em; text-transform: uppercase; }
+.commandCenter { position: relative; isolation: isolate; display: grid; gap: 18px; margin: -28px -32px; min-height: calc(100vh - var(--nav-height)); padding: 28px 32px 42px; overflow: hidden; }
+.commandCenterLight { background: radial-gradient(circle at 12% 4%, rgba(79,125,243,.14), transparent 24%), radial-gradient(circle at 88% 10%, rgba(125,211,252,.19), transparent 22%), var(--canvas); color: var(--ink); }
+.screenGlow { position: absolute; inset: 0; z-index: -1; background-image: linear-gradient(rgba(79,125,243,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(79,125,243,.055) 1px, transparent 1px); background-size: 46px 46px; mask-image: radial-gradient(circle at 50% 28%, #000, transparent 74%); }
+.commandHero { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 24px; border: 1px solid var(--line-strong); border-radius: 22px; background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(234,241,255,.8)); box-shadow: 0 18px 42px rgba(79,125,243,.1); }
+.commandHero p { margin: 0 0 8px; color: var(--blue); font: 800 .72rem var(--font-utility); letter-spacing: .18em; text-transform: uppercase; }
 .commandHero h1 { margin: 0; font: 800 clamp(1.85rem, 4vw, 3.9rem)/.94 var(--font-display); letter-spacing: -.04em; }
-.commandHero span { display: block; margin-top: 12px; color: #9fb6d9; }
+.commandHero span { display: block; margin-top: 12px; color: var(--muted); }
 .commandStatus { display: grid; gap: 6px; justify-items: end; min-width: 160px; }
-.commandStatus strong { color: #22c55e; font-size: 1.18rem; letter-spacing: .14em; text-shadow: 0 0 18px rgba(34,197,94,.55); }
-.commandStatus span { color: #8aa4c4; font-size: .78rem; }
+.commandStatus strong { color: #15803d; font-size: 1.18rem; letter-spacing: .14em; text-shadow: 0 0 14px rgba(34,197,94,.28); }
+.commandStatus span { color: var(--muted); font-size: .78rem; }
 .commandMetricGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-.commandMetricGrid article, .commandPanel, .commandPanelLarge, .alertTower { border: 1px solid rgba(125,211,252,.16); border-radius: 18px; background: rgba(8,18,34,.74); box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 18px 48px rgba(0,0,0,.25); backdrop-filter: blur(18px); }
+.commandMetricGrid article, .commandPanel, .commandPanelLarge, .alertTower { border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.88); box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 16px 38px rgba(79,125,243,.08); backdrop-filter: blur(18px); }
 .commandMetricGrid article { padding: 18px; }
-.commandMetricGrid span, .commandPanel h2, .commandPanelLarge h2, .alertTower h2 { color: #8fb6d9; }
-.commandMetricGrid strong { display: block; margin-top: 9px; color: #f8fafc; font-size: clamp(1.35rem, 3vw, 2.35rem); }
-.commandMetricGrid p { margin: 8px 0 0; color: #7dd3fc; font-size: .82rem; }
+.commandMetricGrid span, .commandPanel h2, .commandPanelLarge h2, .alertTower h2 { color: var(--muted); }
+.commandMetricGrid strong { display: block; margin-top: 9px; color: var(--ink); font-size: clamp(1.35rem, 3vw, 2.35rem); }
+.commandMetricGrid p { margin: 8px 0 0; color: var(--blue); font-size: .82rem; }
 .commandGrid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(300px, .65fr); gap: 18px; }
 .commandGridThree { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .commandPanel, .commandPanelLarge, .alertTower { padding: 20px; }
-.commandPanel h2, .commandPanelLarge h2, .alertTower h2 { margin: 0 0 16px; color: #dff7ff; font-size: 1rem; letter-spacing: .04em; }
+.commandPanel h2, .commandPanelLarge h2, .alertTower h2 { margin: 0 0 16px; color: var(--ink); font-size: 1rem; letter-spacing: .04em; }
+.commandPanel h2 span { display: inline-block; margin-left: 8px; color: var(--blue); font-size: .7rem; font-weight: 700; letter-spacing: .08em; }
 .opsTimeline { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; align-items: stretch; }
-.signalNode { position: relative; display: grid; gap: 8px; min-height: 132px; padding: 16px; border: 1px solid rgba(56,189,248,.18); border-radius: 16px; background: linear-gradient(160deg, rgba(14,38,66,.86), rgba(8,18,34,.72)); }
-.signalNode strong { color: #f8fafc; }
-.signalNode span { color: #8aa4c4; font-size: .82rem; }
-.signalNode i { position: absolute; top: 50%; right: -18px; width: 20px; height: 2px; background: linear-gradient(90deg, #38bdf8, transparent); box-shadow: 0 0 14px rgba(56,189,248,.75); }
+.signalNode { position: relative; display: grid; gap: 8px; min-height: 132px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(160deg, #fff, var(--blue-soft)); }
+.signalNode strong { color: var(--ink); }
+.signalNode span { color: var(--muted); font-size: .82rem; }
+.signalNode i { position: absolute; top: 50%; right: -18px; width: 20px; height: 2px; background: linear-gradient(90deg, var(--blue), transparent); box-shadow: 0 0 12px rgba(79,125,243,.38); }
 .signalNode[data-tone="degraded"] { border-color: rgba(245,158,11,.34); }
 .signalNode[data-tone="failed"] { border-color: rgba(239,68,68,.42); }
 .alertTower { display: grid; align-content: start; gap: 10px; }
-.alertTower > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 12px; border-radius: 12px; background: rgba(15,23,42,.72); border-left: 3px solid #22c55e; }
+.alertTower > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 12px; border-radius: 12px; background: #f8fbff; border-left: 3px solid #22c55e; }
 .alertTower > div[data-tone="degraded"] { border-left-color: #f59e0b; }
 .alertTower > div[data-tone="failed"] { border-left-color: #ef4444; }
-.alertTower span { color: #9fb6d9; font-size: .82rem; }
-.alertTower strong { color: #f8fafc; }
+.alertTower span { color: var(--muted); font-size: .82rem; }
+.alertTower strong { color: var(--ink); }
 .healthRadar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
-.healthRadar span { display: grid; min-height: 78px; place-items: center; border-radius: 999px; background: radial-gradient(circle, rgba(34,197,94,.28), rgba(34,197,94,.08)); color: #dcfce7; font-weight: 900; }
-.healthRadar span[data-tone="degraded"] { background: radial-gradient(circle, rgba(245,158,11,.3), rgba(245,158,11,.08)); color: #fef3c7; }
-.healthRadar span[data-tone="failed"] { background: radial-gradient(circle, rgba(239,68,68,.3), rgba(239,68,68,.08)); color: #fee2e2; }
+.healthRadar span { display: grid; min-height: 78px; place-items: center; border-radius: 999px; background: radial-gradient(circle, rgba(34,197,94,.18), rgba(34,197,94,.04)); color: #15803d; font-weight: 900; }
+.healthRadar span[data-tone="degraded"] { background: radial-gradient(circle, rgba(245,158,11,.2), rgba(245,158,11,.04)); color: #a86900; }
+.healthRadar span[data-tone="failed"] { background: radial-gradient(circle, rgba(239,68,68,.18), rgba(239,68,68,.04)); color: var(--danger); }
 .commandHeatmap { display: grid; grid-template-columns: repeat(10, minmax(14px, 1fr)); gap: 7px; }
-.commandHeatmap span { min-height: 28px; border-radius: 8px; background: #38bdf8; box-shadow: 0 0 16px rgba(56,189,248,.25); }
+.commandHeatmap span { min-height: 28px; border-radius: 8px; background: var(--blue); box-shadow: 0 0 14px rgba(79,125,243,.18); }
 .commandList { display: grid; gap: 10px; }
-.commandList div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(148,163,184,.14); }
-.commandList span, .commandList p { color: #9fb6d9; }
-.commandList strong { color: #f8fafc; }
+.commandList div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.commandList span, .commandList p { color: var(--muted); }
+.commandList strong { color: var(--ink); }
+.commandLatencyChart { position: relative; }
+.commandChartScan { position: absolute; inset: 28px 10px 20px; z-index: 1; pointer-events: none; overflow: hidden; }
+.commandChartScan::after { position: absolute; inset: 0 auto 0 -22%; width: 18%; background: linear-gradient(90deg, transparent, rgba(79,125,243,.18), transparent); content: ''; animation: commandChartSweep 1s ease-out both; }
+@keyframes commandChartSweep { from { transform: translateX(0); } to { transform: translateX(700%); } }
+@media (prefers-reduced-motion: reduce) { .commandChartScan::after { animation: none; } }
 
 .overviewGrid {
   display: grid;

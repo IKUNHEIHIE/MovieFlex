@@ -129,6 +129,7 @@ export default function HealthMonitor({
   }, []);
 
   const uptime = Math.floor(tick);
+  const latencyScanKey = `latency-scan-${uptime}`;
   const lastUpdate = new Date(health.timestamp).toLocaleTimeString('en-US', { hour12: false });
   const statusRank = { ok: 0, degraded: 1, failed: 2 } satisfies Record<Status, number>;
   const systemStatus: Status = statusRank[health.database.status] > statusRank[health.kafka.status] ? health.database.status : health.kafka.status;
@@ -144,8 +145,6 @@ export default function HealthMonitor({
   const dbLatencyScore = Math.min(100, Math.max(0, (1 - health.database.latency / 200) * 100));
   const kafkaScore = health.kafka.connected ? (health.metrics.pendingEvents > 0 ? 70 : 100) : 0;
   const healthScore = Math.round(dbLatencyScore * 0.5 + kafkaScore * 0.5);
-  const healthColor = healthScore >= 80 ? '#38bdf8' : healthScore >= 50 ? '#f59e0b' : '#ef4444';
-  const radialData = [{ name: '健康度', value: healthScore, fill: healthColor }];
   const heatmapData = (history.length ? history : [{ ...health, timestamp: health.timestamp, dbLatency: health.database.latency, pendingEvents: health.metrics.pendingEvents, movieCount: health.metrics.movieCount } as HistoryPoint]).slice(-30).map((point) => ({
     label: new Date(point.timestamp).toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit' }),
     value: point.movieCount,
@@ -166,7 +165,7 @@ export default function HealthMonitor({
   ];
 
   return (
-    <div className={styles.commandCenter}>
+    <div className={`${styles.commandCenter} ${styles.commandCenterLight}`}>
       <div className={styles.screenGlow} />
       <header className={styles.commandHero}>
         <div>
@@ -232,10 +231,10 @@ export default function HealthMonitor({
           <h2>综合健康度仪表盘</h2>
           <div style={{ display: 'grid', placeItems: 'center' }}>
             <svg width="130" height="130" viewBox="0 0 130 130">
-              <defs><linearGradient id="healthGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#38bdf8"/><stop offset="100%" stopColor="#818cf8"/></linearGradient></defs>
-              <circle cx="65" cy="65" r={54} fill="none" stroke="rgba(148,163,184,.1)" strokeWidth={14}/><path d={`M65,${65-54} ${(() => { const pct = healthScore; const rad = (pct / 100) * 2 * Math.PI - Math.PI / 2; return `A54,54 0 ${pct > 50 ? 1 : 0},1 ${65 + 54 * Math.cos(rad)},${65 + 54 * Math.sin(rad)}`; })()}`} fill="none" stroke="url(#healthGrad)" strokeWidth={14} strokeLinecap="round"/>
-              <text x="65" y="58" textAnchor="middle" dominantBaseline="central" fill="#f8fafc" fontSize="26" fontWeight="800">{healthScore}%</text>
-              <text x="65" y="76" textAnchor="middle" dominantBaseline="central" fill="#7dd3fc" fontSize="8.5">{STATUS_LABEL[systemStatus]}</text>
+              <defs><linearGradient id="healthGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#4f7df3"/><stop offset="100%" stopColor="#8ab0ff"/></linearGradient></defs>
+              <circle cx="65" cy="65" r={54} fill="none" stroke="#e5eaf3" strokeWidth={14}/><path d={`M65,${65-54} ${(() => { const pct = healthScore; const rad = (pct / 100) * 2 * Math.PI - Math.PI / 2; return `A54,54 0 ${pct > 50 ? 1 : 0},1 ${65 + 54 * Math.cos(rad)},${65 + 54 * Math.sin(rad)}`; })()}`} fill="none" stroke="url(#healthGrad)" strokeWidth={14} strokeLinecap="round"/>
+              <text x="65" y="58" textAnchor="middle" dominantBaseline="central" fill="#1b2433" fontSize="26" fontWeight="800">{healthScore}%</text>
+              <text x="65" y="76" textAnchor="middle" dominantBaseline="central" fill="#4f7df3" fontSize="8.5">{STATUS_LABEL[systemStatus]}</text>
             </svg>
           </div>
         </section>
@@ -258,16 +257,19 @@ export default function HealthMonitor({
 
       <section className={styles.commandGridThree}>
         <section className={styles.commandPanel}>
-          <h2>数据库延迟趋势</h2>
-          <ResponsiveContainer width="100%" height={240}><AreaChart data={chartData}><defs><linearGradient id="commandLatency" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#38bdf8" stopOpacity={0.78}/><stop offset="100%" stopColor="#38bdf8" stopOpacity={0.05}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,.18)" /><XAxis dataKey="time" stroke="#8aa4c4" fontSize={11} /><YAxis stroke="#8aa4c4" fontSize={11} /><Tooltip contentStyle={{ background: '#0f1b33', border: '1px solid rgba(56,189,248,.25)', borderRadius: 10, color: '#e0f2fe' }} /><Area type="monotone" dataKey="延迟" stroke="#38bdf8" fill="url(#commandLatency)" strokeWidth={2} /></AreaChart></ResponsiveContainer>
+          <h2>数据库延迟趋势 <span>实时采样</span></h2>
+          <div className={styles.commandLatencyChart}>
+            <div className={styles.commandChartScan} key={latencyScanKey} aria-hidden="true" />
+            <ResponsiveContainer width="100%" height={240}><AreaChart data={chartData}><defs><linearGradient id="commandLatency" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#4f7df3" stopOpacity={0.46}/><stop offset="100%" stopColor="#4f7df3" stopOpacity={0.04}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(79,125,243,.16)" /><XAxis dataKey="time" stroke="#8290a8" fontSize={11} /><YAxis stroke="#8290a8" fontSize={11} /><Tooltip contentStyle={{ background: '#fff', border: '1px solid #d7e2f2', borderRadius: 10, color: '#1b2433', boxShadow: '0 12px 28px rgba(79,125,243,.14)' }} /><Area key={latencyScanKey} type="monotone" dataKey="延迟" stroke="#4f7df3" fill="url(#commandLatency)" strokeWidth={2.5} animationDuration={820} /></AreaChart></ResponsiveContainer>
+          </div>
         </section>
         <section className={styles.commandPanel}>
           <h2>Kafka 堆积趋势</h2>
-          <ResponsiveContainer width="100%" height={240}><AreaChart data={chartData}><defs><linearGradient id="commandEvents" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#f59e0b" stopOpacity={0.76}/><stop offset="100%" stopColor="#f59e0b" stopOpacity={0.05}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,.18)" /><XAxis dataKey="time" stroke="#8aa4c4" fontSize={11} /><YAxis stroke="#8aa4c4" fontSize={11} /><Tooltip contentStyle={{ background: '#0f1b33', border: '1px solid rgba(245,158,11,.25)', borderRadius: 10, color: '#fef3c7' }} /><Area type="monotone" dataKey="待处理事件" stroke="#f59e0b" fill="url(#commandEvents)" strokeWidth={2} /></AreaChart></ResponsiveContainer>
+          <ResponsiveContainer width="100%" height={240}><AreaChart data={chartData}><defs><linearGradient id="commandEvents" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#f59e0b" stopOpacity={0.76}/><stop offset="100%" stopColor="#f59e0b" stopOpacity={0.05}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(79,125,243,.16)" /><XAxis dataKey="time" stroke="#8290a8" fontSize={11} /><YAxis stroke="#8290a8" fontSize={11} /><Tooltip contentStyle={{ background: '#fff', border: '1px solid #f7d99b', borderRadius: 10, color: '#1b2433', boxShadow: '0 12px 28px rgba(245,158,11,.12)' }} /><Area type="monotone" dataKey="待处理事件" stroke="#f59e0b" fill="url(#commandEvents)" strokeWidth={2} /></AreaChart></ResponsiveContainer>
         </section>
         <section className={styles.commandPanel}>
           <h2>内容库增长趋势</h2>
-          <ResponsiveContainer width="100%" height={240}><LineChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,.18)" /><XAxis dataKey="time" stroke="#8aa4c4" fontSize={11} /><YAxis stroke="#8aa4c4" fontSize={11} /><Tooltip contentStyle={{ background: '#0f1b33', border: '1px solid rgba(34,197,94,.25)', borderRadius: 10, color: '#dcfce7' }} /><Line type="monotone" dataKey="影片数" stroke="#22c55e" strokeWidth={3} dot={{ r: 3, fill: '#22c55e' }} /></LineChart></ResponsiveContainer>
+          <ResponsiveContainer width="100%" height={240}><LineChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="rgba(79,125,243,.16)" /><XAxis dataKey="time" stroke="#8290a8" fontSize={11} /><YAxis stroke="#8290a8" fontSize={11} /><Tooltip contentStyle={{ background: '#fff', border: '1px solid #bbebcc', borderRadius: 10, color: '#1b2433', boxShadow: '0 12px 28px rgba(34,197,94,.12)' }} /><Line type="monotone" dataKey="影片数" stroke="#22c55e" strokeWidth={3} dot={{ r: 3, fill: '#22c55e' }} /></LineChart></ResponsiveContainer>
         </section>
       </section>
     </div>
