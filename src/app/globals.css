@@ -91,10 +91,13 @@ button, input { font: inherit; }
 .filter-item { padding: 4px 12px; border-radius: var(--radius-sm, 4px); font-size: 0.82rem; color: var(--color-text-secondary); background: var(--color-bg-subtle, #f8fafb); border: 1px solid var(--color-border, #edf5f8); text-decoration: none; white-space: nowrap; transition: all var(--transition-fast); }
 .filter-item:hover { border-color: var(--color-accent); color: var(--color-accent); }
 .filter-item.active, .source-tab.active, .episode-btn.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+.detail-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 30px; }
+.source-tabs { min-width: 0; }
 
 @keyframes navPulse { from { opacity: .45; transform: scaleX(.66); } to { opacity: 1; transform: scaleX(1); } }
 @keyframes navProgress { from { transform: translateX(-120%); } to { transform: translateX(280%); } }
 @keyframes movieListingIn { from { opacity: .68; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (max-width: 860px) { .container { padding: 0 20px; } .navInner { gap: 20px; } .primaryNav { gap: 14px; } .primaryNav a { font-size: 0.82rem; } }
+@media (max-width: 760px) { .detail-layout { grid-template-columns: 1fr; gap: 18px; }.movie-watch-heading { display: grid; gap: 6px; }.episode-header { align-items: flex-start; flex-direction: column; gap: 10px; }.source-tabs { overflow-x: auto; width: 100%; padding-bottom: 2px; scrollbar-width: none; }.source-tabs::-webkit-scrollbar { display: none; }.source-tab { flex: 0 0 auto; }.intro-meta { flex-direction: column; }.intro-meta img { width: 118px !important; } }
 @media (max-width: 680px) { :root { --nav-height: 106px; } .container { padding: 0 16px; } .siteHeader { height: auto; min-height: var(--nav-height); }.navInner { flex-wrap: wrap; gap: 8px 12px; align-content: center; padding-top: 8px; padding-bottom: 9px; }.brand { font-size: 1.17rem; }.brandLogo { max-width: 132px; height: 30px; }.primaryNav { order: 3; width: 100%; gap: 8px; overflow-x: auto; padding: 2px 0 1px; scrollbar-width: none; }.primaryNav::-webkit-scrollbar { display: none; }.primaryNav a { flex: 0 0 auto; font-size: .78rem; }.navActions { flex: 1 1 auto; justify-content: flex-end; }.navSearch { width: min(42vw, 180px); } .navSearch input { height: 33px; } .navSearch button { height: 33px; } }
 @media (prefers-reduced-motion: reduce) { .movie-card-link:active .glass, .navLinkPending, .primaryNav a:active, .movieListingShell { animation: none; transform: none; }.navLinkPending::after, .navProgress::after { animation: none; } }

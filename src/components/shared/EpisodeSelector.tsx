@@ -13,10 +13,10 @@ export default function EpisodeSelector({ movieId, groups, activeSource, activeE
 
   return (
     <section className="glass" style={{ padding: '24px', borderRadius: 'var(--radius-md)', marginBottom: '30px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px', borderBottom: '1px solid var(--color-border)', paddingBottom: '16px', marginBottom: '20px' }}>
+      <div className="episode-header" style={{ display: 'flex', alignItems: 'center', gap: '20px', borderBottom: '1px solid var(--color-border)', paddingBottom: '16px', marginBottom: '20px' }}>
         <h2 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0 }}>选集播放</h2>
         {groups.length > 1 && (
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="source-tabs" style={{ display: 'flex', gap: '8px' }}>
             {groups.map((source) => (
               <Link
                 href={`/movie/${movieId}?source=${source.source}&ep=0`}

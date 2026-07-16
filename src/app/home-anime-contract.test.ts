@@ -12,6 +12,8 @@ const carouselCss = readFileSync(join(root, 'src/components/home/PopularCarousel
 const homeCss = readFileSync(join(root, 'src/app/page.module.css'), 'utf8');
 const globalCss = readFileSync(join(root, 'src/app/globals.css'), 'utf8');
 const moviesPage = readFileSync(join(root, 'src/app/movies/page.tsx'), 'utf8');
+const movieDetailPage = readFileSync(join(root, 'src/app/movie/[id]/page.tsx'), 'utf8');
+const episodeSelector = readFileSync(join(root, 'src/components/shared/EpisodeSelector.tsx'), 'utf8');
 const profilePage = readFileSync(join(root, 'src/app/user/profile/page.tsx'), 'utf8');
 const assistantHistoryPanel = readFileSync(join(root, 'src/components/user/AssistantHistoryPanel.tsx'), 'utf8');
 const mascot = readFileSync(join(root, 'src/components/mascot/FurinaMascot.tsx'), 'utf8');
@@ -93,6 +95,18 @@ describe('anime public home contract', () => {
     expect(globalCss).toContain('.movieListingShell');
     expect(globalCss).toContain('@keyframes movieListingIn');
     expect(globalCss).toContain('prefers-reduced-motion: reduce');
+  });
+
+  it('collapses movie detail layout cleanly on mobile', () => {
+    expect(movieDetailPage).toContain('className="detail-layout"');
+    expect(movieDetailPage).not.toContain("gridTemplateColumns: '2fr 1fr'");
+    expect(episodeSelector).toContain('className="episode-header"');
+    expect(episodeSelector).toContain('className="source-tabs"');
+    expect(globalCss).toContain('.detail-layout {');
+    expect(globalCss).toContain('grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr)');
+    expect(globalCss).toContain('.detail-layout { grid-template-columns: 1fr; gap: 18px; }');
+    expect(globalCss).toContain('.intro-meta { flex-direction: column; }');
+    expect(globalCss).toContain('.source-tabs { overflow-x: auto;');
   });
 
   it('keeps AI assistant history compact and last on the profile page', () => {

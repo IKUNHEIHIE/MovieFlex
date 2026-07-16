@@ -70,7 +70,7 @@ export default async function MovieDetailPage({ params, searchParams }: MovieDet
     <div className="container" style={{ paddingBottom: '60px' }}>
       {activeEpisode ? (
         <section style={{ marginBottom: '30px' }}>
-          <div style={{ marginBottom: '12px' }}>
+          <div className="movie-watch-heading" style={{ marginBottom: '12px' }}>
             <span style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
               正在播放：
             </span>
@@ -93,11 +93,7 @@ export default async function MovieDetailPage({ params, searchParams }: MovieDet
         </div>
       )}
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '2fr 1fr',
-        gap: '30px'
-      }} className="detail-layout">
+      <div className="detail-layout">
         <div>
           <EpisodeSelector
             movieId={movie.id}
