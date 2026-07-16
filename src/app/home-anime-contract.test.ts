@@ -12,6 +12,7 @@ const carouselCss = readFileSync(join(root, 'src/components/home/PopularCarousel
 const homeCss = readFileSync(join(root, 'src/app/page.module.css'), 'utf8');
 const globalCss = readFileSync(join(root, 'src/app/globals.css'), 'utf8');
 const moviesPage = readFileSync(join(root, 'src/app/movies/page.tsx'), 'utf8');
+const profilePage = readFileSync(join(root, 'src/app/user/profile/page.tsx'), 'utf8');
 const mascot = readFileSync(join(root, 'src/components/mascot/FurinaMascot.tsx'), 'utf8');
 
 describe('anime public home contract', () => {
@@ -76,6 +77,12 @@ describe('anime public home contract', () => {
     expect(globalCss).toContain('.movieListingShell');
     expect(globalCss).toContain('@keyframes movieListingIn');
     expect(globalCss).toContain('prefers-reduced-motion: reduce');
+  });
+
+  it('keeps AI assistant history compact and last on the profile page', () => {
+    expect(profilePage).toContain('take: 2');
+    expect(profilePage).not.toContain('个 AI 会话');
+    expect(profilePage.indexOf('MovieGridSection title={recommendations.title}')).toBeLessThan(profilePage.indexOf('<AssistantHistoryPanel conversations={aiConversations} />'));
   });
 
   it('keeps pointer cancellation non-interactive and supports one keyboard activation path', () => {
