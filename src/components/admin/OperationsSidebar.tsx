@@ -145,6 +145,12 @@ export function OperationsSidebar() {
           主题管理
         </Link>
         <Link
+          href="/admin/settings"
+          className={pathname === '/admin/settings' ? styles.activeLink : ''}
+        >
+          系统设置
+        </Link>
+        <Link
           href="/admin/dashboard"
           className={pathname === '/admin/dashboard' ? styles.activeLink : ''}
         >

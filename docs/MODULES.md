@@ -154,6 +154,45 @@
 - 选择当前前台主题。
 - 从主题资源目录加载对应样式。
 
+## 系统设置
+
+相关文件：
+
+- `src/app/admin/settings/page.tsx`
+- `src/components/admin/SystemSettingsForm.tsx`
+- `src/app/api/admin/settings/route.ts`
+- `src/lib/system-settings.ts`
+- `prisma/schema.prisma` 中的 `SystemSetting` 模型
+
+职责：
+
+- 配置网站名称、简介、logo URL 和 favicon URL。
+- 配置 OpenAI 兼容 AI 助手 API 端点、密钥和模型 ID。
+- AI 密钥不回显明文，留空保存不会覆盖旧密钥。
+- 提示管理员使用支持多模态输入的模型以启用电影封皮识别。
+
+## AI 助手模块
+
+相关文件：
+
+- `src/components/assistant/AiAssistantWidget.tsx`
+- `src/components/assistant/assistant-storage.ts`
+- `src/app/api/assistant/chat/route.ts`
+- `src/app/api/assistant/conversations/*`
+- `src/lib/assistant-provider.ts`
+- `src/lib/assistant-store.ts`
+- `src/app/user/assistant/page.tsx`
+- `src/components/user/AssistantHistoryPanel.tsx`
+- `prisma/schema.prisma` 中的 `AiConversation` 和 `AiMessage` 模型
+
+职责：
+
+- 用全新 AI 助手挂件替换旧看板娘 AI 实现。
+- 支持文字推荐问答、电影封皮图片提问和流式回答。
+- 登录用户支持多个会话线程并保存聊天记录。
+- 游客用户仅保留一个浏览器本地会话，刷新和重开浏览器后继续。
+- 图片不保存原图，只保存问题文本、AI 回答、文件名、MIME 类型、大小和图片标记。
+
 ## 推荐模块
 
 相关文件：
