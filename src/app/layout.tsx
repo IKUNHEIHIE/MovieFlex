@@ -7,6 +7,7 @@ import Snowfall from '@/components/layout/Snowfall';
 import FurinaMascot from '@/components/mascot/FurinaMascot';
 import { auth } from '@/lib/auth/auth';
 import { getActiveThemeKey } from '@/lib/theme-registry';
+import { getPublicSystemSettings } from '@/lib/system-settings';
 
 export const metadata: Metadata = {
   title: 'MovieFlex — 影视在线观看平台',
@@ -14,16 +15,18 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [activeTheme, session] = await Promise.all([
+  const [activeTheme, session, publicSettings] = await Promise.all([
     getActiveThemeKey().catch(() => 'ice-blue'),
     auth(),
+    getPublicSystemSettings(),
   ]);
   return (
     <html lang="zh-CN" data-theme={activeTheme}>
       <head>
       <link rel="stylesheet" href={`/themes/${activeTheme}/style.css`} />
+      <link rel="icon" href={publicSettings.siteFaviconUrl} />
     </head>
-      <body><SessionProvider session={session}><Navbar /><MouseTrail /><Snowfall /><FurinaMascot />
+      <body><SessionProvider session={session}><Navbar settings={publicSettings} /><MouseTrail /><Snowfall /><FurinaMascot />
         <main style={{ minHeight: 'calc(100vh - var(--nav-height))' }}>{children}</main>
       </SessionProvider></body>
     </html>

@@ -5,6 +5,11 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 
+type NavbarSettings = {
+  siteName: string;
+  siteLogoUrl: string;
+};
+
 const navItems = [
   { label: '首页', href: '/', match: { pathname: '/' } },
   { label: '电影', href: '/movies?type=1', match: { pathname: '/movies', type: '1' } },
@@ -13,7 +18,7 @@ const navItems = [
   { label: '动漫', href: '/movies?type=24', match: { pathname: '/movies', type: '24' } },
 ];
 
-export default function Navbar() {
+export default function Navbar({ settings = { siteName: 'MovieFlex', siteLogoUrl: '' } }: { settings?: NavbarSettings }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -43,7 +48,9 @@ export default function Navbar() {
   return (
     <header className="siteHeader">
       <div className="container navInner">
-        <Link href="/" className="brand" aria-label="MovieFlex 首页">Movie<span>Flex</span></Link>
+        <Link href="/" className="brand" aria-label={`${settings.siteName} 首页`}>
+          {settings.siteLogoUrl ? <img className="brandLogo" src={settings.siteLogoUrl} alt={settings.siteName} /> : <>Movie<span>Flex</span></>}
+        </Link>
         <nav className="primaryNav" aria-label="主导航">
           {navItems.map((item) => {
             const isActive = isItemActive(item);

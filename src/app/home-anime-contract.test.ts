@@ -30,6 +30,13 @@ describe('anime public home contract', () => {
     expect(adminLayout).not.toContain('FurinaMascot');
   });
 
+  it('passes public system branding settings into the navbar shell', () => {
+    expect(rootLayout).toContain("import { getPublicSystemSettings } from '@/lib/system-settings'");
+    expect(rootLayout).toContain('getPublicSystemSettings()');
+    expect(rootLayout).toContain('<Navbar settings={publicSettings} />');
+    expect(rootLayout).toContain('rel="icon" href={publicSettings.siteFaviconUrl}');
+  });
+
   it('gives every featured movie distinct play and details actions', () => {
     expect(carousel).toContain('立即播放');
     expect(carousel).toContain('详情介绍');

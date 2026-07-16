@@ -56,6 +56,7 @@ button, input { font: inherit; }
 .navInner { display: flex; height: 100%; align-items: center; gap: 34px; }
 .brand { color: var(--color-text-primary); font-size: 1.4rem; font-weight: 850; letter-spacing: 0; white-space: nowrap; }
 .brand span { color: var(--color-accent); }
+.brandLogo { width: auto; max-width: 168px; height: 34px; object-fit: contain; }
 .primaryNav { display: flex; align-items: center; gap: 22px; }
 .primaryNav a { color: var(--color-text-secondary); font-size: 0.9rem; font-weight: 700; white-space: nowrap; transition: color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
 .navLink { position: relative; padding: 7px 10px; border-radius: 999px; }

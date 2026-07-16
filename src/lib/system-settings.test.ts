@@ -49,6 +49,15 @@ describe('system settings', () => {
     expect(state.get(systemSettingKeys.siteFaviconUrl)).toBe('https://example.com/favicon.ico');
   });
 
+  it('returns saved public logo URL for the frontend shell', async () => {
+    const { saveAdminSystemSettings, getPublicSystemSettings } = await import('./system-settings');
+
+    await saveAdminSystemSettings({ siteLogoUrl: '/brand/logo.svg' });
+
+    const settings = await getPublicSystemSettings();
+    expect(settings.siteLogoUrl).toBe('/brand/logo.svg');
+  });
+
   it('reports configured API key after saving a new key', async () => {
     const { saveAdminSystemSettings, getAdminSystemSettings } = await import('./system-settings');
 
