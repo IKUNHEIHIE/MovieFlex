@@ -227,9 +227,9 @@ export default function AiAssistantWidget() {
   return (
     <aside className={styles.widget} aria-label="MovieFlex AI 助手" style={{ transform: `translate3d(${position.x}px, ${position.y}px, 0)` }}>
       {open && (
-        <section className={`${styles.panel} ${position.x < 430 ? styles.panelRight : ''}`} aria-label="芙宁娜 AI 助手">
+        <section className={`${styles.panel} ${position.x < 430 ? styles.panelRight : ''}`} aria-label="观影小助手">
           <header className={styles.header}>
-            <div><strong>芙宁娜 AI 助手</strong><span>{isLoggedIn ? '多会话已保存' : '游客单会话，本地保存'}</span></div>
+            <div><strong>观影小助手</strong><span>{isLoggedIn ? '多会话已保存' : '游客单会话，本地保存'}</span></div>
             <button type="button" className={styles.close} onClick={() => setOpen(false)} aria-label="关闭聊天">x</button>
           </header>
           <div className={styles.chatShell}>
@@ -260,7 +260,7 @@ export default function AiAssistantWidget() {
           </div>
         </section>
       )}
-      <button type="button" className={styles.character} aria-label="点击打开 MovieFlex AI 助手，长按后可拖动" onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); pressedAt.current = event.pointerId; dragOffset.current = { x: event.clientX - position.x, y: event.clientY - position.y }; pressTimer.current = window.setTimeout(() => { dragging.current = true; }, 180); }} onPointerMove={(event) => { if (pressedAt.current === event.pointerId && dragging.current) setPosition(bounded({ x: event.clientX - dragOffset.current.x, y: event.clientY - dragOffset.current.y })); }} onPointerUp={release} onPointerCancel={cleanupPointer} onLostPointerCapture={cleanupPointer}>
+      <button type="button" className={styles.character} aria-label="点击打开观影小助手，长按后可拖动" onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); pressedAt.current = event.pointerId; dragOffset.current = { x: event.clientX - position.x, y: event.clientY - position.y }; pressTimer.current = window.setTimeout(() => { dragging.current = true; }, 180); }} onPointerMove={(event) => { if (pressedAt.current === event.pointerId && dragging.current) setPosition(bounded({ x: event.clientX - dragOffset.current.x, y: event.clientY - dragOffset.current.y })); }} onPointerUp={release} onPointerCancel={cleanupPointer} onLostPointerCapture={cleanupPointer}>
         <img src={`/mascot/furina/${POSES[pose]}`} alt="" draggable="false" onError={() => setImageFailed(true)} />
       </button>
     </aside>

@@ -37,12 +37,12 @@ export default async function UserAssistantPage({ searchParams }: { searchParams
           <div style={{ display: 'grid', gap: 12 }}>
             {active?.messages.map((message) => (
               <article key={message.id} style={{ justifySelf: message.role === 'user' ? 'end' : 'start', maxWidth: '82%', padding: 14, borderRadius: 14, background: message.role === 'user' ? 'rgba(79,125,243,.18)' : 'rgba(255,255,255,.62)' }}>
-                <strong>{message.role === 'user' ? '我' : '芙宁娜'}</strong>
+                <strong>{message.role === 'user' ? '我' : '观影小助手'}</strong>
                 <p style={{ whiteSpace: 'pre-wrap' }}>{message.content}</p>
                 {message.hasImage && <small>包含图片：{message.imageFileName} · {message.imageMimeType}</small>}
               </article>
             ))}
-            {!active && <p style={{ color: 'var(--muted)' }}>还没有 AI 对话。点击右下角芙宁娜开始提问吧。</p>}
+            {!active && <p style={{ color: 'var(--muted)' }}>还没有 AI 对话。点击右下角观影小助手开始提问吧。</p>}
           </div>
         </section>
       </div>

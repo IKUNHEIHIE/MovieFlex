@@ -17,6 +17,9 @@ const episodeSelector = readFileSync(join(root, 'src/components/shared/EpisodeSe
 const profilePage = readFileSync(join(root, 'src/app/user/profile/page.tsx'), 'utf8');
 const assistantHistoryPanel = readFileSync(join(root, 'src/components/user/AssistantHistoryPanel.tsx'), 'utf8');
 const mascot = readFileSync(join(root, 'src/components/mascot/FurinaMascot.tsx'), 'utf8');
+const assistantWidget = readFileSync(join(root, 'src/components/assistant/AiAssistantWidget.tsx'), 'utf8');
+const assistantPage = readFileSync(join(root, 'src/app/user/assistant/page.tsx'), 'utf8');
+const assistantProvider = readFileSync(join(root, 'src/lib/assistant-provider.ts'), 'utf8');
 
 describe('anime public home contract', () => {
   it('uses a dedicated popular carousel populated from four view-ranked movies', () => {
@@ -129,5 +132,14 @@ describe('anime public home contract', () => {
     expect(mascot).toContain('onLostPointerCapture={cleanupPointer}');
     expect(mascot).toContain('onClick={activateMascot}');
     expect(mascot).toContain('shouldActivateMascotClick(event.detail)');
+  });
+
+  it('uses 观影小助手 as the user-visible assistant persona', () => {
+    expect(assistantWidget).toContain('观影小助手');
+    expect(assistantPage).toContain('观影小助手');
+    expect(assistantProvider).toContain('名字是观影小助手');
+    expect(assistantWidget).not.toContain('芙宁娜');
+    expect(assistantPage).not.toContain('芙宁娜');
+    expect(assistantProvider).not.toContain('名字是芙宁娜');
   });
 });

@@ -11,7 +11,7 @@ export type OpenAIChatMessage = {
 };
 
 export const ASSISTANT_SYSTEM_PROMPT = `
-你是 MovieFlex 网站里的影视 AI 助手，名字是芙宁娜。
+你是 MovieFlex 网站里的影视 AI 助手，名字是观影小助手。
 
 请始终使用自然、友好、简洁的中文回答。
 你可以帮助用户：
