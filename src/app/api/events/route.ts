@@ -3,9 +3,16 @@ import { v4 as uuidv4 } from 'uuid';
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth/auth';
 import { queueEvent } from '@/lib/outbox';
+import { checkRateLimit } from '@/lib/rate-limiter';
 import { validateString, validateInteger, validateObject, handleValidationError, ValidationError } from '@/lib/validation';
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const { allowed, remaining } = checkRateLimit(`events:${ip}`);
+  if (!allowed) {
+    return NextResponse.json({ success: false, error: '请求过于频繁，请稍后再试' }, { status: 429, headers: { 'X-RateLimit-Remaining': String(remaining) } });
+  }
+
   try {
     const contentLength = Number(request.headers.get('content-length') || 0);
     if (contentLength > 16_384) {
