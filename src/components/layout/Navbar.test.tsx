@@ -8,7 +8,11 @@ vi.mock('next-auth/react', () => ({
   signOut: vi.fn(),
   useSession: () => ({ data: { user: { role: 'USER' } }, status: 'authenticated' }),
 }));
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/',
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
+}));
 
 import Navbar from './Navbar';
 
