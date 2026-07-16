@@ -11,6 +11,7 @@ const carousel = readFileSync(join(root, 'src/components/home/PopularCarousel.ts
 const carouselCss = readFileSync(join(root, 'src/components/home/PopularCarousel.module.css'), 'utf8');
 const homeCss = readFileSync(join(root, 'src/app/page.module.css'), 'utf8');
 const globalCss = readFileSync(join(root, 'src/app/globals.css'), 'utf8');
+const moviesPage = readFileSync(join(root, 'src/app/movies/page.tsx'), 'utf8');
 const mascot = readFileSync(join(root, 'src/components/mascot/FurinaMascot.tsx'), 'utf8');
 
 describe('anime public home contract', () => {
@@ -67,6 +68,14 @@ describe('anime public home contract', () => {
     expect(globalCss).toContain('.navLinkActive');
     expect(globalCss).toContain('.navLinkPending');
     expect(globalCss).toContain('.navProgress');
+  });
+
+  it('softens movie category route changes with a listing entry animation', () => {
+    expect(moviesPage).toContain('listingMotionKey');
+    expect(moviesPage).toContain('className="movieListingShell"');
+    expect(globalCss).toContain('.movieListingShell');
+    expect(globalCss).toContain('@keyframes movieListingIn');
+    expect(globalCss).toContain('prefers-reduced-motion: reduce');
   });
 
   it('keeps pointer cancellation non-interactive and supports one keyboard activation path', () => {

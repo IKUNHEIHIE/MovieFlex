@@ -108,6 +108,7 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
     const queryStr = nextParams.toString();
     return `/movies${queryStr ? '?' + queryStr : ''}`;
   };
+  const listingMotionKey = [typeId || 'all', area || 'all', year || 'all', lang || 'all', sort, currentPage, pageSize].join('-');
 
   // 构建分类树：父分类及其子分类
   const parentCategories = categories.filter(c => !c.parentId);
@@ -121,6 +122,7 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
 
   return (
     <div className="container" style={{ paddingBottom: '60px' }}>
+      <div key={listingMotionKey} className="movieListingShell">
       <section className="glass" style={{ padding: '24px', borderRadius: 'var(--radius-md)', marginBottom: '30px' }}>
         <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '20px', color: 'var(--color-text-primary)' }}>
           影片库筛选
@@ -200,6 +202,7 @@ export default async function MoviesPage({ searchParams }: MoviesPageProps) {
           </div>
         )}
       </section>
+      </div>
     </div>
   );
 }
