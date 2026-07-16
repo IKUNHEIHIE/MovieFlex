@@ -6,6 +6,7 @@ const root = process.cwd();
 const homePage = readFileSync(join(root, 'src/app/page.tsx'), 'utf8');
 const rootLayout = readFileSync(join(root, 'src/app/layout.tsx'), 'utf8');
 const adminLayout = readFileSync(join(root, 'src/app/admin/layout.tsx'), 'utf8');
+const navbar = readFileSync(join(root, 'src/components/layout/Navbar.tsx'), 'utf8');
 const carousel = readFileSync(join(root, 'src/components/home/PopularCarousel.tsx'), 'utf8');
 const carouselCss = readFileSync(join(root, 'src/components/home/PopularCarousel.module.css'), 'utf8');
 const homeCss = readFileSync(join(root, 'src/app/page.module.css'), 'utf8');
@@ -52,6 +53,20 @@ describe('anime public home contract', () => {
     expect(homeCss).toContain('.moreLink:active');
     expect(homeCss).toContain('scale(.985)');
     expect(globalCss).toContain('.movie-card-link:active .glass');
+  });
+
+  it('makes public navigation route-aware with pending feedback hooks', () => {
+    expect(navbar).toContain('usePathname');
+    expect(navbar).toContain('useSearchParams');
+    expect(navbar).toContain('navItems.map');
+    expect(navbar).toContain('navLinkActive');
+    expect(navbar).toContain('navLinkPending');
+    expect(navbar).toContain("aria-current={isActive ? 'page' : undefined}");
+    expect(navbar).toContain('className="navProgress"');
+    expect(globalCss).not.toContain('.primaryNav a:first-child');
+    expect(globalCss).toContain('.navLinkActive');
+    expect(globalCss).toContain('.navLinkPending');
+    expect(globalCss).toContain('.navProgress');
   });
 
   it('keeps pointer cancellation non-interactive and supports one keyboard activation path', () => {

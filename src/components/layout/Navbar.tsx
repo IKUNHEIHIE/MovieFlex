@@ -1,15 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
+
+const navItems = [
+  { label: '首页', href: '/', match: { pathname: '/' } },
+  { label: '电影', href: '/movies?type=1', match: { pathname: '/movies', type: '1' } },
+  { label: '剧集', href: '/movies?type=10', match: { pathname: '/movies', type: '10' } },
+  { label: '综艺', href: '/movies?type=19', match: { pathname: '/movies', type: '19' } },
+  { label: '动漫', href: '/movies?type=24', match: { pathname: '/movies', type: '24' } },
+];
 
 export default function Navbar() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentType = searchParams.get('type');
   const [searchKeyword, setSearchKeyword] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  const isItemActive = (item: typeof navItems[number]) => {
+    if (item.match.pathname !== pathname) return false;
+    return 'type' in item.match ? currentType === item.match.type : true;
+  };
+
+  useEffect(() => {
+    if (!pendingHref) return;
+    const pendingItem = navItems.find((item) => item.href === pendingHref);
+    if (pendingItem && isItemActive(pendingItem)) setPendingHref(null);
+  }, [pathname, currentType, pendingHref]);
 
   const handleSearch = (event: React.FormEvent) => {
     event.preventDefault();
@@ -22,12 +45,23 @@ export default function Navbar() {
       <div className="container navInner">
         <Link href="/" className="brand" aria-label="MovieFlex 首页">Movie<span>Flex</span></Link>
         <nav className="primaryNav" aria-label="主导航">
-          <Link href="/">首页</Link>
-          <Link href="/movies?type=1">电影</Link>
-          <Link href="/movies?type=10">剧集</Link>
-          <Link href="/movies?type=19">综艺</Link>
-          <Link href="/movies?type=24">动漫</Link>
+          {navItems.map((item) => {
+            const isActive = isItemActive(item);
+            const isPending = pendingHref === item.href && !isActive;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`navLink ${isActive ? 'navLinkActive' : ''} ${isPending ? 'navLinkPending' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
+                onClick={() => setPendingHref(isActive ? null : item.href)}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
+        {pendingHref && <span className="navProgress" aria-hidden="true" />}
         <div className="navActions">
           <form onSubmit={handleSearch} className="navSearch">
             <input type="search" value={searchKeyword} onChange={(event) => setSearchKeyword(event.target.value)} placeholder="搜索影片" aria-label="搜索影片" />

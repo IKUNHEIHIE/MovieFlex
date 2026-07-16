@@ -57,8 +57,14 @@ button, input { font: inherit; }
 .brand { color: var(--color-text-primary); font-size: 1.4rem; font-weight: 850; letter-spacing: 0; white-space: nowrap; }
 .brand span { color: var(--color-accent); }
 .primaryNav { display: flex; align-items: center; gap: 22px; }
-.primaryNav a { color: var(--color-text-secondary); font-size: 0.9rem; font-weight: 700; white-space: nowrap; transition: color var(--transition-fast); }
-.primaryNav a:first-child, .primaryNav a:hover { color: var(--color-accent); }
+.primaryNav a { color: var(--color-text-secondary); font-size: 0.9rem; font-weight: 700; white-space: nowrap; transition: color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
+.navLink { position: relative; padding: 7px 10px; border-radius: 999px; }
+.navLink:hover, .navLinkActive { background: rgba(255, 255, 255, .72); color: var(--color-accent); box-shadow: inset 0 0 0 1px rgba(155, 73, 56, .12); }
+.navLinkActive::after, .navLinkPending::after { position: absolute; right: 10px; bottom: 3px; left: 10px; height: 2px; border-radius: 99px; background: currentColor; content: ''; }
+.primaryNav a:active, .navLinkPending { transform: translateY(1px) scale(.98); color: var(--color-accent); }
+.navLinkPending::after { animation: navPulse 760ms ease-in-out infinite alternate; }
+.navProgress { position: absolute; right: 0; bottom: -1px; left: 0; height: 2px; overflow: hidden; background: rgba(155, 73, 56, .08); }
+.navProgress::after { display: block; width: 38%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, transparent, rgba(155, 73, 56, .85), transparent); animation: navProgress 920ms ease-in-out infinite; content: ''; }
 .navActions { display: flex; min-width: 0; align-items: center; gap: 13px; margin-left: auto; }
 .navSearch { position: relative; width: min(23vw, 230px); }
 .navSearch input { width: 100%; height: 35px; padding: 0 36px 0 13px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: #fff; color: var(--color-text-primary); font-size: 0.82rem; outline: none; }
@@ -84,6 +90,8 @@ button, input { font: inherit; }
 .filter-item:hover { border-color: var(--color-accent); color: var(--color-accent); }
 .filter-item.active, .source-tab.active, .episode-btn.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
 
+@keyframes navPulse { from { opacity: .45; transform: scaleX(.66); } to { opacity: 1; transform: scaleX(1); } }
+@keyframes navProgress { from { transform: translateX(-120%); } to { transform: translateX(280%); } }
 @media (max-width: 860px) { .container { padding: 0 20px; } .navInner { gap: 20px; } .primaryNav { gap: 14px; } .primaryNav a { font-size: 0.82rem; } }
 @media (max-width: 680px) { :root { --nav-height: 58px; } .container { padding: 0 16px; } .navInner { gap: 14px; } .brand { font-size: 1.17rem; } .primaryNav { display: none; } .navSearch { width: min(42vw, 180px); } .navSearch input { height: 33px; } .navSearch button { height: 33px; } }
-@media (prefers-reduced-motion: reduce) { .movie-card-link:active .glass { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .movie-card-link:active .glass, .navLinkPending, .primaryNav a:active { transform: none; }.navLinkPending::after, .navProgress::after { animation: none; } }
