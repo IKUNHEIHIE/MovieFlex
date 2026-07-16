@@ -7,6 +7,7 @@ const adminPages = [
   'src/app/admin/dashboard/page.tsx',
   'src/app/admin/movies/page.tsx',
   'src/app/admin/themes/page.tsx',
+  'src/app/admin/settings/page.tsx',
   'src/app/admin/users/page.tsx',
   'src/app/admin/stats/movies/page.tsx',
   'src/app/admin/stats/categories/page.tsx',
@@ -55,5 +56,12 @@ describe('admin style unification', () => {
     expect(source).toContain('热门影片');
     expect(source).toContain('快捷操作');
     expect(source).not.toMatch(/admin-theme\.css|AdminButton|AdminCard|AdminTable/);
+  });
+
+  it('includes the system settings menu entry', () => {
+    const source = readFileSync(join(process.cwd(), 'src/components/admin/OperationsSidebar.tsx'), 'utf8');
+
+    expect(source).toContain('/admin/settings');
+    expect(source).toContain('系统设置');
   });
 });

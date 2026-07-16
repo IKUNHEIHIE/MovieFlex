@@ -151,6 +151,7 @@
 | --- | --- | --- | --- |
 | `PATCH` | `/api/admin/themes/active` | 管理员 | 设置前台当前主题。 |
 | `POST` | `/api/admin/outbox/retry` | 管理员 | 重试待投递 Kafka 事件。 |
+| `GET/PATCH` | `/api/admin/settings` | 管理员 | 读取或保存网站信息、logo、favicon 和 AI 助手配置。AI 密钥只显示是否已配置，留空保存时不会覆盖旧密钥。 |
 
 ## 内部接口
 
@@ -163,4 +164,33 @@
 
 | 方法 | 路由 | 权限 | 说明 |
 | --- | --- | --- | --- |
-| `POST` | `/api/assistant` | 前台 | 可选助手接口，依赖 SenseNova 配置。 |
+| `POST` | `/api/assistant/chat` | 公开/用户 | OpenAI 兼容流式聊天接口。游客不落库，登录用户可带 `conversationId` 保存到会话。 |
+| `GET/POST` | `/api/assistant/conversations` | 用户 | 获取登录用户 AI 会话列表或创建新会话。 |
+| `GET/DELETE` | `/api/assistant/conversations/[id]` | 用户 | 读取或删除自己的 AI 会话消息。 |
+
+### `POST /api/assistant/chat`
+
+后台需先在「系统设置」里配置 OpenAI 兼容 API 端点、密钥和模型 ID。若要支持电影封皮识别，请使用支持多模态输入的模型。
+
+请求体示例：
+
+```json
+{
+  "conversationId": 1,
+  "messages": [
+    { "role": "user", "content": "推荐一部适合周末看的科幻片" }
+  ]
+}
+```
+
+带图片时，前端只在本次请求传递 data URL；服务端不会保存原图，只保存文件名、MIME 类型、大小和 `hasImage` 标记。
+
+流式响应示例：
+
+```text
+data: {"text":"推荐"}
+
+data: {"conversationId":1}
+
+data: [DONE]
+```
