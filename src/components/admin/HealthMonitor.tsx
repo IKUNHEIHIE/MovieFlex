@@ -4,9 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import OutboxRetryButton from './OutboxRetryButton';
-import AdminPageHeader from '@/components/shared/AdminPageHeader';
 import AnimatedNumber from '@/components/animated/AnimatedNumber';
-import ChartContainer from '@/components/animated/ChartContainer';
 import styles from '@/app/admin/admin.module.css';
 
 type Status = 'ok' | 'degraded' | 'failed';
@@ -80,103 +78,6 @@ function StatusDot({ status }: { status: Status }) {
   );
 }
 
-function ServiceCard({
-  name,
-  status,
-  detail,
-}: {
-  name: string;
-  status: Status;
-  detail: React.ReactNode;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      whileHover={{ scale: 1.02 }}
-    >
-      <div className={styles.metricCard}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12 }}>
-          <StatusDot status={status} />
-          <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{name}</span>
-        </div>
-        <div className={styles.muted} style={{ fontSize: '0.85rem', display: 'grid', gap: 4 }}>
-          {detail}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-function LatencyGauge({ latency, status }: { latency: number; status: Status }) {
-  const getColor = () => {
-    if (latency < 50) return '#22c55e';
-    if (latency < 100) return '#f59e0b';
-    return '#ef4444';
-  };
-
-  const getPercentage = () => {
-    return Math.min((latency / 200) * 100, 100);
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className={styles.metricCard}>
-        <div style={{ position: 'relative', width: 120, height: 120, margin: '0 auto' }}>
-          <svg width="120" height="120" style={{ transform: 'rotate(-90deg)' }}>
-            <circle
-              cx="60"
-              cy="60"
-              r="50"
-              fill="none"
-              stroke="#e5eaf3"
-              strokeWidth="10"
-            />
-            <motion.circle
-              cx="60"
-              cy="60"
-              r="50"
-              fill="none"
-              stroke={getColor()}
-              strokeWidth="10"
-              strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 50}`}
-              initial={{ strokeDashoffset: 2 * Math.PI * 50 }}
-              animate={{ strokeDashoffset: 2 * Math.PI * 50 * (1 - getPercentage() / 100) }}
-              transition={{ duration: 1, ease: 'easeOut' }}
-            />
-          </svg>
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            textAlign: 'center'
-          }}>
-            <motion.div
-              key={latency}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              style={{ fontSize: 24, fontWeight: 700, color: getColor() }}
-            >
-              <AnimatedNumber value={latency} format={(v) => `${v}`} />
-            </motion.div>
-            <div className={styles.muted} style={{ fontSize: 12 }}>ms</div>
-          </div>
-        </div>
-        <div style={{ marginTop: 12, fontSize: 14, fontWeight: 600, textAlign: 'center' }}>
-          数据库延迟
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 const STATUS_LABEL: Record<Status, string> = {
   ok: '正常运行',
   degraded: '降级',
@@ -229,6 +130,9 @@ export default function HealthMonitor({
 
   const uptime = Math.floor(tick);
   const lastUpdate = new Date(health.timestamp).toLocaleTimeString('en-US', { hour12: false });
+  const statusRank = { ok: 0, degraded: 1, failed: 2 } satisfies Record<Status, number>;
+  const systemStatus: Status = statusRank[health.database.status] > statusRank[health.kafka.status] ? health.database.status : health.kafka.status;
+  const statusText = systemStatus === 'ok' ? 'ONLINE' : systemStatus === 'degraded' ? 'DEGRADED' : 'ALERT';
 
   const chartData = history.map((point) => ({
     time: new Date(point.timestamp).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }),
@@ -236,234 +140,135 @@ export default function HealthMonitor({
     待处理事件: point.pendingEvents,
     影片数: point.movieCount,
   }));
+  const maxMovies = Math.max(1, ...history.map((point) => point.movieCount), health.metrics.movieCount);
+  const dbLatencyScore = Math.min(100, Math.max(0, (1 - health.database.latency / 200) * 100));
+  const kafkaScore = health.kafka.connected ? (health.metrics.pendingEvents > 0 ? 70 : 100) : 0;
+  const healthScore = Math.round(dbLatencyScore * 0.5 + kafkaScore * 0.5);
+  const healthColor = healthScore >= 80 ? '#38bdf8' : healthScore >= 50 ? '#f59e0b' : '#ef4444';
+  const radialData = [{ name: '健康度', value: healthScore, fill: healthColor }];
+  const heatmapData = (history.length ? history : [{ ...health, timestamp: health.timestamp, dbLatency: health.database.latency, pendingEvents: health.metrics.pendingEvents, movieCount: health.metrics.movieCount } as HistoryPoint]).slice(-30).map((point) => ({
+    label: new Date(point.timestamp).toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+    value: point.movieCount,
+    intensity: Math.max(0.12, point.movieCount / maxMovies),
+  }));
+  const alerts = [
+    { label: '数据库状态', value: STATUS_LABEL[health.database.status], tone: health.database.status },
+    { label: 'Kafka 连接', value: health.kafka.connected ? '已连接' : '未连接', tone: health.kafka.connected ? 'ok' : 'failed' as Status },
+    { label: '待投递事件', value: `${health.metrics.pendingEvents}`, tone: health.metrics.pendingEvents > 0 ? 'degraded' as Status : 'ok' as Status },
+    { label: '最近采集任务', value: health.metrics.latestTask.status || '暂无任务', tone: health.metrics.latestTask.status === 'FAILED' ? 'failed' as Status : health.metrics.latestTask.status ? 'ok' as Status : 'degraded' as Status },
+  ];
+  const nodes = [
+    { label: '采集源', detail: health.metrics.latestTask.status || '等待任务', status: health.metrics.latestTask.status === 'FAILED' ? 'failed' as Status : 'ok' as Status },
+    { label: '影片库', detail: `${health.metrics.movieCount.toLocaleString()} 部`, status: 'ok' as Status },
+    { label: '播放事件', detail: '实时写入', status: 'ok' as Status },
+    { label: 'Kafka 队列', detail: `${health.metrics.pendingEvents} 待投递`, status: health.metrics.pendingEvents > 0 ? 'degraded' as Status : health.kafka.status },
+    { label: '统计推荐', detail: health.metrics.latestRecommendation.batchId || '等待批次', status: health.metrics.latestRecommendation.batchId ? 'ok' as Status : 'degraded' as Status },
+  ];
 
   return (
-    <div className={styles.pageStack}>
-      <AdminPageHeader
-        eyebrow="ANALYTICS"
-        title="数据大屏"
-        badge={`实时 · 已刷新 ${uptime}s`}
-      />
+    <div className={styles.commandCenter}>
+      <div className={styles.screenGlow} />
+      <header className={styles.commandHero}>
+        <div>
+          <p>全链路数据监控</p>
+          <h1>MovieFlex 实时运营指挥中心</h1>
+          <span>采集 · 播放 · Kafka · 统计推荐链路实时巡航</span>
+        </div>
+        <div className={styles.commandStatus}>
+          <strong>{statusText}</strong>
+          <span>刷新 {uptime}s · {lastUpdate}</span>
+        </div>
+      </header>
 
-      <section className={styles.metricGrid} style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-        <ServiceCard
-          name="数据库 (MySQL)"
-          status={health.database.status}
-          detail={
-            <>
-              <span>状态：{STATUS_LABEL[health.database.status]}</span>
-              <span>查询延迟：{health.database.latency > 0 ? `${health.database.latency} ms` : '—'}</span>
-              <span>更新时间：{lastUpdate}</span>
-            </>
-          }
-        />
-        <ServiceCard
-          name="消息队列 (Kafka)"
-          status={health.kafka.status}
-          detail={
-            <>
-              <span>状态：{STATUS_LABEL[health.kafka.status]}</span>
-              <span>生产者连接：{health.kafka.connected ? '已连接' : '未连接'}</span>
-              <span>待投递事件：{health.metrics.pendingEvents}</span>
-            </>
-          }
-        />
+      <section className={styles.commandMetricGrid}>
+        <article><span>数据库延迟</span><strong><AnimatedNumber value={health.database.latency} format={(value) => `${value}ms`} /></strong><p>{STATUS_LABEL[health.database.status]}</p></article>
+        <article><span>影片库规模</span><strong><AnimatedNumber value={health.metrics.movieCount} /></strong><p>内容资产实时增长</p></article>
+        <article><span>Kafka 待投递</span><strong><AnimatedNumber value={health.metrics.pendingEvents} /></strong><p>{health.kafka.connected ? '生产者在线' : '生产者离线'}</p></article>
+        <article><span>推荐批次</span><strong>{health.metrics.latestRecommendation.batchId || '待生成'}</strong><p>统计推荐链路</p></article>
       </section>
 
-      <section className={styles.metricGrid} style={{ gridTemplateColumns: '1fr 2fr' }}>
-        <LatencyGauge latency={health.database.latency} status={health.database.status} />
-        <section className={styles.chartPanel}>
-          <ChartContainer title="数据库延迟趋势（最近1小时）" loading={false}>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="latencyGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#4f7df3" stopOpacity={0.8}/>
-                  <stop offset="100%" stopColor="#4f7df3" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="time" stroke="#999" fontSize={12} />
-              <YAxis stroke="#999" fontSize={12} />
-              <Tooltip 
-                contentStyle={{
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(102, 126, 234, 0.2)',
-                  borderRadius: 12,
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="延迟"
-                stroke="#4f7df3"
-                strokeWidth={2}
-                fill="url(#latencyGradient)"
-                dot={{ r: 3, fill: '#4f7df3', strokeWidth: 0 }}
-                activeDot={{ r: 6, fill: '#4f7df3', stroke: '#fff', strokeWidth: 2 }}
-                animationDuration={1500}
-              />
-              </AreaChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </section>
-      </section>
-
-      <section className={styles.metricGrid} style={{ gridTemplateColumns: '1fr 1fr' }}>
-        <section className={styles.chartPanel}>
-        <ChartContainer title="Kafka 待处理事件趋势" loading={false}>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="eventsGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.8}/>
-                  <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="time" stroke="#999" fontSize={12} />
-              <YAxis stroke="#999" fontSize={12} />
-              <Tooltip 
-                contentStyle={{
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(102, 126, 234, 0.2)',
-                  borderRadius: 12,
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="待处理事件"
-                stroke="#f59e0b"
-                strokeWidth={2}
-                fill="url(#eventsGradient)"
-                dot={{ r: 3, fill: '#f59e0b', strokeWidth: 0 }}
-                activeDot={{ r: 6, fill: '#f59e0b', stroke: '#fff', strokeWidth: 2 }}
-                animationDuration={1500}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+      <section className={styles.commandGrid}>
+        <section className={styles.commandPanelLarge}>
+          <h2>链路拓扑</h2>
+          <div className={styles.opsTimeline}>
+            {nodes.map((node, index) => (
+              <div key={node.label} className={styles.signalNode} data-tone={node.status}>
+                <StatusDot status={node.status} />
+                <strong>{node.label}</strong>
+                <span>{node.detail}</span>
+                {index < nodes.length - 1 && <i aria-hidden="true" />}
+              </div>
+            ))}
+          </div>
         </section>
 
-        <section className={styles.chartPanel}>
-        <ChartContainer title="影片库增长趋势" loading={false}>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="time" stroke="#999" fontSize={12} />
-              <YAxis stroke="#999" fontSize={12} />
-              <Tooltip 
-                contentStyle={{
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(102, 126, 234, 0.2)',
-                  borderRadius: 12,
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                }}
-              />
-              <Line
-                type="monotone"
-                dataKey="影片数"
-                stroke="#22c55e"
-                strokeWidth={3}
-                dot={{ r: 4, fill: '#22c55e', strokeWidth: 0 }}
-                activeDot={{ r: 7, fill: '#22c55e', stroke: '#fff', strokeWidth: 2 }}
-                animationDuration={1500}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-        </section>
-      </section>
-
-      <section className={styles.metricGrid}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <div className={styles.metricCard}>
-            <span>影片库</span>
-            <strong>
-              <AnimatedNumber value={health.metrics.movieCount} />
-            </strong>
-          </div>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className={styles.metricCard}>
-            <span>最近采集</span>
-            <strong>
-              {health.metrics.latestTask.status ? (
-                <>
-                  <StatusDot status={health.metrics.latestTask.status === 'SUCCEEDED' ? 'ok' : health.metrics.latestTask.status === 'FAILED' ? 'failed' : 'degraded'} />
-                  {health.metrics.latestTask.status}
-                </>
-              ) : '暂无'}
-            </strong>
-          </div>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <div className={styles.metricCard}>
-            <span>推荐批次</span>
-            <strong>
-              {health.metrics.latestRecommendation.batchId || '暂无'}
-            </strong>
-          </div>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <div className={styles.metricCard}>
-            <span>待投递事件</span>
-            <strong style={{ color: health.metrics.pendingEvents > 0 ? '#a86900' : undefined }}>
-              <AnimatedNumber value={health.metrics.pendingEvents} />
-            </strong>
-          </div>
-        </motion.div>
-      </section>
-
-      <section className={styles.panel}>
-        <h2>Kafka 事件队列</h2>
-          <OutboxRetryButton />
-      </section>
-
-      <section className={styles.panel}>
-        <h2>最近分析结果</h2>
-          {analytics.length ? (
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead>
-                  <tr><th>指标</th><th>键</th><th>数值</th><th>时间窗口</th><th>批次</th></tr>
-                </thead>
-                <tbody>
-                  {analytics.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.metricType}</td>
-                      <td>{item.metricKey}</td>
-                      <td>{Number(item.metricValue).toFixed(2)}</td>
-                      <td>{item.timeWindow}</td>
-                      <td>{item.batchId}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <section className={styles.alertTower}>
+          <h2>告警中心</h2>
+          {alerts.map((alert) => (
+            <div key={alert.label} data-tone={alert.tone}>
+              <span>{alert.label}</span>
+              <strong>{alert.value}</strong>
             </div>
-          ) : (
-            <p className={styles.muted}>尚未写入 Spark 分析结果。Kafka 与 Spark 的运行状态需要由部署侧任务写入后才能显示。</p>
-          )}
+          ))}
+          <OutboxRetryButton />
+        </section>
+      </section>
+
+      <section className={styles.commandGridThree}>
+        <section className={styles.commandPanel}>
+          <h2>系统健康雷达</h2>
+          <div className={styles.healthRadar}>
+            {[
+              ['DB', health.database.status],
+              ['Kafka', health.kafka.status],
+              ['采集', alerts[3].tone],
+              ['队列', alerts[2].tone],
+              ['推荐', health.metrics.latestRecommendation.batchId ? 'ok' : 'degraded'],
+            ].map(([label, tone]) => <span key={label} data-tone={tone}>{label}</span>)}
+          </div>
+        </section>
+
+        <section className={styles.commandPanel}>
+          <h2>综合健康度仪表盘</h2>
+          <div style={{ display: 'grid', placeItems: 'center' }}>
+            <svg width="130" height="130" viewBox="0 0 130 130">
+              <defs><linearGradient id="healthGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#38bdf8"/><stop offset="100%" stopColor="#818cf8"/></linearGradient></defs>
+              <circle cx="65" cy="65" r={54} fill="none" stroke="rgba(148,163,184,.1)" strokeWidth={14}/><path d={`M65,${65-54} ${(() => { const pct = healthScore; const rad = (pct / 100) * 2 * Math.PI - Math.PI / 2; return `A54,54 0 ${pct > 50 ? 1 : 0},1 ${65 + 54 * Math.cos(rad)},${65 + 54 * Math.sin(rad)}`; })()}`} fill="none" stroke="url(#healthGrad)" strokeWidth={14} strokeLinecap="round"/>
+              <text x="65" y="58" textAnchor="middle" dominantBaseline="central" fill="#f8fafc" fontSize="26" fontWeight="800">{healthScore}%</text>
+              <text x="65" y="76" textAnchor="middle" dominantBaseline="central" fill="#7dd3fc" fontSize="8.5">{STATUS_LABEL[systemStatus]}</text>
+            </svg>
+          </div>
+        </section>
+
+        <section className={styles.commandPanel}>
+          <h2>活跃日历热力图</h2>
+          <div className={styles.commandHeatmap}>
+            {heatmapData.map((point) => <span key={point.label} title={`${point.label}: ${point.value}`} style={{ opacity: point.intensity }} />)}
+          </div>
+        </section>
+
+        <section className={styles.commandPanel}>
+          <h2>最近分析结果</h2>
+          <div className={styles.commandList}>
+            {analytics.slice(0, 5).map((item) => <div key={item.id}><span>{item.metricType}</span><strong>{Number(item.metricValue).toFixed(2)}</strong></div>)}
+            {analytics.length === 0 && <p>等待 Spark 分析结果写入。</p>}
+          </div>
+        </section>
+      </section>
+
+      <section className={styles.commandGridThree}>
+        <section className={styles.commandPanel}>
+          <h2>数据库延迟趋势</h2>
+          <ResponsiveContainer width="100%" height={240}><AreaChart data={chartData}><defs><linearGradient id="commandLatency" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#38bdf8" stopOpacity={0.78}/><stop offset="100%" stopColor="#38bdf8" stopOpacity={0.05}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,.18)" /><XAxis dataKey="time" stroke="#8aa4c4" fontSize={11} /><YAxis stroke="#8aa4c4" fontSize={11} /><Tooltip contentStyle={{ background: '#0f1b33', border: '1px solid rgba(56,189,248,.25)', borderRadius: 10, color: '#e0f2fe' }} /><Area type="monotone" dataKey="延迟" stroke="#38bdf8" fill="url(#commandLatency)" strokeWidth={2} /></AreaChart></ResponsiveContainer>
+        </section>
+        <section className={styles.commandPanel}>
+          <h2>Kafka 堆积趋势</h2>
+          <ResponsiveContainer width="100%" height={240}><AreaChart data={chartData}><defs><linearGradient id="commandEvents" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#f59e0b" stopOpacity={0.76}/><stop offset="100%" stopColor="#f59e0b" stopOpacity={0.05}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,.18)" /><XAxis dataKey="time" stroke="#8aa4c4" fontSize={11} /><YAxis stroke="#8aa4c4" fontSize={11} /><Tooltip contentStyle={{ background: '#0f1b33', border: '1px solid rgba(245,158,11,.25)', borderRadius: 10, color: '#fef3c7' }} /><Area type="monotone" dataKey="待处理事件" stroke="#f59e0b" fill="url(#commandEvents)" strokeWidth={2} /></AreaChart></ResponsiveContainer>
+        </section>
+        <section className={styles.commandPanel}>
+          <h2>内容库增长趋势</h2>
+          <ResponsiveContainer width="100%" height={240}><LineChart data={chartData}><CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,.18)" /><XAxis dataKey="time" stroke="#8aa4c4" fontSize={11} /><YAxis stroke="#8aa4c4" fontSize={11} /><Tooltip contentStyle={{ background: '#0f1b33', border: '1px solid rgba(34,197,94,.25)', borderRadius: 10, color: '#dcfce7' }} /><Line type="monotone" dataKey="影片数" stroke="#22c55e" strokeWidth={3} dot={{ r: 3, fill: '#22c55e' }} /></LineChart></ResponsiveContainer>
+        </section>
       </section>
     </div>
   );
