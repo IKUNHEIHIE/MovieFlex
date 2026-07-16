@@ -71,6 +71,24 @@ describe('admin style unification', () => {
     expect(source).toContain('heatmapGrid');
   });
 
+  it('renders the admin dashboard as a light operations command center with a live latency scan', () => {
+    const healthMonitor = readFileSync(join(process.cwd(), 'src/components/admin/HealthMonitor.tsx'), 'utf8');
+    const css = adminCss();
+
+    expect(healthMonitor).toContain('MovieFlex 实时运营指挥中心');
+    expect(healthMonitor).toContain('全链路数据监控');
+    expect(healthMonitor).toContain('链路拓扑');
+    expect(healthMonitor).toContain('告警中心');
+    expect(healthMonitor).toContain('系统健康雷达');
+    expect(healthMonitor).toContain('活跃日历热力图');
+    expect(healthMonitor).toContain('latencyScanKey');
+    expect(healthMonitor).toContain('commandChartScan');
+    for (const className of ['commandCenter', 'commandCenterLight', 'commandHero', 'commandMetricGrid', 'signalNode', 'alertTower', 'opsTimeline', 'screenGlow', 'commandChartScan']) {
+      expect(css).toContain(`.${className}`);
+    }
+    expect(css).toContain('@media (prefers-reduced-motion: reduce)');
+  });
+
   it('does not import the unfinished dark admin theme or helper components', () => {
     for (const page of adminPages) {
       const source = readFileSync(join(process.cwd(), page), 'utf8');
