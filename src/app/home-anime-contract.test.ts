@@ -7,6 +7,7 @@ const homePage = readFileSync(join(root, 'src/app/page.tsx'), 'utf8');
 const rootLayout = readFileSync(join(root, 'src/app/layout.tsx'), 'utf8');
 const adminLayout = readFileSync(join(root, 'src/app/admin/layout.tsx'), 'utf8');
 const carousel = readFileSync(join(root, 'src/components/home/PopularCarousel.tsx'), 'utf8');
+const carouselCss = readFileSync(join(root, 'src/components/home/PopularCarousel.module.css'), 'utf8');
 const mascot = readFileSync(join(root, 'src/components/mascot/FurinaMascot.tsx'), 'utf8');
 
 describe('anime public home contract', () => {
@@ -27,6 +28,16 @@ describe('anime public home contract', () => {
     expect(carousel).toContain('立即播放');
     expect(carousel).toContain('详情介绍');
     expect(carousel).toContain('?autoplay=1');
+  });
+
+  it('animates popular carousel slide changes without hard cuts', () => {
+    expect(carousel).toContain('previousMovie');
+    expect(carousel).toContain('styles.previousBackdrop');
+    expect(carousel).toContain('styles.activeBackdrop');
+    expect(carousel).toContain('key={activeMovie.id}');
+    expect(carouselCss).toContain('@keyframes backdropIn');
+    expect(carouselCss).toContain('@keyframes backdropOut');
+    expect(carouselCss).toContain('@media (prefers-reduced-motion: reduce)');
   });
 
   it('keeps pointer cancellation non-interactive and supports one keyboard activation path', () => {

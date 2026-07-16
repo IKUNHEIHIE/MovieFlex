@@ -22,11 +22,21 @@ export default function PopularCarousel({ movies }: { movies: CarouselMovie[] })
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [previousMovie, setPreviousMovie] = useState<CarouselMovie | null>(null);
+  const transitionTimer = useRef<number | null>(null);
   const swipeStart = useRef<number | null>(null);
   const hasSlides = movies.length > 0;
   const paused = isHovered || isFocused;
   const activeMovie = movies[activeIndex] ?? movies[0];
-  const goTo = (index: number) => setActiveIndex((index + movies.length) % movies.length);
+  const goTo = (index: number) => {
+    if (movies.length < 1) return;
+    setActiveIndex((current) => {
+      const nextIndex = (index + movies.length) % movies.length;
+      if (nextIndex === current) return current;
+      if (!reducedMotion) setPreviousMovie(movies[current] ?? null);
+      return nextIndex;
+    });
+  };
   const next = () => { if (movies.length > 1) goTo(activeIndex + 1); };
   const previous = () => { if (movies.length > 1) goTo(activeIndex - 1); };
 
@@ -49,6 +59,15 @@ export default function PopularCarousel({ movies }: { movies: CarouselMovie[] })
     return () => window.clearInterval(timer);
   }, [activeIndex, paused, reducedMotion, movies.length]);
 
+  useEffect(() => {
+    if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
+    if (reducedMotion || !previousMovie) return;
+    transitionTimer.current = window.setTimeout(() => setPreviousMovie(null), 720);
+    return () => {
+      if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
+    };
+  }, [activeIndex, previousMovie, reducedMotion]);
+
   if (!hasSlides || !activeMovie) {
     return <section className={styles.emptyHero}><p>热门影片正在登场</p><h1>稍候片刻，舞台即将亮起。</h1></section>;
   }
@@ -58,11 +77,12 @@ export default function PopularCarousel({ movies }: { movies: CarouselMovie[] })
     onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)} onFocus={() => setIsFocused(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setIsFocused(false); }}
     onPointerDown={(event) => { swipeStart.current = event.clientX; }}
     onPointerUp={(event) => { const start = swipeStart.current; swipeStart.current = null; if (start === null) return; const distance = event.clientX - start; if (Math.abs(distance) >= 44) distance < 0 ? next() : previous(); }}>
-    {activeMovie.picUrl && <img className={styles.backdrop} src={activeMovie.picUrl} alt="" aria-hidden="true" />}
+    {previousMovie?.picUrl && <img className={`${styles.backdropLayer} ${styles.previousBackdrop}`} src={previousMovie.picUrl} alt="" aria-hidden="true" />}
+    {activeMovie.picUrl && <img className={`${styles.backdropLayer} ${styles.activeBackdrop}`} src={activeMovie.picUrl} alt="" aria-hidden="true" />}
     <div className={styles.veil} />
     <div className={styles.wave} aria-hidden="true" />
     <div className={styles.frame} aria-hidden="true"><span>HYDRO STAGE</span><span>{String(activeIndex + 1).padStart(2, '0')} / {String(movies.length).padStart(2, '0')}</span></div>
-    <div className={styles.content}>
+    <div key={activeMovie.id} className={`${styles.content} ${styles.contentMotion}`}>
       <p className={styles.eyebrow}>本周人气放映</p>
       <h1>{activeMovie.title}</h1>
       <div className={styles.details}><strong>{formatMovieScore(activeMovie.score)}</strong><span>{activeMovie.typeName || '热门影片'}</span>{activeMovie.year && <span>{activeMovie.year}</span>}</div>
