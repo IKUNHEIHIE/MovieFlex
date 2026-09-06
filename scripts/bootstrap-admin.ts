@@ -12,6 +12,7 @@
  *
  * Required env: DATABASE_URL
  */
+import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import prisma from '../src/lib/prisma';
 
