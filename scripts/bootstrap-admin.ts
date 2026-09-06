@@ -13,18 +13,14 @@
  * Required env: DATABASE_URL
  */
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-
-function usageAndExit() {
-  console.error('Usage: npx tsx scripts/bootstrap-admin.ts <username> <email> <password>');
-  process.exit(2);
-}
+import prisma from '../src/lib/prisma';
 
 async function main() {
-  const [, username, email, password] = process.argv;
-  if (!username || !email || !password) usageAndExit();
+  const args = process.argv.slice(2);
+  const username = args[0] || 'admin';
+  const email = args[1] || 'admin@movieflex.com';
+  const password = args[2] || 'admin123456';
+
   if (password.length < 6) {
     console.error('Error: password must be at least 6 characters.');
     process.exit(2);
