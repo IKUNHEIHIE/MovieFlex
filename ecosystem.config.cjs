@@ -4,7 +4,7 @@ module.exports = {
       name: 'movieflex',
       cwd: __dirname,
       script: 'node_modules/next/dist/bin/next',
-      args: 'start --hostname 0.0.0.0 -p 3060',
+      args: 'start --hostname :: -p 3060',
       env: {
         NODE_ENV: 'production',
       },
