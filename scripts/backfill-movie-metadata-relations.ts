@@ -22,8 +22,8 @@ async function main() {
     const areas = movies.flatMap((movie) => splitMetadataValues(movie.area).map((area) => ({ movieId: movie.id, area })));
     const languages = movies.flatMap((movie) => splitMetadataValues(movie.language).map((language) => ({ movieId: movie.id, language })));
     await prisma.$transaction([
-      prisma.movieArea.createMany({ data: areas, skipDuplicates: true }),
-      prisma.movieLanguage.createMany({ data: languages, skipDuplicates: true }),
+      (prisma.movieArea.createMany as any)({ data: areas, skipDuplicates: true }),
+      (prisma.movieLanguage.createMany as any)({ data: languages, skipDuplicates: true }),
     ]);
     processed += movies.length;
     console.log(`Processed ${processed} movies`);
