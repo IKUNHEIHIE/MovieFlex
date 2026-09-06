@@ -1,0 +1,355 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  avatarUrl String? @map("avatar_url")
+  role String @default(USER)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  favorites    UserFavorite[]
+  ratings      UserRating[]
+  watchHistory WatchHistory[]
+  aiConversations AiConversation[]
+
+  @@map("users")
+}
+
+model MovieArea {
+  movieId Int @map("movie_id")
+  area    String
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, area])
+  @@index([area], name: "idx_movie_area")
+  @@map("movie_areas")
+}
+
+model MovieLanguage {
+  movieId  Int @map("movie_id")
+  language String
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, language])
+  @@index([language], name: "idx_movie_language")
+  @@map("movie_languages")
+}
+
+
+model Movie {
+  id          Int       @id @default(autoincrement())
+  vodId       Int @map("vod_id")
+  sourceKey   String @map("source_key")
+  title       String
+  titleEn     String? @map("title_en")
+  typeId      Int @map("type_id")
+  typeName    String? @map("type_name")
+  picUrl      String? @map("pic_url")
+  director    String?
+  actors      String?
+  area        String?
+  language    String?
+  areaClean   String? @map("area_clean")
+  languageClean String? @map("language_clean")
+  year        Int?
+  remarks     String?
+  description String?
+  playFrom    String? @map("play_from")
+  playUrl     String? @map("play_url")
+  score       Decimal @default(0)
+  scoreCount  Int @default(0) @map("score_count")
+  viewCount   Int @default(0) @map("view_count")
+  sourceTime  DateTime? @map("source_time")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  favorites    UserFavorite[]
+  ratings      UserRating[]
+  watchHistory WatchHistory[]
+  areas        MovieArea[]
+  languages    MovieLanguage[]
+
+  @@unique([sourceKey, vodId], name: "uk_source_vod")
+  @@index([typeId], name: "idx_type")
+  @@index([area], name: "idx_area")
+  @@index([year], name: "idx_year")
+  @@index([language], name: "idx_language")
+  @@index([areaClean], name: "idx_area_clean")
+  @@index([languageClean], name: "idx_language_clean")
+  @@map("movies")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  parentId  Int? @map("parent_id")
+  sortOrder Int @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  parent   Category?  @relation("CategoryParent", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryParent")
+
+  @@map("categories")
+}
+
+model UserFavorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int @map("user_id")
+  movieId   Int @map("movie_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId], name: "uk_user_movie")
+  @@map("user_favorites")
+}
+
+model UserRating {
+  id        Int      @id @default(autoincrement())
+  userId    Int @map("user_id")
+  movieId   Int @map("movie_id")
+  rating    Decimal
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId], name: "uk_user_movie_rating")
+  @@map("user_ratings")
+}
+
+model WatchHistory {
+  id            Int      @id @default(autoincrement())
+  userId        Int @map("user_id")
+  movieId       Int @map("movie_id")
+  episode       String?
+  watchDuration Int @default(0) @map("watch_duration")
+  totalDuration Int @default(0) @map("total_duration")
+  progress      Decimal @default(0)
+  lastWatchedAt DateTime @default(now()) @map("last_watched_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId, episode], name: "uk_user_movie_ep")
+  @@index([userId, lastWatchedAt], name: "idx_user_time")
+  @@map("watch_history")
+}
+
+model CollectSource {
+  id            Int          @id @default(autoincrement())
+  name          String
+  apiUrl        String @map("api_url")
+  sourceKey     String       @unique @map("source_key")
+  format String @default(JSON)
+  isActive      Boolean @default(true) @map("is_active")
+  lastSync      DateTime? @map("last_sync")
+  createdAt     DateTime @default(now()) @map("created_at")
+  playerConfigs Json? @map("player_configs")
+
+  @@map("collect_sources")
+}
+
+model CollectTask {
+  id              String            @id
+  sourceKey       String @map("source_key")
+  mode String
+  status String @default(QUEUED)
+  targetRecords   Int? @map("target_records")
+  totalPages      Int @default(0) @map("total_pages")
+  pagesProcessed  Int @default(0) @map("pages_processed")
+  nextPage        Int @default(1) @map("next_page")
+  currentPage     Int @default(0) @map("current_page")
+  fetched         Int @default(0)
+  saved           Int @default(0)
+  errorMessage    String? @map("error_message")
+  createdAt       DateTime @default(now()) @map("created_at")
+  startedAt       DateTime? @map("started_at")
+  updatedAt       DateTime @default(now()) @updatedAt @map("updated_at")
+  heartbeatAt     DateTime? @map("heartbeat_at")
+  pausedAt        DateTime? @map("paused_at")
+  finishedAt      DateTime? @map("finished_at")
+  leaseToken      String? @map("lease_token")
+  leaseExpiresAt  DateTime? @map("lease_expires_at")
+
+  @@index([sourceKey], name: "source_key")
+  @@index([status], name: "status")
+  @@index([status, createdAt], name: "idx_collect_task_status_created")
+  @@map("collect_tasks")
+}
+
+
+
+
+
+model CategoryMapping {
+  id              Int           @id @default(autoincrement())
+  sourceKey       String @map("source_key")
+  sourceTypeId    Int @map("source_type_id")
+  sourceTypeName  String @map("source_type_name")
+  localCategoryId Int? @map("local_category_id")
+  status String @default(PENDING_REVIEW)
+  isAuto          Boolean @default(true) @map("is_auto")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@unique([sourceKey, sourceTypeId], name: "uk_source_type")
+  @@map("category_mappings")
+}
+
+model SystemSetting {
+  key       String   @id
+  value     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
+
+model AiConversation {
+  id        Int      @id @default(autoincrement())
+  userId    Int @map("user_id")
+  title     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages AiMessage[]
+
+  @@index([userId, updatedAt], name: "idx_ai_conversation_user_updated")
+  @@map("ai_conversations")
+}
+
+model AiMessage {
+  id             Int      @id @default(autoincrement())
+  conversationId Int @map("conversation_id")
+  role           String
+  content        String
+  hasImage       Boolean @default(false) @map("has_image")
+  imageFileName  String? @map("image_file_name")
+  imageMimeType  String? @map("image_mime_type")
+  imageSize      Int? @map("image_size")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  conversation AiConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt], name: "idx_ai_message_conversation_created")
+  @@map("ai_messages")
+}
+
+model Theme {
+  id          Int      @id @default(autoincrement())
+  name        String
+  themeKey    String   @unique @map("theme_key")
+  author      String?
+  version     String?
+  description String?
+  isBuiltIn   Boolean @default(false) @map("is_built_in")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("themes")
+}
+
+model Recommendation {
+  id        Int      @id @default(autoincrement())
+  userId    Int @map("user_id")
+  movieId   Int @map("movie_id")
+  score     Decimal
+  rankPos   Int @map("rank_pos")
+  batchId   String @map("batch_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId, batchId], name: "idx_user_batch")
+  @@index([batchId], name: "idx_batch")
+  @@map("recommendations")
+}
+
+model AnalyticsResult {
+  id          Int      @id @default(autoincrement())
+  metricType  String @map("metric_type")
+  metricKey   String @map("metric_key")
+  metricValue Decimal @map("metric_value")
+  extraData   Json? @map("extra_data")
+  timeWindow  String @map("time_window")
+  reportDate  DateTime @map("report_date")
+  batchId     String @map("batch_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([metricType, reportDate], name: "idx_type_date")
+  @@index([batchId], name: "idx_analytics_batch")
+  @@map("analytics_results")
+}
+
+model EventOutbox {
+  id           String    @id
+  topic        String
+  payload      Json
+  status       String @default("PENDING")
+  attempts     Int @default(0)
+  lastError    String? @map("last_error")
+  availableAt  DateTime @default(now()) @map("available_at")
+  deliveredAt  DateTime? @map("delivered_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([status, availableAt], name: "idx_outbox_status_available")
+  @@map("event_outbox")
+}
+
+model DoubanMovie {
+  id            Int      @id @default(autoincrement())
+  name          String? @map("电影名称")
+  link          String? @map("电影链接")
+  director      String? @map("导演")
+  scriptwriter  String? @map("编剧")
+  actors        String? @map("主演")
+  genre         String? @map("类型")
+  country       String? @map("制片国家/地区")
+  language      String? @map("语言")
+  releaseDate   String? @map("上映日期")
+  duration      String? @map("片长")
+  alias         String? @map("又名")
+  imdb          String? @map("IMDb")
+  rating        Float? @map("豆瓣评分")
+  ratingCount   Int? @map("评价人数")
+  star5         Float? @map("五星比例")
+  star4         Float? @map("四星比例")
+  star3         Float? @map("三星比例")
+  star2         Float? @map("二星比例")
+  star1         Float? @map("一星比例")
+  summary       String? @map("剧情简介")
+
+  @@map("douban_movies")
+}
+
+model DailyStats {
+  id             Int      @id @default(autoincrement())
+  date           DateTime
+  dimension      String @map("dimension")
+  dimensionId    Int? @map("dimension_id")
+  totalViews     Int @default(0) @map("total_views")
+  userViews      Int @default(0) @map("user_views")
+  guestViews     Int @default(0) @map("guest_views")
+  uniqueUsers    Int @default(0) @map("unique_users")
+  totalFavorites Int @default(0) @map("total_favorites")
+  avgProgress    Decimal @default(0) @map("avg_progress")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@unique([date, dimension, dimensionId], name: "uk_dimension_date")
+  @@index([dimension, date], name: "idx_dimension_date")
+  @@index([date], name: "idx_date")
+  @@map("daily_stats")
+}

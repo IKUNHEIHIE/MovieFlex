@@ -1,13 +1,18 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 
 // 从数据库连接 URL 中提取连接信息
-// DATABASE_URL 格式: mysql://user:password@host:port/database
+// SQLite: file:./prisma/dev.db
+// MySQL: mysql://user:password@host:port/database
 function createAdapter() {
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error('DATABASE_URL is not set');
 
-  // 使用连接字符串直接传给 PrismaMariaDb adapter
+  if (url.startsWith('file:') || url.endsWith('.db') || url.startsWith('sqlite:')) {
+    return new PrismaBetterSqlite3({ url });
+  }
+
   return new PrismaMariaDb(url);
 }
 
