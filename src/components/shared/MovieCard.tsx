@@ -26,7 +26,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
       }}>
         <div style={{ position: 'relative', aspectRatio: '2/3', background: '#222' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={movie.picUrl || ''} alt={movie.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img src={movie.picUrl || ''} alt={movie.title} referrerPolicy="no-referrer" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           <div style={{
             position: 'absolute',
             top: '8px',
