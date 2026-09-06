@@ -10,7 +10,7 @@ export default async function AdminUsersPage() {
   return (
     <>
       <AdminPageHeader eyebrow="USERS" title="用户管理" badge={`${totalCount} 位用户`} />
-      <UserManager initialUsers={users.map(({ id, username, email, role, _count, createdAt }) => ({ id, username, email, role, favoritesCount: _count.favorites, watchHistoryCount: _count.watchHistory, createdAt: createdAt.toISOString() }))} totalCount={totalCount} />
+      <UserManager initialUsers={users.map(({ id, username, email, role, _count, createdAt }) => ({ id, username, email, role: role as 'USER' | 'ADMIN', favoritesCount: _count.favorites, watchHistoryCount: _count.watchHistory, createdAt: createdAt.toISOString() }))} totalCount={totalCount} />
     </>
   );
 }
