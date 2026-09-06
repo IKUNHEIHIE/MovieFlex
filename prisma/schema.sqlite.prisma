@@ -12,7 +12,7 @@ model User {
   email     String   @unique
   password  String
   avatarUrl String? @map("avatar_url")
-  role String @default(USER)
+  role String @default("USER")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -155,7 +155,7 @@ model CollectSource {
   name          String
   apiUrl        String @map("api_url")
   sourceKey     String       @unique @map("source_key")
-  format String @default(JSON)
+  format String @default("JSON")
   isActive      Boolean @default(true) @map("is_active")
   lastSync      DateTime? @map("last_sync")
   createdAt     DateTime @default(now()) @map("created_at")
@@ -168,7 +168,7 @@ model CollectTask {
   id              String            @id
   sourceKey       String @map("source_key")
   mode String
-  status String @default(QUEUED)
+  status String @default("QUEUED")
   targetRecords   Int? @map("target_records")
   totalPages      Int @default(0) @map("total_pages")
   pagesProcessed  Int @default(0) @map("pages_processed")
@@ -202,7 +202,7 @@ model CategoryMapping {
   sourceTypeId    Int @map("source_type_id")
   sourceTypeName  String @map("source_type_name")
   localCategoryId Int? @map("local_category_id")
-  status String @default(PENDING_REVIEW)
+  status String @default("PENDING_REVIEW")
   isAuto          Boolean @default(true) @map("is_auto")
   createdAt       DateTime @default(now()) @map("created_at")
 
